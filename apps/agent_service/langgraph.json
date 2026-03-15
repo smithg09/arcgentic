@@ -1,0 +1,13 @@
+{
+    "python_version": "3.12",
+    "dockerfile_lines": [],
+    "dependencies": [
+        "."
+    ],
+    "graphs": {
+        "architect": "./agent/graph.py:graph",
+        "supervisor": "./agent/graph.py:supervisor_graph",
+        "learning": "./agent/graph.py:learning_graph"
+    },
+    "env": ".env"
+}

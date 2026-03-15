@@ -1,0 +1,13 @@
+{
+  "name": "agent_service",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "python3 -m venv .venv && .venv/bin/pip install -r requirements.txt",
+    "langdev": "npx @langchain/langgraph-cli dev --port 8123 --no-browser",
+    "dev": "pnpm run setup && .venv/bin/python app.py",
+    "build": "echo 'No build required for Python API'",
+    "lint": "echo 'Linting not configured'",
+    "start": "pnpm run dev"
+  }
+}

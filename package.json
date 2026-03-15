@@ -1,0 +1,21 @@
+{
+  "name": "arcgentic-platform",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write .",
+    "check-types": "turbo run check-types",
+    "setup": "turbo run setup"
+  },
+  "devDependencies": {
+    "prettier": "^3.7.4",
+    "prettier-plugin-svelte": "^3.4.0",
+    "turbo": "^2.8.17"
+  },
+  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=18"
+  }
+}
