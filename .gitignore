@@ -35,3 +35,7 @@ dist
 __pycache__
 .next
 .env
+
+conver.out
+build
+.turbo

@@ -31,6 +31,22 @@
     },
     "setup": {
       "cache": false
+    },
+    "gqlgen": {
+      "dependsOn": [
+        "^gqlgen"
+      ],
+      "outputs": [
+        "cmd/core/graph/**"
+      ]
+    },
+    "sqlc": {
+      "dependsOn": [
+        "^sqlc"
+      ],
+      "outputs": [
+        "internal/module/**/querier/**"
+      ]
     }
   }
 }

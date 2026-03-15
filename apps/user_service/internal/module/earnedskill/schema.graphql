@@ -1,0 +1,21 @@
+type EarnedSkills @goModel(model: "github.com/smithg09/core/internal/module/earnedskill.EarnedSkill") {
+  user_id: Uuid! @goField(name: "UserID")
+  skills: [String!]!
+  session_ids: [Uuid!]! @goField(name: "SessionIDs")
+  created_at: Time!
+  updated_at: Time!
+}
+
+input UpsertEarnedSkillsDto @goModel(model: "github.com/smithg09/core/internal/module/earnedskill.UpsertDto") {
+  user_id: Uuid! @goField(name: "UserID")
+  skills: [String!]!
+  session_ids: [Uuid!]! @goField(name: "SessionIDs")
+}
+
+extend type Query {
+  getEarnedSkills(user_id: Uuid!): EarnedSkills
+}
+
+extend type Mutation {
+  upsertEarnedSkills(data: UpsertEarnedSkillsDto!): EarnedSkills
+}

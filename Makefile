@@ -95,7 +95,7 @@ dev:
 	else \
 		echo "$(BLUE)PostgreSQL is already running$(NC)"; \
 	fi
-	@yarn dev
+	@pnpm dev
 
 dev-backend:
 	@echo "$(GREEN)Starting Go backend...$(NC)"
@@ -108,11 +108,11 @@ dev-backend:
 	else \
 		echo "$(BLUE)PostgreSQL is already running$(NC)"; \
 	fi
-	@yarn run dev --filter=core
+	@pnpm run dev --filter=core
 
 dev-frontend:
 	@echo "$(GREEN)Starting SvelteKit frontend...$(NC)"
-	@yarn dev --filter=web
+	@pnpm dev --filter=web
 
 .PHONY: dev dev-backend dev-frontend
 
@@ -171,11 +171,11 @@ migrate-version:
 #
 gqlgen:
 	@echo "$(GREEN)Generating GraphQL code...$(NC)"
-	@yarn run gqlgen
+	@pnpm run gqlgen
 
 sqlc:
 	@echo "$(GREEN)Generating SQLC queries...$(NC)"
-	@yarn run sqlc
+	@pnpm run sqlc
 
 mock:
 	@echo "$(GREEN)Generating mock for $(name)...$(NC)"
@@ -198,16 +198,16 @@ mock:
 #
 build:
 	@echo "$(GREEN)Building all services...$(NC)"
-	@yarn build
+	@pnpm build
 
 build-backend:
 	@echo "$(GREEN)Building Go backend...$(NC)"
-	@yarn build --filter=core
+	@pnpm build --filter=core
 	@echo "$(BLUE)Binary created at $(BACKEND_DIR)/build/$(NAME)$(NC)"
 
 build-frontend:
 	@echo "$(GREEN)Building SvelteKit frontend...$(NC)"
-	@yarn build --filter=web
+	@pnpm build --filter=web
 
 .PHONY: build build-backend build-frontend
 
@@ -216,15 +216,15 @@ build-frontend:
 #
 test:
 	@echo "$(GREEN)Running all tests...$(NC)"
-	@yarn test
+	@pnpm test
 
 test-backend:
 	@echo "$(GREEN)Running Go tests...$(NC)"
-	@yarn run test --filter=core
+	@pnpm run test --filter=core
 
 test-frontend:
 	@echo "$(GREEN)Running Go tests...$(NC)"
-	@yarn run test --filter=web
+	@pnpm run test --filter=web
 
 .PHONY: test test-backend
 
@@ -233,20 +233,20 @@ test-frontend:
 #
 lint:
 	@echo "$(GREEN)Running linters...$(NC)"
-	@yarn lint
+	@pnpm lint
 
 format:
 	@echo "$(GREEN)Formatting code...$(NC)"
-	@yarn format
+	@pnpm format
 
 format-check:
 	@echo "$(GREEN)Checking code format...$(NC)"
-	@yarn format:check
+	@pnpm format:check
 	@cd $(BACKEND_DIR) && test -z "$(shell gofmt -l .)" || (echo "Go files need formatting. Run 'make format'" && exit 1)
 
 check-types:
 	@echo "$(GREEN)Type checking...$(NC)"
-	@yarn check-types
+	@pnpm check-types
 
 .PHONY: lint format format-check check-types
 
@@ -275,7 +275,7 @@ clean-all: clean
 #
 setup:
 	@echo "$(GREEN)Setting up project...$(NC)"
-	@yarn install
+	@pnpm install
 	@make db-up
 	@sleep 3
 	@cd $(BACKEND_DIR) && cp .env.example .env || true
