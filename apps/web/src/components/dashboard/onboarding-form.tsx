@@ -23,17 +23,19 @@ export function OnboardingForm() {
 
   return (
     <div className="mx-auto max-w-md">
-      <div className="animate-in-up text-center mb-8">
-        <div className="mx-auto mb-6 flex justify-center">
-          <Logo className="h-14 w-14 shadow-md ring-1 ring-border/10" />
+      <div className="motion-hero text-center mb-10">
+        <div className="mx-auto mb-8 flex justify-center">
+          <Logo className="h-16 w-16 shadow-lg" />
         </div>
-        <h1 className="text-title text-foreground mb-2">Welcome to Arcgentic</h1>
-        <p className="text-body text-muted-foreground">
+        <h1 className="text-title text-foreground mb-3">
+          Welcome to Arcgentic
+        </h1>
+        <p className="text-body text-muted-foreground font-light">
           Set up your profile to get started with personalized learning.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 animate-in-up" style={{ animationDelay: '100ms' }}>
+      <form onSubmit={handleSubmit} className="space-y-5 motion-hero" style={{ animationDelay: '150ms' }}>
         <div>
           <label htmlFor="name" className="text-caption font-medium text-foreground block mb-1.5">
             Name
@@ -76,7 +78,7 @@ export function OnboardingForm() {
 
         <Button
           type="submit"
-          className="w-full mt-2"
+          className="w-full mt-3 shadow-md shadow-primary/15"
           disabled={createUser.isPending || !name.trim() || !email.trim() || !role.trim()}
         >
           {createUser.isPending ? 'Creating...' : 'Get Started'}

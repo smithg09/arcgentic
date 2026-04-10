@@ -5,7 +5,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ─── Swiss Precision Design System ─── */
+/* ─── Arcgentic — Energetic Confidence Design System ─── */
 
 @theme inline {
   --animate-drift-slow: drift-slow 12s ease-in-out infinite alternate;
@@ -13,9 +13,12 @@
   --animate-float-slow: float-slow 8s ease-in-out infinite alternate;
   --animate-float-fast: float-slow 6s ease-in-out infinite alternate;
   --animate-spin-slow: spin-slow 12s linear infinite;
-  /* Typography */
+
+  /* Typography — Instrument Serif for drama, Space Grotesk for precision */
+  --font-hero-heading: 'Instrument Serif', 'Georgia', serif;
   --font-heading: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', serif;
-  --font-sans: 'Geist Variable', 'Geist', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-sans: 'Space Grotesk', 'Geist Variable', 'Avenir Next', sans-serif;
+
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Mono', ui-monospace, monospace;
 
   /* Color tokens */
@@ -56,101 +59,101 @@
   --radius-4xl: 1.25rem;
 }
 
-/* ─── Light Mode: Cool White Swiss ─── */
+/* ─── Light Mode: Warm Cream + Vermillion ─── */
 :root {
-  /* Backgrounds — cool-tinted whites */
-  --background: oklch(0.98 0.004 250);
-  --foreground: oklch(0.13 0.01 250);
+  /* Backgrounds — warm cream, not sterile white */
+  --background: oklch(0.975 0.007 65);
+  --foreground: oklch(0.14 0.02 45);
 
-  /* Cards — slightly elevated */
-  --card: oklch(1 0.002 250);
-  --card-foreground: oklch(0.13 0.01 250);
+  /* Cards — warm white, slightly elevated */
+  --card: oklch(0.995 0.004 65);
+  --card-foreground: oklch(0.14 0.02 45);
 
   /* Popovers */
-  --popover: oklch(1 0.002 250);
-  --popover-foreground: oklch(0.13 0.01 250);
+  --popover: oklch(0.995 0.004 65);
+  --popover-foreground: oklch(0.14 0.02 45);
 
-  /* Primary — warm amber */
-  --primary: oklch(0.55 0.18 42);
-  --primary-foreground: oklch(0.99 0.002 250);
+  /* Primary — rich vermillion */
+  --primary: oklch(0.52 0.2 25);
+  --primary-foreground: oklch(0.98 0.005 65);
 
-  /* Secondary — warm surface */
-  --secondary: oklch(0.97 0.008 42);
-  --secondary-foreground: oklch(0.2 0.015 42);
+  /* Secondary — warm sand */
+  --secondary: oklch(0.955 0.012 55);
+  --secondary-foreground: oklch(0.22 0.02 45);
 
-  /* Muted — subtle warm */
-  --muted: oklch(0.96 0.006 42);
-  --muted-foreground: oklch(0.5 0.012 42);
+  /* Muted — warm light */
+  --muted: oklch(0.945 0.008 55);
+  --muted-foreground: oklch(0.48 0.015 45);
 
-  /* Accent — warm amber tint */
-  --accent: oklch(0.96 0.01 42);
-  --accent-foreground: oklch(0.45 0.16 42);
+  /* Accent — warm tint */
+  --accent: oklch(0.95 0.014 45);
+  --accent-foreground: oklch(0.45 0.18 25);
 
   /* Destructive */
-  --destructive: oklch(0.55 0.18 42);
+  --destructive: oklch(0.52 0.2 25);
 
-  /* Borders — precise, visible but subtle */
-  --border: oklch(0.88 0.005 42);
-  --input: oklch(0.88 0.005 42);
-  --ring: oklch(0.55 0.18 42);
+  /* Borders — warm-tinted, visible structure */
+  --border: oklch(0.87 0.008 55);
+  --input: oklch(0.87 0.008 55);
+  --ring: oklch(0.52 0.2 25);
 
-  /* Secondary accent — teal for skills/progress/success */
-  --secondary-accent: oklch(0.58 0.15 170);
-  --secondary-accent-foreground: oklch(0.99 0.002 250);
+  /* Secondary accent — deep forest teal */
+  --secondary-accent: oklch(0.48 0.12 175);
+  --secondary-accent-foreground: oklch(0.98 0.005 65);
 
   /* Content type tints */
-  --content-article: oklch(0.97 0.02 25);
-  --content-article-foreground: oklch(0.45 0.18 25);
-  --content-flashcard: oklch(0.96 0.02 170);
-  --content-flashcard-foreground: oklch(0.52 0.12 170);
-  --content-widget: oklch(0.96 0.015 260);
-  --content-widget-foreground: oklch(0.55 0.12 260);
+  --content-article: oklch(0.96 0.02 30);
+  --content-article-foreground: oklch(0.45 0.18 30);
+  --content-flashcard: oklch(0.955 0.02 175);
+  --content-flashcard-foreground: oklch(0.45 0.1 175);
+  --content-widget: oklch(0.955 0.015 260);
+  --content-widget-foreground: oklch(0.5 0.1 260);
 
   --radius: 0.5rem;
 }
 
-/* ─── Dark Mode: Cool Charcoal ─── */
+/* ─── Dark Mode: Inky Warm Depth ─── */
 .dark {
-  --background: oklch(0.14 0.01 250);
-  --foreground: oklch(0.93 0.006 250);
+  --background: oklch(0.15 0 0);
+  --foreground: oklch(0.92 0.008 55);
 
-  --card: oklch(0.18 0.01 250);
-  --card-foreground: oklch(0.93 0.006 250);
+  --card: oklch(0.18 0 0);
+  --card-foreground: oklch(0.92 0.008 55);
 
-  --popover: oklch(0.18 0.01 250);
-  --popover-foreground: oklch(0.93 0.006 250);
+  --popover: oklch(0.17 0.015 45);
+  --popover-foreground: oklch(0.92 0.008 55);
 
-  /* Primary — warm amber for dark */
-  --primary: oklch(0.6 0.15 42);
-  --primary-foreground: oklch(0.99 0.002 250);
+  /* Primary — warm vermillion for dark */
+  --primary: oklch(0.62 0.19 25);
+  --primary-foreground: oklch(0.98 0.005 55);
 
-  --secondary: oklch(0.22 0.012 42);
-  --secondary-foreground: oklch(0.92 0.006 42);
+  --secondary: oklch(0.21 0.015 45);
+  --secondary-foreground: oklch(0.9 0.008 55);
 
-  --muted: oklch(0.22 0.008 42);
-  --muted-foreground: oklch(0.6 0.01 42);
+  --muted: oklch(0.21 0.01 45);
+  --muted-foreground: oklch(0.58 0.012 55);
 
-  --accent: oklch(0.24 0.015 42);
-  --accent-foreground: oklch(0.72 0.14 42);
+  --accent: oklch(0.23 0.018 35);
+  --accent-foreground: oklch(0.72 0.16 25);
 
-  --destructive: oklch(0.6 0.15 42);
+  --destructive: oklch(0.62 0.19 25);
 
-  /* Borders — lighter surfaces for depth */
-  --border: oklch(0.26 0.008 42);
-  --input: oklch(0.28 0.008 42);
-  --ring: oklch(0.6 0.15 42);
+  /* Borders — warm, subtle structure */
+  --border: oklch(0.26 0.012 45);
+  --input: oklch(0.28 0.012 45);
+  --ring: oklch(0.62 0.19 25);
 
-  /* Secondary accent — muted sage for dark (subtle, blends with warm) */
-  --secondary-accent: oklch(0.55 0.08 160);
-  --secondary-accent-foreground: oklch(0.95 0.004 42);
+  /* Secondary accent — teal for dark */
+  --secondary-accent: oklch(0.52 0.1 175);
+  --secondary-accent-foreground: oklch(0.95 0.005 55);
 
-  /* Content type tints — darker warm surfaces */
-  --content-article: oklch(0.22 0.012 42);
-  --content-article-foreground: oklch(0.78 0.12 42);
-  --content-flashcard: oklch(0.22 0.01 160);
-  --content-flashcard-foreground: oklch(0.72 0.08 160);
-  --content-widget: oklch(0.22 0.008 240);
-  --content-widget-foreground: oklch(0.75 0.08 240);
+  /* Content type tints — warm depth */
+  --content-article: oklch(0.21 0.015 35);
+  --content-article-foreground: oklch(0.75 0.12 30);
+  --content-flashcard: oklch(0.21 0.01 175);
+  --content-flashcard-foreground: oklch(0.7 0.08 175);
+  --content-widget: oklch(0.21 0.008 250);
+  --content-widget-foreground: oklch(0.72 0.08 250);
 }
 
 /* ─── Base ─── */
@@ -171,9 +174,9 @@
 
   body {
     @apply bg-background text-foreground;
-    font-size: clamp(1rem, 1.2vw, 1.125rem);
+    font-size: clamp(0.9375rem, 1.1vw, 1.0625rem);
     line-height: 1.6;
-    letter-spacing: -0.003em;
+    letter-spacing: -0.01em;
     font-weight: 400;
   }
 
@@ -184,109 +187,115 @@
 
   /* Selection — vermillion tint */
   ::selection {
-    background: oklch(0.55 0.22 25 / 15%);
+    background: oklch(0.52 0.2 25 / 18%);
   }
+
 
   h1 {
     font-family: var(--font-heading);
-    font-size: clamp(2rem, 5vw, 4rem);
-    line-height: 1.05;
-    letter-spacing: -0.035em;
-    font-weight: 700;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-weight: 400;
   }
 
   h2 {
     font-family: var(--font-heading);
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
-    line-height: 1.15;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1.05;
     letter-spacing: -0.025em;
-    font-weight: 700;
+    font-weight: 400;
   }
 
   h3 {
     font-family: var(--font-heading);
-    font-size: clamp(1.25rem, 2vw, 1.75rem);
-    line-height: 1.25;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    line-height: 1.15;
     letter-spacing: -0.015em;
-    font-weight: 600;
+    font-weight: 400;
   }
 }
 
-/* ─── Typography Scale ─── */
+/* ─── Typography Scale — Dramatic Hierarchy ─── */
 @layer utilities {
   .text-fluid-display {
     font-family: var(--font-heading);
-    font-size: clamp(2rem, 5vw, 4rem);
-    line-height: 1.05;
-    letter-spacing: -0.035em;
-    font-weight: 700;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-weight: 400;
   }
 
   .text-fluid-title {
     font-family: var(--font-heading);
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
-    line-height: 1.15;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1.05;
     letter-spacing: -0.025em;
-    font-weight: 700;
+    font-weight: 400;
   }
 
   .text-fluid-heading {
     font-family: var(--font-heading);
-    font-size: clamp(1.25rem, 2vw, 1.75rem);
-    line-height: 1.25;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    line-height: 1.15;
     letter-spacing: -0.015em;
-    font-weight: 600;
+    font-weight: 400;
   }
 
   .text-fluid-body {
-    font-size: clamp(1rem, 1.2vw, 1.125rem);
+    font-size: clamp(0.9375rem, 1.1vw, 1.0625rem);
     line-height: 1.6;
-    letter-spacing: -0.003em;
+    letter-spacing: -0.01em;
     font-weight: 400;
   }
 
   .text-display {
     font-family: var(--font-heading);
-    font-size: 2rem;
-    line-height: 1.08;
-    letter-spacing: -0.035em;
-    font-weight: 700;
+    font-size: 3rem;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-weight: 400;
   }
 
   .text-title {
     font-family: var(--font-heading);
-    font-size: 1.5625rem;
-    line-height: 1.2;
+    font-size: 2rem;
+    line-height: 1.05;
     letter-spacing: -0.025em;
-    font-weight: 700;
+    font-weight: 400;
   }
 
   .text-heading {
     font-family: var(--font-heading);
-    font-size: 1.25rem;
-    line-height: 1.25;
+    font-size: 1.5rem;
+    line-height: 1.15;
     letter-spacing: -0.015em;
-    font-weight: 600;
+    font-weight: 400;
+  }
+
+  .font-hero-heading {
+    font-family: var(--font-hero-heading);
   }
 
   .text-body {
-    font-size: 1rem;
+    font-size: 0.9375rem;
     line-height: 1.6;
-    letter-spacing: -0.003em;
+    letter-spacing: -0.01em;
     font-weight: 400;
   }
 
   .text-caption {
     font-size: 0.8125rem;
     line-height: 1.5;
-    letter-spacing: 0.002em;
+    letter-spacing: 0em;
     font-weight: 400;
   }
 
   .text-overline {
-    font-size: 0.75rem;
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
     line-height: 1.4;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     font-weight: 600;
   }
@@ -294,11 +303,11 @@
 
 @media (min-width: 64rem) {
   .text-display {
-    font-size: 2.5rem;
+    font-size: 4rem;
   }
 }
 
-/* ─── Motion Tokens ─── */
+/* ─── Motion Tokens — Dramatic ─── */
 @layer base {
   :root {
     --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
@@ -309,10 +318,11 @@
     --duration-fast: 200ms;
     --duration-normal: 300ms;
     --duration-slow: 500ms;
+    --duration-dramatic: 800ms;
   }
 }
 
-/* ─── Animations ─── */
+/* ─── Animations — Bolder Entrances ─── */
 @layer utilities {
   .animate-in-up {
     animation: slide-up var(--duration-slow) var(--ease-out-expo) both;
@@ -323,43 +333,27 @@
   }
 
   .motion-hero {
-    animation: fade-rise 620ms var(--ease-out-expo) both;
+    animation: fade-rise-dramatic var(--duration-dramatic) var(--ease-out-expo) both;
     will-change: transform, opacity;
   }
 
   .motion-soft-in {
-    animation: fade-rise 380ms var(--ease-out-quart) both;
+    animation: fade-rise 420ms var(--ease-out-quart) both;
   }
 
   .motion-chip-in {
-    animation: chip-in 240ms var(--ease-out-quint) both;
+    animation: chip-in 280ms var(--ease-out-quint) both;
   }
 
-  /* Stagger delays for lists */
-  .animate-delay-1 {
-    animation-delay: 40ms;
-  }
-  .animate-delay-2 {
-    animation-delay: 80ms;
-  }
-  .animate-delay-3 {
-    animation-delay: 120ms;
-  }
-  .animate-delay-4 {
-    animation-delay: 160ms;
-  }
-  .animate-delay-5 {
-    animation-delay: 200ms;
-  }
-  .animate-delay-6 {
-    animation-delay: 240ms;
-  }
-  .animate-delay-7 {
-    animation-delay: 280ms;
-  }
-  .animate-delay-8 {
-    animation-delay: 320ms;
-  }
+  /* Stagger delays — wider gaps for more drama */
+  .animate-delay-1 { animation-delay: 60ms; }
+  .animate-delay-2 { animation-delay: 120ms; }
+  .animate-delay-3 { animation-delay: 180ms; }
+  .animate-delay-4 { animation-delay: 240ms; }
+  .animate-delay-5 { animation-delay: 300ms; }
+  .animate-delay-6 { animation-delay: 360ms; }
+  .animate-delay-7 { animation-delay: 420ms; }
+  .animate-delay-8 { animation-delay: 480ms; }
 
   /* Background geometry animations */
   .animate-drift-slow {
@@ -394,26 +388,6 @@
     animation: orb-float-3 18s ease-in-out infinite;
   }
 
-  .animate-ring-expand {
-    animation: ring-expand 12s ease-out infinite;
-  }
-
-  .animate-draw-lines {
-    animation: draw-lines 8s ease-in-out infinite;
-  }
-
-  .animate-scale-pulse {
-    animation: scale-pulse 6s ease-in-out infinite;
-  }
-
-  .animate-bounce-vertical {
-    animation: bounce-vertical 4s ease-in-out infinite;
-  }
-
-  .animate-drift-reversed {
-    animation: drift-reversed 12s ease-in-out infinite alternate;
-  }
-
   .motion-press {
     transition:
       transform var(--duration-fast) var(--ease-out-quart),
@@ -424,7 +398,7 @@
   }
 
   .motion-press:hover {
-    transform: translateY(-1px) scale(1.02);
+    transform: translateY(-2px) scale(1.02);
   }
 
   .motion-press:active {
@@ -449,15 +423,15 @@
   }
 
   .motion-focus-shell:focus-within {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px oklch(from var(--primary) l c h / 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px oklch(from var(--primary) l c h / 0.1);
   }
 }
 
 @keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
@@ -477,7 +451,18 @@
 @keyframes fade-rise {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.992);
+    transform: translateY(14px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-rise-dramatic {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -488,7 +473,7 @@
 @keyframes chip-in {
   from {
     opacity: 0;
-    transform: translateY(6px) scale(0.96);
+    transform: translateY(8px) scale(0.95);
   }
   to {
     opacity: 1;
@@ -497,142 +482,46 @@
 }
 
 @keyframes drift-slow {
-  from {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  to {
-    transform: translate(25px, -35px) rotate(6deg);
-  }
+  from { transform: translate(0, 0) rotate(0deg); }
+  to { transform: translate(25px, -35px) rotate(6deg); }
 }
 
 @keyframes drift-medium {
-  from {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  to {
-    transform: translate(-20px, 20px) rotate(-4deg);
-  }
+  from { transform: translate(0, 0) rotate(0deg); }
+  to { transform: translate(-20px, 20px) rotate(-4deg); }
 }
 
 @keyframes float-slow {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-18px);
-  }
+  from { transform: translateY(0); }
+  to { transform: translateY(-18px); }
 }
 
 @keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes pulse-slow {
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.1);
-  }
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
 }
 
 @keyframes orb-float-1 {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(30px, 20px) scale(1.05);
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 20px) scale(1.05); }
+  100% { transform: translate(0, 0) scale(1); }
 }
 
 @keyframes orb-float-2 {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-25px, 30px) scale(1.08);
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-25px, 30px) scale(1.08); }
+  100% { transform: translate(0, 0) scale(1); }
 }
 
 @keyframes orb-float-3 {
-  0% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(20px, -15px);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
-
-@keyframes ring-expand {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  50% {
-    opacity: 0.08;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.5);
-  }
-}
-
-@keyframes draw-lines {
-  0%,
-  100% {
-    stroke-dashoffset: 0;
-  }
-  50% {
-    stroke-dashoffset: 20;
-  }
-}
-
-@keyframes scale-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.25;
-  }
-  50% {
-    transform: scale(1.15);
-    opacity: 0.35;
-  }
-}
-
-@keyframes bounce-vertical {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-@keyframes drift-reversed {
-  from {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  to {
-    transform: translate(-20px, 25px) rotate(-4deg);
-  }
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(20px, -15px); }
+  100% { transform: translate(0, 0); }
 }
 
 /* ─── Reduced Motion ─── */
@@ -657,19 +546,19 @@
 .prose h4 {
   font-family: var(--font-heading);
   letter-spacing: -0.02em;
-  font-weight: 700;
+  font-weight: 400;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
 }
 
 .prose h1 {
-  font-size: 1.75rem;
+  font-size: 2rem;
 }
 .prose h2 {
-  font-size: 1.375rem;
+  font-size: 1.5rem;
 }
 .prose h3 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
 }
 
 .prose p {
@@ -806,15 +695,8 @@
 }
 
 @keyframes shimmer-text {
-  0%,
-  100% {
-    opacity: 1;
-    color: var(--foreground);
-  }
-  50% {
-    opacity: 0.65;
-    color: var(--muted-foreground);
-  }
+  0%, 100% { opacity: 1; color: var(--foreground); }
+  50% { opacity: 0.65; color: var(--muted-foreground); }
 }
 
 /* Tool list inside expanded group */
@@ -880,15 +762,8 @@
 }
 
 @keyframes pulse-dot {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.4;
-    transform: scale(0.85);
-  }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
 }
 
 /* Detail panel (args + response) */
@@ -976,28 +851,9 @@
   animation-delay: 240ms;
 }
 
-@keyframes pulse-dot {
-  0%,
-  100% {
-    transform: scale(0.85);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
 @keyframes typing-dot {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.35;
-  }
-  50% {
-    transform: translateY(-1.5px);
-    opacity: 1;
-  }
+  0%, 100% { transform: translateY(0); opacity: 0.35; }
+  50% { transform: translateY(-1.5px); opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

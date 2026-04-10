@@ -94,47 +94,46 @@ export function HeroPrompt({ onSubmit, isLoading }: HeroPromptProps) {
   }, []);
 
   return (
-    <div className="mx-auto w-full max-w-4xl ml-0 text-left">
-      {/* Animated glow behind the chat box */}
-      <div className="absolute -top-24 -left-24 w-64 h-64 rounded-full bg-primary/5 blur-3xl animate-pulse-slow pointer-events-none" />
-      <div
-        className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full bg-secondary-accent/10 blur-2xl animate-pulse-slow pointer-events-none"
-        style={{ animationDelay: '1.5s' }}
-      />
-
-      {/* Headline */}
-      <div className="mb-8 animate-in-up space-y-3 sm:mb-10" style={{ animationDelay: '0ms' }}>
-        <h1 className="text-fluid-display font-black tracking-tight text-foreground max-w-[18ch]">
-          Ask, Learn, Master.
+    <div className="relative mx-auto w-full max-w-4xl ml-0 text-left">
+      {/* Headline — the ONE hero moment */}
+      <div className="mb-8 sm:mb-12 space-y-3" style={{ animationDelay: '0ms' }}>
+        <h1 className="motion-hero font-hero-heading text-fluid-display max-w-[14ch]">
+          Ask, Learn,{' '}
+          <em className="text-primary not-italic" style={{ fontStyle: 'italic' }}>
+            Master.
+          </em>
         </h1>
-        <p className="text-fluid-body text-muted-foreground max-w-[64ch]">
-          Start a learning session on any topic. Your AI agent will research, teach, and create
-          content tailored to you.
+        <p
+          className="motion-hero text-lg text-muted-foreground max-w-[52ch] font-light tracking-tight leading-relaxed"
+          style={{ animationDelay: '120ms' }}
+        >
+          Start a learning session on any topic. Your AI agent researches, teaches,
+          and creates content tailored to you.
         </p>
       </div>
 
-      {/* Chat box */}
+      {/* Chat box — confident, weighty */}
       <div
         className={`group-focus-within animate-in-up relative rounded-3xl border border-input shadow-sm transition-all focus-within:-translate-y-0.5 focus-within:shadow-md duration-300 overflow-hidden ${isDragging ? 'border-primary bg-primary/10' : 'bg-card/95 backdrop-blur-sm'
           }`}
-        style={{ animationDelay: '100ms' }}
+        style={{ animationDelay: '200ms' }}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
         {/* File and URL previews */}
         {(files.length > 0 || urls.length > 0) && (
-          <div className="flex flex-wrap gap-2 px-4 pt-3">
+          <div className="flex flex-wrap gap-2 px-5 pt-4">
             {files.map((file, i) => (
               <div
                 key={`f-${i}`}
-                className="group flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5 text-caption"
+                className="group/chip flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5 text-caption"
               >
                 <FileText className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="max-w-32 truncate text-foreground">{file.name}</span>
                 <button
                   onClick={() => removeFile(i)}
-                  className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
+                  className="text-muted-foreground opacity-0 transition-opacity group-hover/chip:opacity-100 hover:text-foreground"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -143,13 +142,13 @@ export function HeroPrompt({ onSubmit, isLoading }: HeroPromptProps) {
             {urls.map((url, i) => (
               <div
                 key={`u-${i}`}
-                className="group flex items-center gap-2 rounded-lg bg-secondary/80 border border-border/50 px-3 py-1.5 text-caption"
+                className="group/chip flex items-center gap-2 rounded-lg bg-secondary/80 border border-border/50 px-3 py-1.5 text-caption"
               >
                 <Link2 className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="max-w-32 truncate text-foreground">{url}</span>
                 <button
                   onClick={() => removeUrl(i)}
-                  className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
+                  className="text-muted-foreground opacity-0 transition-opacity group-hover/chip:opacity-100 hover:text-foreground"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -169,7 +168,7 @@ export function HeroPrompt({ onSubmit, isLoading }: HeroPromptProps) {
           onKeyDown={handleKeyDown}
           placeholder="What do you want to learn today?"
           rows={3}
-          className="w-full resize-none bg-transparent px-6 pt-6 pb-14 text-fluid-body text-foreground font-medium placeholder:text-foreground/40 focus:outline-none placeholder:font-normal"
+          className="w-full resize-none bg-transparent px-6 pt-6 pb-16 text-[0.9375rem] text-foreground font-medium placeholder:text-muted-foreground/50 focus:outline-none placeholder:font-normal leading-relaxed"
           disabled={isLoading}
         />
 
@@ -186,13 +185,13 @@ export function HeroPrompt({ onSubmit, isLoading }: HeroPromptProps) {
             {/* Upload */}
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="h-10 w-10 shrink-0 rounded-full border border-primary/20 bg-primary/5 text-primary shadow-primary/10 transition-all hover:bg-primary/15 hover:border-primary/40"
+              className="h-9 w-9 shrink-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading}
             >
-              <Paperclip className="h-5 w-5" />
+              <Paperclip className="h-[18px] w-[18px]" />
             </Button>
             <input
               ref={fileInputRef}
@@ -206,32 +205,32 @@ export function HeroPrompt({ onSubmit, isLoading }: HeroPromptProps) {
             {/* URL */}
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="h-10 w-10 shrink-0 rounded-full border border-primary/20 bg-primary/5 text-primary shadow-primary/10 transition-all hover:bg-primary/15 hover:border-primary/40"
+              className="h-9 w-9 shrink-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
               onClick={() => setIsLinkDialogOpen(true)}
               disabled={isLoading}
             >
-              <Link2 className="h-5 w-5" />
+              <Link2 className="h-[18px] w-[18px]" />
             </Button>
           </div>
 
-          {/* Send */}
+          {/* Send — bold, confident */}
           <Button
             onClick={handleSubmit}
             disabled={isLoading || (!message.trim() && files.length === 0 && urls.length === 0)}
             size="icon"
-            className="group-send h-10 w-10 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md transition-all hover:bg-primary/90 hover:scale-105 active:scale-95"
+            className="h-10 w-10 shrink-0 rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/20 transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:scale-105 active:scale-95 disabled:shadow-none"
           >
-            <ArrowUp className="h-5 w-5 transition-transform duration-200 group-hover/parent:-translate-y-0.5" />
+            <ArrowUp className="h-5 w-5" />
           </Button>
         </div>
       </div>
 
       {/* Keyboard hint */}
       <p
-        className="mt-4 pl-2 text-sm font-medium text-muted-foreground animate-in-fade"
-        style={{ animationDelay: '300ms' }}
+        className="mt-5 pl-1 text-xs font-medium tracking-wide text-muted-foreground/60 animate-in-fade"
+        style={{ animationDelay: '500ms' }}
       >
         ⌘ + Enter to send
       </p>

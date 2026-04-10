@@ -80,12 +80,17 @@ export function SessionsList({ userId, onSessionClick }: SessionsListProps) {
   if (sessions.length === 0) return null;
 
   return (
-    <div className="animate-in-up" style={{ animationDelay: '400ms' }}>
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <p className="text-overline text-muted-foreground">
-          Recent Sessions
-          <span className="ml-1.5 text-caption font-normal">({filtered.length})</span>
-        </p>
+    <div className="animate-in-up" style={{ animationDelay: '500ms' }}>
+      {/* Section header — overline style */}
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <div className="flex items-baseline gap-2">
+          <h2 className="text-overline text-muted-foreground">
+            Recent Sessions
+          </h2>
+          <span className="text-caption text-muted-foreground/50 font-normal">
+            {filtered.length}
+          </span>
+        </div>
 
         <div className="flex items-center gap-1.5">
           <DropdownMenu>
@@ -135,7 +140,7 @@ export function SessionsList({ userId, onSessionClick }: SessionsListProps) {
       </div>
 
       {layout === 'list' ? (
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           {filtered.map((session, idx) => (
             <SessionListItem
               key={session.session_id}
@@ -180,19 +185,20 @@ function SessionListItem({
   return (
     <button
       onClick={onClick}
-      style={{ animationDelay: `${420 + index * 60}ms` }}
-      className="group animate-in-up flex w-full items-center justify-between rounded-lg px-3 py-3 text-left hover:bg-secondary/60 border-l-2 border-transparent hover:border-l-4 hover:border-primary/40 transition-all"
+      style={{ animationDelay: `${520 + index * 50}ms` }}
+      className="group animate-in-up flex w-full items-center justify-between rounded-lg px-3 py-3 text-left
+        hover:bg-secondary/60 transition-all duration-200 cursor-pointer"
     >
       <div className="flex items-center gap-3 min-w-0">
         <div className="flex-shrink-0">
           {session.is_marked_completed ? (
             <CheckCircle2 className="h-4 w-4 text-primary" />
           ) : (
-            <Circle className="h-4 w-4 text-muted-foreground/40" />
+            <Circle className="h-4 w-4 text-muted-foreground/30" />
           )}
         </div>
         <div className="min-w-0">
-          <p className="text-body text-foreground line-clamp-1">{title}</p>
+          <p className="text-body text-foreground line-clamp-1 font-medium">{title}</p>
           <p className="mt-0.5 text-caption text-muted-foreground">
             {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
           </p>
@@ -244,18 +250,18 @@ function SessionCardItem({
   return (
     <button
       onClick={onClick}
-      style={{ animationDelay: `${420 + index * 60}ms` }}
-      className="group animate-in-up relative rounded-xl border border-border/60 bg-background p-4 text-left 
-        hover:bg-secondary/60 hover:-translate-y-1 hover:shadow-lg hover:border-primary/30
-        active:translate-y-0 active:scale-[0.99] active:shadow-sm
-        transition-all duration-200 ease-out-quart cursor-pointer flex flex-col justify-between"
+      style={{ animationDelay: `${520 + index * 50}ms` }}
+      className="group animate-in-up relative rounded-xl border border-border/60 bg-card p-5 text-left
+        hover:bg-secondary/40 hover:-translate-y-1 hover:shadow-md hover:border-border
+        active:translate-y-0 active:scale-[0.99]
+        transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between min-h-[120px]"
     >
-      <div className="mb-3 flex items-start justify-between w-full">
+      <div className="mb-4 flex items-start justify-between w-full">
         <div className="flex items-center gap-2">
           {session.is_marked_completed ? (
             <CheckCircle2 className="h-4 w-4 text-primary" />
           ) : (
-            <Circle className="h-4 w-4 text-muted-foreground/40" />
+            <Circle className="h-4 w-4 text-muted-foreground/30" />
           )}
         </div>
         <DropdownMenu>
@@ -285,14 +291,13 @@ function SessionCardItem({
       </div>
 
       <div>
-        <p className="mb-2 text-body font-medium text-foreground line-clamp-2">{title}</p>
+        <p className="mb-2 text-body font-medium text-foreground line-clamp-2 leading-snug">{title}</p>
         <div className="flex items-center gap-2">
           <span className="text-caption text-muted-foreground">
             {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </span>
           {session.is_marked_completed && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
-              <CheckCircle2 className="h-2.5 w-2.5" />
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary">
               Done
             </span>
           )}
@@ -300,7 +305,7 @@ function SessionCardItem({
       </div>
 
       <div
-        className={`absolute inset-x-0 bottom-0 h-1 rounded-b-xl ${session.is_marked_completed ? 'bg-primary/60' : 'bg-primary/20'} opacity-50`}
+        className={`absolute inset-x-0 bottom-0 h-1 rounded-b-xl ${session.is_marked_completed ? 'bg-primary/60' : 'bg-primary/10'}`}
       />
     </button>
   );

@@ -9,10 +9,13 @@ export function SkillsStrip({ skills }: SkillsStripProps) {
 
   return (
     <div
-      className="animate-in-up rounded-xl border border-border bg-card p-5 shadow-sm"
+      className="animate-in-up flex flex-col gap-4"
       style={{ animationDelay: '300ms' }}
     >
-      <p className="mb-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Earned Skills</p>
+      <h2 className="text-overline text-muted-foreground">
+        Earned Skills
+      </h2>
+      {/* <p className="mb-4 text-xs font-bold uppercase tracking-wider text-muted-foreground"></p> */}
       <div className="flex flex-wrap gap-2">
         {skills.map((skill, i) => (
           <Badge key={i} variant="secondary" className="rounded-full font-medium">

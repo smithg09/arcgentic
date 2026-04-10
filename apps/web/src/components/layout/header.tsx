@@ -9,15 +9,15 @@ export function Header() {
   const { user } = useCurrentUser();
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 items-center justify-between px-4 md:px-6">
-        {/* Logo area */}
+    <header className="sticky top-0 z-50 w-full bg-background backdrop-blur-xl border-b border-border/50">
+      <div className="flex h-14 items-center justify-between px-5 md:px-8">
+        {/* Logo area — heading font for brand */}
         <a
           href="/"
-          className="group flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring p-1 -ml-1 rounded-md transition-opacity hover:opacity-90"
+          className="group flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring p-1 -ml-1 rounded-md transition-opacity hover:opacity-80"
         >
-          <Logo className="h-6 w-6 sm:h-7 sm:w-7 shrink-0 transition-transform duration-500 ease-out group-hover:scale-105 shadow-sm" />
-          <span className="font-sans text-lg font-semibold tracking-tight text-foreground transition-colors">
+          <Logo className="h-7 w-7 shrink-0 transition-transform duration-500 ease-out group-hover:scale-105" />
+          <span className="font-heading text-xl tracking-tight text-foreground transition-colors">
             Arcgentic
           </span>
         </a>
@@ -39,12 +39,12 @@ export function Header() {
             </div>
           )}
 
-          {/* Theme toggle - smooth icon button */}
+          {/* Theme toggle */}
           <button
             onClick={toggleTheme}
             className={cn(
               'relative flex h-8 w-8 items-center justify-center rounded-full bg-transparent transition-colors',
-              'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-foreground/70 hover:text-foreground'
+              'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-foreground/60 hover:text-foreground'
             )}
             aria-label="Toggle theme"
           >

@@ -13,8 +13,8 @@ export const FloatingGeometry = memo(() => {
         className="absolute inset-0 opacity-[0.015]"
         style={{
           backgroundImage: `
-            linear-gradient(to right, currentColor 2px, transparent 2px),
-            linear-gradient(to bottom, currentColor 2px, transparent 2px)
+            linear-gradient(to right, currentColor 1.5px, transparent 1.5px),
+            linear-gradient(to bottom, currentColor 1.5px, transparent 1.5px)
           `,
           backgroundSize: '60px 60px'
         }}

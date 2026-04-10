@@ -82,25 +82,22 @@ export function DashboardPage() {
   }
 
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-12 py-16 lg:py-24 px-4 sm:px-6 lg:px-10">
+    <main className="mx-auto flex max-w-6xl flex-col gap-6 py-20 lg:py-32 px-5 sm:px-8 lg:px-10">
       <section>
         <HeroPrompt onSubmit={handleNewSession} isLoading={createSessionMutation.isPending} />
       </section>
 
-      <section className="flex flex-col gap-12 lg:grid lg:grid-cols-[1fr_180px]">
-        <div className="flex flex-col gap-8">
-          <PromptPills onSelect={(prompt) => handleNewSession(prompt)} />
-        </div>
-        
-        {skills?.skills && skills.skills.length > 0 && (
-          <aside className="lg:sticky lg:top-24">
-            <SkillsStrip skills={skills.skills} />
-          </aside>
-        )}
+      <section className='flex flex-col gap-8 mb-12 max-w-5xl'>
+        <PromptPills onSelect={(prompt) => handleNewSession(prompt)} />
       </section>
 
       {user && (
-        <section>
+        <section className='flex flex-col gap-12'>
+          {skills?.skills && skills.skills.length > 0 && (
+            <aside>
+              <SkillsStrip skills={skills.skills} />
+            </aside>
+          )}
           <div className="min-w-0">
             <SessionsList userId={user.id} onSessionClick={handleSessionClick} />
           </div>

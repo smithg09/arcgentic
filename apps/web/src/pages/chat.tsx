@@ -59,7 +59,7 @@ export function ChatPage() {
       }
 
       if (title && session?.title !== title) {
-        updateSession(sessionId, { title }).catch(() => {});
+        updateSession(sessionId, { title }).catch(() => { });
       }
     }
   });
@@ -72,7 +72,7 @@ export function ChatPage() {
           queryClient.invalidateQueries({ queryKey: ['session', sessionId] });
           queryClient.invalidateQueries({ queryKey: ['sessions'] });
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [agentState?.spec?.topic, session, sessionId, queryClient]);
 
