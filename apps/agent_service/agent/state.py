@@ -43,6 +43,13 @@ class ContentFile(TypedDict):
     path: str  # logical filename, e.g. "podcast.json"
 
 
+class AgentTask(BaseModel):
+    """A single task in the agent execution queue."""
+
+    agent: str  # "builder" | "learning"
+    user_request: str  # extracted sub-request for this specific agent
+
+
 # ─── State reducers ──────────────────────────────────────────────────────────
 
 def merge_content(left: dict, right: dict) -> dict:
@@ -60,14 +67,52 @@ def merge_todos(left: list, right: list) -> list:
         merged[item["id"]] = item
     return list(merged.values())
 
+
+def merge_spec(left: LearningSpec | None, right: LearningSpec | None | dict) -> LearningSpec:
+    """Merge LearningSpec objects. Retains existing values and appends new sources/lists."""
+    if not left:
+        return right if isinstance(right, LearningSpec) else LearningSpec(**(right or {}))
+    if not right:
+        return left
+
+    # Convert dict to LearningSpec if necessary
+    if isinstance(right, dict):
+        right = LearningSpec(**right)
+
+    merged = left.model_copy()
+    
+    # Overwrite non-empty strings/booleans
+    if right.topic: merged.topic = right.topic
+    if right.experience_level: merged.experience_level = right.experience_level
+    if right.preferred_depth and right.preferred_depth != "moderate":
+        merged.preferred_depth = right.preferred_depth
+    if right.source_summary: merged.source_summary = right.source_summary
+    if right.is_ready: merged.is_ready = right.is_ready
+    
+    # Append lists, avoiding exact duplicates
+    if right.focus_areas:
+        merged.focus_areas = left.focus_areas + [x for x in right.focus_areas if x not in left.focus_areas]
+    if right.learning_goals:
+        merged.learning_goals = left.learning_goals + [x for x in right.learning_goals if x not in left.learning_goals]
+    if right.sources:
+        existing = {(s.name, s.url) for s in left.sources}
+        for source in right.sources:
+            if (source.name, source.url) not in existing:
+                merged.sources.append(source)
+                
+    return merged
+
+
 # ─── Agent state ─────────────────────────────────────────────────────────────
 
 class AgentState(TypedDict):
     """The shared state passed through all agent nodes in the graph."""
 
     messages: Annotated[list[BaseMessage], add_messages]
-    spec: LearningSpec
+    spec: Annotated[LearningSpec, merge_spec]
     current_agent: str
     content: Annotated[dict[str, ContentFile], merge_content]
     session_id: str
     todos: Annotated[list[dict], merge_todos]
+    agent_queue: list[AgentTask]  # ordered queue of agents to execute
+    current_user_request: str  # extracted user prompt for the current agent task

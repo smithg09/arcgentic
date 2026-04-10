@@ -29,19 +29,28 @@ def parse_user_input(
     """
     sources: list[Source] = []
 
-    # Process PDF files
+    # Process uploaded files
     if files:
         for filename, file_bytes in files:
+            ext = filename.split('.')[-1].lower() if '.' in filename else ''
             try:
-                source = extract_from_pdf(file_bytes, filename)
-                sources.append(source)
+                if ext == 'pdf':
+                    source = extract_from_pdf(file_bytes, filename)
+                    sources.append(source)
+                else:
+                    # Attempt to parse as plain text (md, txt, json, yaml, etc.)
+                    try:
+                        text_content = file_bytes.decode('utf-8')
+                        sources.append(Source(
+                            type="text",
+                            name=filename,
+                            url=None,
+                            content=text_content,
+                        ))
+                    except UnicodeDecodeError:
+                        print(f"Warning: Unsupported binary file format '{filename}' (ext: '{ext}'). Skipping.")
             except Exception as e:
-                sources.append(Source(
-                    type="pdf",
-                    name=filename,
-                    url=None,
-                    content=f"[Error extracting PDF: {str(e)}]",
-                ))
+                print(f"Warning: Error extracting {filename}: {str(e)}. Skipping.")
 
     # Process URLs
     if urls:
@@ -53,12 +62,7 @@ def parse_user_input(
                 source = extract_from_url(url)
                 sources.append(source)
             except Exception as e:
-                sources.append(Source(
-                    type="link",
-                    name=url,
-                    url=url,
-                    content=f"[Error fetching URL: {str(e)}]",
-                ))
+                print(f"Warning: Error fetching URL {url}: {str(e)}. Skipping.")
 
     return sources
 

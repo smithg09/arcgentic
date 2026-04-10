@@ -20,5 +20,5 @@ lxml_html_clean
 # Image generation
 google-genai
 
-copilotkit
-langgraph-api
+# copilotkit
+# langgraph-api

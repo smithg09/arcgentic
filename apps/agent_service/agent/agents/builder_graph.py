@@ -15,7 +15,7 @@ from __future__ import annotations
 import os
 from typing import Any, Literal
 
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.graph import StateGraph, END
@@ -42,6 +42,9 @@ def builder_agent_node(state: AgentState, config: RunnableConfig) -> dict[str, A
     Reads current state, binds all tools, and lets the LLM decide the next
     action (list skills, fetch instructions, generate content, write files).
     The LLM loops via tool calls until it declares completion with no tool call.
+
+    Uses `current_user_request` from state as the focused instruction
+    extracted by the supervisor for this specific task.
     """
     llm = ChatOpenAI(
         model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
@@ -54,6 +57,7 @@ def builder_agent_node(state: AgentState, config: RunnableConfig) -> dict[str, A
     spec = state.get("spec") or LearningSpec()
     content = state.get("content") or {}
     messages = state.get("messages", [])
+    current_user_request = state.get("current_user_request", "")
 
     llm_with_tools = llm.bind_tools(ALL_BUILDER_TOOLS)
 
@@ -105,6 +109,13 @@ After all three are written, output your completion message (no more tool calls)
             autonomy_block
             + f"\n## Already Generated\n{already_built}\n\n"
             "Decide which additional resources to generate, or improve existing ones."
+        )
+
+    # Inject the focused current user request if available
+    if current_user_request:
+        system_prompt += (
+            f"\n## Current User Request\n"
+            f"Focus on this specific request:\n> {current_user_request}\n"
         )
 
     llm_messages = [SystemMessage(content=system_prompt)] + messages
