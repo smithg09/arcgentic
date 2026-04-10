@@ -36,8 +36,14 @@ func (r *postgresSessionRepository) CreateOne(ctx context.Context, data CreateDt
 		isMarkedCompleted = *data.IsMarkedCompleted
 	}
 
+	title := ""
+	if data.Title != nil {
+		title = *data.Title
+	}
+
 	params := sessionQuerier.CreateOneParams{
 		UserID:            data.UserID,
+		Title:             title,
 		IsMarkedCompleted: isMarkedCompleted,
 	}
 
@@ -128,6 +134,9 @@ func (r *postgresSessionRepository) UpdateOneById(ctx context.Context, id uuid.U
 	if data.UserID != nil {
 		params.UserID = uuid.NullUUID{Valid: true, UUID: *data.UserID}
 	}
+	if data.Title != nil {
+		params.Title = sql.NullString{Valid: true, String: *data.Title}
+	}
 	if data.IsMarkedCompleted != nil {
 		params.IsMarkedCompleted = sql.NullBool{Valid: true, Bool: *data.IsMarkedCompleted}
 	}
@@ -153,6 +162,7 @@ func (r *postgresSessionRepository) buildModelFromQuerier(qm sessionQuerier.Sess
 	return &Session{
 		SessionID:         qm.SessionID,
 		UserID:            qm.UserID,
+		Title:             qm.Title,
 		IsMarkedCompleted: qm.IsMarkedCompleted,
 		CreatedAt:         qm.CreatedAt,
 		UpdatedAt:         qm.UpdatedAt,

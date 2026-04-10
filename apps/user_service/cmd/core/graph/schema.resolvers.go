@@ -75,6 +75,11 @@ func (r *queryResolver) GetUser(ctx context.Context, id uuid.UUID) (*user.User, 
 	return r.UserService.GetUser(ctx, id)
 }
 
+// ListUsers is the resolver for the listUsers field.
+func (r *queryResolver) ListUsers(ctx context.Context) ([]user.User, error) {
+	return r.UserService.ListUsers(ctx)
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -83,59 +88,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *mutationResolver) CreateCategory(ctx context.Context, data category.CreateDto) (*category.Category, error) {
-	return r.CategoryService.CreateCategory(ctx, data)
-}
-func (r *mutationResolver) UpdateCategory(ctx context.Context, id uuid.UUID, data category.UpdateDto) (*category.Category, error) {
-	return r.CategoryService.UpdateCategory(ctx, id, data)
-}
-func (r *mutationResolver) DeleteCategory(ctx context.Context, id uuid.UUID) (*bool, error) {
-	err := r.CategoryService.DeleteCategory(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	success := true
-	return &success, nil
-}
-func (r *mutationResolver) CreatePost(ctx context.Context, data post.CreateDto) (*post.Post, error) {
-	return r.PostService.CreatePost(ctx, data)
-}
-func (r *mutationResolver) UpdatePost(ctx context.Context, id uuid.UUID, data post.UpdateDto) (*post.Post, error) {
-	return r.PostService.UpdatePost(ctx, id, data)
-}
-func (r *mutationResolver) DeletePost(ctx context.Context, id uuid.UUID) (*bool, error) {
-	err := r.PostService.DeletePost(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	success := true
-	return &success, nil
-}
-func (r *postResolver) Category(ctx context.Context, obj *post.Post) (*category.Category, error) {
-	return r.CategoryService.LoadCategory(ctx, obj.Category)
-}
-func (r *queryResolver) GetCategory(ctx context.Context, id uuid.UUID) (*category.Category, error) {
-	return r.CategoryService.GetCategory(ctx, id)
-}
-func (r *queryResolver) ListCategories(ctx context.Context, where *category.WhereDto) ([]category.Category, error) {
-	return r.CategoryService.ListCategories(ctx, where)
-}
-func (r *queryResolver) GetPost(ctx context.Context, id uuid.UUID) (*post.Post, error) {
-	return r.PostService.GetPost(ctx, id)
-}
-func (r *queryResolver) ListPosts(ctx context.Context, where *post.WhereDto) ([]post.Post, error) {
-	return r.PostService.ListPosts(ctx, where)
-}
-func (r *Resolver) Post() PostResolver { return &postResolver{r} }
-type postResolver struct{ *Resolver }
-*/

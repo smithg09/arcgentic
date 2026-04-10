@@ -14,18 +14,19 @@ import (
 )
 
 const createOne = `-- name: CreateOne :one
-INSERT INTO sessions (user_id, is_marked_completed, created_at, updated_at)
-VALUES ($1, $2, NOW(), NOW())
-RETURNING session_id, user_id, is_marked_completed, created_at, updated_at
+INSERT INTO sessions (user_id, title, is_marked_completed, created_at, updated_at)
+VALUES ($1, $2, $3, NOW(), NOW())
+RETURNING session_id, user_id, is_marked_completed, created_at, updated_at, title
 `
 
 type CreateOneParams struct {
 	UserID            uuid.UUID
+	Title             string
 	IsMarkedCompleted bool
 }
 
 func (q *Queries) CreateOne(ctx context.Context, arg CreateOneParams) (Session, error) {
-	row := q.db.QueryRowContext(ctx, createOne, arg.UserID, arg.IsMarkedCompleted)
+	row := q.db.QueryRowContext(ctx, createOne, arg.UserID, arg.Title, arg.IsMarkedCompleted)
 	var i Session
 	err := row.Scan(
 		&i.SessionID,
@@ -33,12 +34,13 @@ func (q *Queries) CreateOne(ctx context.Context, arg CreateOneParams) (Session, 
 		&i.IsMarkedCompleted,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Title,
 	)
 	return i, err
 }
 
 const getMany = `-- name: GetMany :many
-SELECT session_id, user_id, is_marked_completed, created_at, updated_at
+SELECT session_id, user_id, is_marked_completed, created_at, updated_at, title
 FROM sessions
 WHERE
   (
@@ -97,6 +99,7 @@ func (q *Queries) GetMany(ctx context.Context, arg GetManyParams) ([]Session, er
 			&i.IsMarkedCompleted,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Title,
 		); err != nil {
 			return nil, err
 		}
@@ -112,7 +115,7 @@ func (q *Queries) GetMany(ctx context.Context, arg GetManyParams) ([]Session, er
 }
 
 const getOneById = `-- name: GetOneById :one
-SELECT session_id, user_id, is_marked_completed, created_at, updated_at FROM sessions
+SELECT session_id, user_id, is_marked_completed, created_at, updated_at, title FROM sessions
 WHERE session_id = $1
 `
 
@@ -125,6 +128,7 @@ func (q *Queries) GetOneById(ctx context.Context, sessionID uuid.UUID) (Session,
 		&i.IsMarkedCompleted,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Title,
 	)
 	return i, err
 }
@@ -132,19 +136,26 @@ func (q *Queries) GetOneById(ctx context.Context, sessionID uuid.UUID) (Session,
 const updateOneById = `-- name: UpdateOneById :one
 UPDATE sessions SET
   user_id = coalesce($1, user_id),
-  is_marked_completed = coalesce($2, is_marked_completed),
+  title = coalesce($2, title),
+  is_marked_completed = coalesce($3, is_marked_completed),
   updated_at = now()
-WHERE session_id = $3 RETURNING session_id, user_id, is_marked_completed, created_at, updated_at
+WHERE session_id = $4 RETURNING session_id, user_id, is_marked_completed, created_at, updated_at, title
 `
 
 type UpdateOneByIdParams struct {
 	UserID            uuid.NullUUID
+	Title             sql.NullString
 	IsMarkedCompleted sql.NullBool
 	ID                uuid.UUID
 }
 
 func (q *Queries) UpdateOneById(ctx context.Context, arg UpdateOneByIdParams) (Session, error) {
-	row := q.db.QueryRowContext(ctx, updateOneById, arg.UserID, arg.IsMarkedCompleted, arg.ID)
+	row := q.db.QueryRowContext(ctx, updateOneById,
+		arg.UserID,
+		arg.Title,
+		arg.IsMarkedCompleted,
+		arg.ID,
+	)
 	var i Session
 	err := row.Scan(
 		&i.SessionID,
@@ -152,6 +163,7 @@ func (q *Queries) UpdateOneById(ctx context.Context, arg UpdateOneByIdParams) (S
 		&i.IsMarkedCompleted,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Title,
 	)
 	return i, err
 }

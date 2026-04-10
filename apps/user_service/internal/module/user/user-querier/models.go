@@ -5,20 +5,10 @@
 package userQuerier
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
-
-type Category struct {
-	ID        uuid.UUID
-	Name      string
-	Slug      string
-	Status    string
-	CreatedAt sql.NullTime
-	UpdatedAt sql.NullTime
-}
 
 type EarnedSkill struct {
 	UserID     uuid.UUID
@@ -28,23 +18,13 @@ type EarnedSkill struct {
 	UpdatedAt  time.Time
 }
 
-type Post struct {
-	ID        uuid.UUID
-	Title     string
-	Slug      string
-	Category  uuid.UUID
-	Status    string
-	Content   sql.NullString
-	CreatedAt sql.NullTime
-	UpdatedAt sql.NullTime
-}
-
 type Session struct {
 	SessionID         uuid.UUID
 	UserID            uuid.UUID
 	IsMarkedCompleted bool
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
+	Title             string
 }
 
 type User struct {

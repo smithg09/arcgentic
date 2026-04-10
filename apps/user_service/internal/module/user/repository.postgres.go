@@ -107,6 +107,26 @@ func (r *postgresUserRepository) UpdateOneById(ctx context.Context, id uuid.UUID
 	return r.buildModelFromQuerier(qm), nil
 }
 
+func (r *postgresUserRepository) GetAll(ctx context.Context) ([]User, error) {
+	models, err := r.querier.GetAll(ctx)
+	if err != nil {
+		r.logger.
+			Error().
+			Err(err).
+			Str("method", "GetAll").
+			Str("event", "call querier.GetAll").
+			Send()
+		return nil, err
+	}
+
+	items := make([]User, len(models))
+	for i, model := range models {
+		items[i] = *r.buildModelFromQuerier(model)
+	}
+
+	return items, nil
+}
+
 func (r *postgresUserRepository) DeleteOne(ctx context.Context, id uuid.UUID) error {
 	deletedRows, err := r.querier.DeleteOne(ctx, id)
 	if err != nil {

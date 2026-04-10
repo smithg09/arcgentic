@@ -16,6 +16,10 @@ UPDATE users SET
   updated_at = now()
 WHERE id = sqlc.arg(id) RETURNING *;
 
+-- name: GetAll :many
+SELECT * FROM users
+ORDER BY created_at ASC;
+
 -- name: DeleteOne :execrows
 DELETE FROM users
 WHERE id = $1;

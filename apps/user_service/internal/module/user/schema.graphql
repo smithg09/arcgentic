@@ -24,6 +24,7 @@ input UpdateUserDto @goModel(model: "github.com/smithg09/core/internal/module/us
 
 extend type Query {
   getUser(id: Uuid!): User
+  listUsers: [User!]!
 }
 
 extend type Mutation {

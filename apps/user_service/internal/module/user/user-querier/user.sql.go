@@ -58,6 +58,42 @@ func (q *Queries) DeleteOne(ctx context.Context, id uuid.UUID) (int64, error) {
 	return result.RowsAffected()
 }
 
+const getAll = `-- name: GetAll :many
+SELECT id, name, email, professional_role, llm_preferences, created_at, updated_at FROM users
+ORDER BY created_at ASC
+`
+
+func (q *Queries) GetAll(ctx context.Context) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getAll)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Email,
+			&i.ProfessionalRole,
+			&i.LlmPreferences,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getOneById = `-- name: GetOneById :one
 SELECT id, name, email, professional_role, llm_preferences, created_at, updated_at FROM users
 WHERE id = $1

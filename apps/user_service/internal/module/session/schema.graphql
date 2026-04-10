@@ -1,6 +1,7 @@
 type Session @goModel(model: "github.com/smithg09/core/internal/module/session.Session") {
   session_id: Uuid! @goField(name: "SessionID")
   user_id: Uuid! @goField(name: "UserID")
+  title: String!
   is_marked_completed: Boolean! @goField(name: "IsMarkedCompleted")
   created_at: Time!
   updated_at: Time!
@@ -8,6 +9,7 @@ type Session @goModel(model: "github.com/smithg09/core/internal/module/session.S
 
 input CreateSessionDto @goModel(model: "github.com/smithg09/core/internal/module/session.CreateDto") {
   user_id: Uuid! @goField(name: "UserID")
+  title: String @goField(name: "Title")
   is_marked_completed: Boolean @goField(name: "IsMarkedCompleted")
 }
 
@@ -20,6 +22,7 @@ input WhereSessionsDto @goModel(model: "github.com/smithg09/core/internal/module
 
 input UpdateSessionDto @goModel(model: "github.com/smithg09/core/internal/module/session.UpdateDto") {
   user_id: Uuid @goField(name: "UserID")
+  title: String @goField(name: "Title")
   is_marked_completed: Boolean @goField(name: "IsMarkedCompleted")
 }
 

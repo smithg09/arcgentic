@@ -28,6 +28,7 @@ type SessionRepository interface {
 type Session struct {
 	SessionID         uuid.UUID `json:"sessionId"`
 	UserID            uuid.UUID `json:"userId"`
+	Title             string    `json:"title"`
 	IsMarkedCompleted bool      `json:"isMarkedCompleted"`
 	CreatedAt         time.Time `json:"createdAt"`
 	UpdatedAt         time.Time `json:"updatedAt"`
@@ -35,6 +36,7 @@ type Session struct {
 
 type CreateDto struct {
 	UserID            uuid.UUID `json:"userId"`
+	Title             *string   `json:"title"`
 	IsMarkedCompleted *bool     `json:"isMarkedCompleted"`
 }
 
@@ -47,5 +49,6 @@ type WhereDto struct {
 
 type UpdateDto struct {
 	UserID            *uuid.UUID `json:"userId"`
+	Title             *string    `json:"title"`
 	IsMarkedCompleted *bool      `json:"isMarkedCompleted"`
 }

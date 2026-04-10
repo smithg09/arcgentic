@@ -39,6 +39,7 @@ type QueryResolver interface {
 	GetSession(ctx context.Context, id uuid.UUID) (*session.Session, error)
 	ListSessions(ctx context.Context, where *session.WhereDto) ([]session.Session, error)
 	GetUser(ctx context.Context, id uuid.UUID) (*user.User, error)
+	ListUsers(ctx context.Context) ([]user.User, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -731,6 +732,8 @@ func (ec *executionContext) fieldContext_Mutation_createSession(ctx context.Cont
 				return ec.fieldContext_Session_session_id(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Session_user_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Session_title(ctx, field)
 			case "is_marked_completed":
 				return ec.fieldContext_Session_is_marked_completed(ctx, field)
 			case "created_at":
@@ -795,6 +798,8 @@ func (ec *executionContext) fieldContext_Mutation_updateSession(ctx context.Cont
 				return ec.fieldContext_Session_session_id(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Session_user_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Session_title(ctx, field)
 			case "is_marked_completed":
 				return ec.fieldContext_Session_is_marked_completed(ctx, field)
 			case "created_at":
@@ -1152,6 +1157,8 @@ func (ec *executionContext) fieldContext_Query_getSession(ctx context.Context, f
 				return ec.fieldContext_Session_session_id(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Session_user_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Session_title(ctx, field)
 			case "is_marked_completed":
 				return ec.fieldContext_Session_is_marked_completed(ctx, field)
 			case "created_at":
@@ -1219,6 +1226,8 @@ func (ec *executionContext) fieldContext_Query_listSessions(ctx context.Context,
 				return ec.fieldContext_Session_session_id(ctx, field)
 			case "user_id":
 				return ec.fieldContext_Session_user_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Session_title(ctx, field)
 			case "is_marked_completed":
 				return ec.fieldContext_Session_is_marked_completed(ctx, field)
 			case "created_at":
@@ -1307,6 +1316,66 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 	if fc.Args, err = ec.field_Query_getUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_listUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_listUsers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ListUsers(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]user.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚕgithubᚗcomᚋsmithg09ᚋcoreᚋinternalᚋmoduleᚋuserᚐUserᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_listUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "professional_role":
+				return ec.fieldContext_User_professional_role(ctx, field)
+			case "llm_preferences":
+				return ec.fieldContext_User_llm_preferences(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -1573,6 +1642,50 @@ func (ec *executionContext) fieldContext_Session_user_id(_ context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Uuid does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_title(ctx context.Context, field graphql.CollectedField, obj *session.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2029,7 +2142,7 @@ func (ec *executionContext) unmarshalInputCreateSessionDto(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user_id", "is_marked_completed"}
+	fieldsInOrder := [...]string{"user_id", "title", "is_marked_completed"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -2043,6 +2156,13 @@ func (ec *executionContext) unmarshalInputCreateSessionDto(ctx context.Context, 
 				return it, err
 			}
 			it.UserID = data
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Title = data
 		case "is_marked_completed":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_marked_completed"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -2378,7 +2498,7 @@ func (ec *executionContext) unmarshalInputUpdateSessionDto(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user_id", "is_marked_completed"}
+	fieldsInOrder := [...]string{"user_id", "title", "is_marked_completed"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -2392,6 +2512,13 @@ func (ec *executionContext) unmarshalInputUpdateSessionDto(ctx context.Context, 
 				return it, err
 			}
 			it.UserID = data
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Title = data
 		case "is_marked_completed":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_marked_completed"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -2826,6 +2953,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "listUsers":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_listUsers(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "_service":
 			field := field
 
@@ -2897,6 +3046,11 @@ func (ec *executionContext) _Session(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "user_id":
 			out.Values[i] = ec._Session_user_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "title":
+			out.Values[i] = ec._Session_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3098,6 +3252,54 @@ func (ec *executionContext) unmarshalNUpdateUserDto2githubᚗcomᚋsmithg09ᚋco
 func (ec *executionContext) unmarshalNUpsertEarnedSkillsDto2githubᚗcomᚋsmithg09ᚋcoreᚋinternalᚋmoduleᚋearnedskillᚐUpsertDto(ctx context.Context, v any) (earnedskill.UpsertDto, error) {
 	res, err := ec.unmarshalInputUpsertEarnedSkillsDto(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUser2githubᚗcomᚋsmithg09ᚋcoreᚋinternalᚋmoduleᚋuserᚐUser(ctx context.Context, sel ast.SelectionSet, v user.User) graphql.Marshaler {
+	return ec._User(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUser2ᚕgithubᚗcomᚋsmithg09ᚋcoreᚋinternalᚋmoduleᚋuserᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []user.User) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUser2githubᚗcomᚋsmithg09ᚋcoreᚋinternalᚋmoduleᚋuserᚐUser(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNUuid2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx context.Context, v any) (uuid.UUID, error) {

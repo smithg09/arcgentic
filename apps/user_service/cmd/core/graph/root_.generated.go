@@ -66,6 +66,7 @@ type ComplexityRoot struct {
 		GetSession         func(childComplexity int, id uuid.UUID) int
 		GetUser            func(childComplexity int, id uuid.UUID) int
 		ListSessions       func(childComplexity int, where *session.WhereDto) int
+		ListUsers          func(childComplexity int) int
 		Ping               func(childComplexity int) int
 		__resolve__service func(childComplexity int) int
 	}
@@ -74,6 +75,7 @@ type ComplexityRoot struct {
 		CreatedAt         func(childComplexity int) int
 		IsMarkedCompleted func(childComplexity int) int
 		SessionID         func(childComplexity int) int
+		Title             func(childComplexity int) int
 		UpdatedAt         func(childComplexity int) int
 		UserID            func(childComplexity int) int
 	}
@@ -267,6 +269,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.ListSessions(childComplexity, args["where"].(*session.WhereDto)), true
 
+	case "Query.listUsers":
+		if e.complexity.Query.ListUsers == nil {
+			break
+		}
+
+		return e.complexity.Query.ListUsers(childComplexity), true
+
 	case "Query.ping":
 		if e.complexity.Query.Ping == nil {
 			break
@@ -301,6 +310,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Session.SessionID(childComplexity), true
+
+	case "Session.title":
+		if e.complexity.Session.Title == nil {
+			break
+		}
+
+		return e.complexity.Session.Title(childComplexity), true
 
 	case "Session.updated_at":
 		if e.complexity.Session.UpdatedAt == nil {
@@ -617,6 +633,7 @@ extend type Mutation {
 	{Name: "../../../internal/module/session/schema.graphql", Input: `type Session @goModel(model: "github.com/smithg09/core/internal/module/session.Session") {
   session_id: Uuid! @goField(name: "SessionID")
   user_id: Uuid! @goField(name: "UserID")
+  title: String!
   is_marked_completed: Boolean! @goField(name: "IsMarkedCompleted")
   created_at: Time!
   updated_at: Time!
@@ -624,6 +641,7 @@ extend type Mutation {
 
 input CreateSessionDto @goModel(model: "github.com/smithg09/core/internal/module/session.CreateDto") {
   user_id: Uuid! @goField(name: "UserID")
+  title: String @goField(name: "Title")
   is_marked_completed: Boolean @goField(name: "IsMarkedCompleted")
 }
 
@@ -636,6 +654,7 @@ input WhereSessionsDto @goModel(model: "github.com/smithg09/core/internal/module
 
 input UpdateSessionDto @goModel(model: "github.com/smithg09/core/internal/module/session.UpdateDto") {
   user_id: Uuid @goField(name: "UserID")
+  title: String @goField(name: "Title")
   is_marked_completed: Boolean @goField(name: "IsMarkedCompleted")
 }
 
@@ -674,6 +693,7 @@ input UpdateUserDto @goModel(model: "github.com/smithg09/core/internal/module/us
 
 extend type Query {
   getUser(id: Uuid!): User
+  listUsers: [User!]!
 }
 
 extend type Mutation {

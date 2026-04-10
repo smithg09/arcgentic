@@ -1,27 +1,5 @@
 version: "2"
 sql:
-- name: post
-  schema: "./db/migration"
-  queries: "./internal/module/post/post-querier"
-  engine: "postgresql"
-  gen:
-    go: 
-      package: "postQuerier"
-      out: "internal/module/post/post-querier"
-      emit_interface: true
-  rules:
-    - sqlc/db-prepare
-- name: category
-  schema: "./db/migration"
-  queries: "./internal/module/category/category-querier"
-  engine: "postgresql"
-  gen:
-    go: 
-      package: "categoryQuerier"
-      out: "internal/module/category/category-querier"
-      emit_interface: true
-  rules:
-    - sqlc/db-prepare
 - name: user
   schema: "./db/migration"
   queries: "./internal/module/user/user-querier"

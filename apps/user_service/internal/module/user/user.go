@@ -13,6 +13,7 @@ import (
 type UserService interface {
 	CreateUser(ctx context.Context, data CreateDto) (*User, error)
 	GetUser(ctx context.Context, id uuid.UUID) (*User, error)
+	ListUsers(ctx context.Context) ([]User, error)
 	UpdateUser(ctx context.Context, id uuid.UUID, data UpdateDto) (*User, error)
 	DeleteUser(ctx context.Context, id uuid.UUID) error
 }
@@ -20,6 +21,7 @@ type UserService interface {
 type UserRepository interface {
 	CreateOne(ctx context.Context, data CreateDto) (*User, error)
 	GetOneById(ctx context.Context, id uuid.UUID) (*User, error)
+	GetAll(ctx context.Context) ([]User, error)
 	UpdateOneById(ctx context.Context, id uuid.UUID, data UpdateDto) (*User, error)
 	DeleteOne(ctx context.Context, id uuid.UUID) error
 }

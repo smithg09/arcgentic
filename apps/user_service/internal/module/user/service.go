@@ -22,6 +22,10 @@ func (s *userService) GetUser(ctx context.Context, id uuid.UUID) (*User, error) 
 	return s.repository.GetOneById(ctx, id)
 }
 
+func (s *userService) ListUsers(ctx context.Context) ([]User, error) {
+	return s.repository.GetAll(ctx)
+}
+
 func (s *userService) UpdateUser(ctx context.Context, id uuid.UUID, data UpdateDto) (*User, error) {
 	return s.repository.UpdateOneById(ctx, id, data)
 }

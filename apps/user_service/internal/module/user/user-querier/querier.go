@@ -13,6 +13,7 @@ import (
 type Querier interface {
 	CreateOne(ctx context.Context, arg CreateOneParams) (User, error)
 	DeleteOne(ctx context.Context, id uuid.UUID) (int64, error)
+	GetAll(ctx context.Context) ([]User, error)
 	GetOneById(ctx context.Context, id uuid.UUID) (User, error)
 	UpdateOneById(ctx context.Context, arg UpdateOneByIdParams) (User, error)
 }
