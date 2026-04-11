@@ -36,7 +36,7 @@ export function HeroPrompt({ onSubmit, isLoading }: HeroPromptProps) {
   }, [message, files, urls, onSubmit]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    if (e.key === 'Enter') {
       e.preventDefault();
       handleSubmit();
     }
