@@ -107,8 +107,8 @@ export function HeroPrompt({ onSubmit, isLoading }: HeroPromptProps) {
           className="motion-hero text-lg text-muted-foreground max-w-[52ch] font-light tracking-tight leading-relaxed"
           style={{ animationDelay: '120ms' }}
         >
-          Start a learning session on any topic. Your AI agent researches, teaches,
-          and creates content tailored to you.
+          Drop a topic, upload your sources, and let the agent do the rest.
+          Research, curate, and build content that adapts to how you learn.
         </p>
       </div>
 
@@ -226,14 +226,6 @@ export function HeroPrompt({ onSubmit, isLoading }: HeroPromptProps) {
           </Button>
         </div>
       </div>
-
-      {/* Keyboard hint */}
-      <p
-        className="mt-5 pl-1 text-xs font-medium tracking-wide text-muted-foreground/60 animate-in-fade"
-        style={{ animationDelay: '500ms' }}
-      >
-        ⌘ + Enter to send
-      </p>
 
       <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
         <DialogContent>

@@ -183,8 +183,11 @@ function SessionListItem({
   const title = session.title || 'Untitled Session';
 
   return (
-    <button
+    <div
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
       style={{ animationDelay: `${520 + index * 50}ms` }}
       className="group animate-in-up flex w-full items-center justify-between rounded-lg px-3 py-3 text-left
         hover:bg-secondary/60 transition-all duration-200 cursor-pointer"
@@ -208,7 +211,7 @@ function SessionListItem({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             className="h-7 w-7 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
             onClick={(e) => e.stopPropagation()}
@@ -229,7 +232,7 @@ function SessionListItem({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-    </button>
+    </div>
   );
 }
 
@@ -248,8 +251,11 @@ function SessionCardItem({
   const title = session.title || 'Untitled Session';
 
   return (
-    <button
+    <div
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
       style={{ animationDelay: `${520 + index * 50}ms` }}
       className="group animate-in-up relative rounded-xl border border-border/60 bg-card p-5 text-left
         hover:bg-secondary/40 hover:-translate-y-1 hover:shadow-md hover:border-border
@@ -267,7 +273,7 @@ function SessionCardItem({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon"
               className="h-6 w-6 rounded-md opacity-0 group-hover:opacity-100 transition-all -mt-1 -mr-1"
               onClick={(e) => e.stopPropagation()}
@@ -307,6 +313,6 @@ function SessionCardItem({
       <div
         className={`absolute inset-x-0 bottom-0 h-1 rounded-b-xl ${session.is_marked_completed ? 'bg-primary/60' : 'bg-primary/10'}`}
       />
-    </button>
+    </div>
   );
 }

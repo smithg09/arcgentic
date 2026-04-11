@@ -1,27 +1,55 @@
 import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Shuffle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw, Shuffle, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface FlashcardViewerProps {
   content: string;
 }
 
 interface Flashcard {
+  id?: number;
+  category?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
   front: string;
   back: string;
+  hint?: string;
 }
 
+interface FlashcardSet {
+  title?: string;
+  description?: string;
+  cards: Flashcard[];
+}
+
+const DIFFICULTY_COLORS: Record<string, string> = {
+  easy: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20',
+  medium: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20',
+  hard: 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20',
+};
+
 export function FlashcardViewer({ content }: FlashcardViewerProps) {
-  const cards = useMemo<Flashcard[]>(() => {
+  const flashcardSet = useMemo<FlashcardSet>(() => {
     try {
-      return JSON.parse(content);
+      const parsed = JSON.parse(content);
+      // Support both wrapped { title, cards: [] } and flat array []
+      if (Array.isArray(parsed)) {
+        return { cards: parsed };
+      }
+      return {
+        title: parsed.title,
+        description: parsed.description,
+        cards: parsed.cards || [{ front: 'Error parsing flashcards', back: content }],
+      };
     } catch {
-      return [{ front: 'Error parsing flashcards', back: content }];
+      return { cards: [{ front: 'Error parsing flashcards', back: content }] };
     }
   }, [content]);
 
+  const cards = flashcardSet.cards;
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   const [shuffled, setShuffled] = useState(false);
   const [order, setOrder] = useState<number[]>(cards.map((_, i) => i));
 
@@ -33,6 +61,7 @@ export function FlashcardViewer({ content }: FlashcardViewerProps) {
     setOrder(newOrder);
     setIndex(0);
     setFlipped(false);
+    setShowHint(false);
     setShuffled(true);
   };
 
@@ -40,18 +69,47 @@ export function FlashcardViewer({ content }: FlashcardViewerProps) {
     setOrder(cards.map((_, i) => i));
     setIndex(0);
     setFlipped(false);
+    setShowHint(false);
     setShuffled(false);
+  };
+
+  const goTo = (i: number) => {
+    setIndex(i);
+    setFlipped(false);
+    setShowHint(false);
   };
 
   if (!card) return null;
 
   return (
     <div className="mx-auto max-w-lg">
+      {/* Title */}
+      {flashcardSet.title && (
+        <div className="mb-5 space-y-1">
+          <h2 className="text-heading text-foreground">{flashcardSet.title}</h2>
+          {flashcardSet.description && (
+            <p className="text-body text-muted-foreground">{flashcardSet.description}</p>
+          )}
+        </div>
+      )}
+
       {/* Progress */}
       <div className="flex items-center justify-between mb-4">
-        <span className="text-overline text-muted-foreground">
-          {index + 1} of {cards.length}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-overline text-muted-foreground">
+            {index + 1} of {cards.length}
+          </span>
+          {card.category && (
+            <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0">
+              {card.category}
+            </Badge>
+          )}
+          {card.difficulty && (
+            <span className={`inline-flex items-center rounded-full border px-1.5 py-0 text-[10px] font-semibold uppercase tracking-wide ${DIFFICULTY_COLORS[card.difficulty] || ''}`}>
+              {card.difficulty}
+            </span>
+          )}
+        </div>
         <div className="flex gap-1">
           <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={shuffle}>
             <Shuffle className="h-3.5 w-3.5" />
@@ -99,7 +157,28 @@ export function FlashcardViewer({ content }: FlashcardViewerProps) {
         </div>
       </button>
 
-      <p className="text-caption text-muted-foreground/50 text-center mt-2">Click to flip</p>
+      {/* Hint */}
+      {card.hint && !flipped && (
+        <div className="mt-2 text-center">
+          {showHint ? (
+            <p className="text-caption text-muted-foreground/70 motion-soft-in">
+              💡 {card.hint}
+            </p>
+          ) : (
+            <button
+              onClick={() => setShowHint(true)}
+              className="inline-flex items-center gap-1 text-caption text-muted-foreground/50 hover:text-muted-foreground transition-colors cursor-pointer"
+            >
+              <Lightbulb className="h-3 w-3" />
+              Show hint
+            </button>
+          )}
+        </div>
+      )}
+
+      {!card.hint && (
+        <p className="text-caption text-muted-foreground/50 text-center mt-2">Click to flip</p>
+      )}
 
       {/* Navigation */}
       <div className="flex items-center justify-center gap-3 mt-4">
@@ -107,10 +186,7 @@ export function FlashcardViewer({ content }: FlashcardViewerProps) {
           variant="ghost"
           size="icon"
           className="h-8 w-8 rounded-md"
-          onClick={() => {
-            setIndex(Math.max(0, index - 1));
-            setFlipped(false);
-          }}
+          onClick={() => goTo(Math.max(0, index - 1))}
           disabled={index === 0}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -135,10 +211,7 @@ export function FlashcardViewer({ content }: FlashcardViewerProps) {
           variant="ghost"
           size="icon"
           className="h-8 w-8 rounded-md"
-          onClick={() => {
-            setIndex(Math.min(cards.length - 1, index + 1));
-            setFlipped(false);
-          }}
+          onClick={() => goTo(Math.min(cards.length - 1, index + 1))}
           disabled={index === cards.length - 1}
         >
           <ChevronRight className="h-4 w-4" />

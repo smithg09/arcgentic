@@ -200,9 +200,9 @@ export function ChatPage() {
         className="flex-1 min-h-0 bg-background"
       >
         <Panel
-          defaultSize={isDesktop ? 240 : 52}
+          defaultSize={isDesktop ? 400 : 52}
           minSize={isDesktop ? 220 : 360}
-          maxSize={isDesktop ? 480 : 480}
+          maxSize={isDesktop ? 580 : 480}
         >
           <ChatPanel
             messages={messages}

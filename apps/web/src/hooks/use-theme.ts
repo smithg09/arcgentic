@@ -6,7 +6,7 @@ function getSystemTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-function getStoredTheme(): Theme | null {
+export function getStoredTheme(): Theme | null {
   const stored = localStorage.getItem('arcgentic-theme')
   return stored === 'light' || stored === 'dark' ? stored : null
 }
@@ -28,6 +28,7 @@ export function useTheme() {
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
+    document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
   return { theme, setTheme, toggleTheme }

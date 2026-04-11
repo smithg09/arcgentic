@@ -156,6 +156,14 @@
   --content-widget-foreground: oklch(0.72 0.08 250);
 }
 
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
 /* ─── Base ─── */
 @layer base {
   * {
@@ -547,7 +555,7 @@
   font-family: var(--font-heading);
   letter-spacing: -0.02em;
   font-weight: 400;
-  margin-top: 1.5em;
+  margin-top: .2em;
   margin-bottom: 0.5em;
 }
 
@@ -626,6 +634,65 @@
 .prose a:hover {
   opacity: 0.8;
 }
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin: 1.25em 0;
+}
+
+.prose thead {
+  background: var(--secondary);
+  text-align: left;
+}
+
+.prose th {
+  padding: 0.625em 1em;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--foreground);
+  border-bottom: 1.5px solid var(--border);
+}
+
+.prose td {
+  padding: 0.5em 1em;
+  color: color-mix(in oklab, var(--foreground), var(--muted-foreground) 15%);
+  border-bottom: 1px solid color-mix(in oklab, var(--border), transparent 50%);
+}
+
+.prose tr:nth-child(even) {
+  background: color-mix(in oklab, var(--secondary), transparent 60%);
+}
+
+.prose tr:hover {
+  background: color-mix(in oklab, var(--muted), transparent 30%);
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
+}
+
+/* ─── Mermaid Containers ─── */
+.prose .mermaid-container {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  margin: 1.5em 0;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--card), transparent 50%);
+}
+
+.prose .mermaid-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+
 
 /* ─── Scrollbar Styling ─── */
 ::-webkit-scrollbar {

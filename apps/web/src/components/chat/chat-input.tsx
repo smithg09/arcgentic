@@ -45,7 +45,7 @@ export function ChatInput({ onSend, onStop, isStreaming, disabled }: ChatInputPr
   }, [message, files, urls, isStreaming, onSend, onStop]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    if (e.key === 'Enter') {
       e.preventDefault();
       handleSubmit();
     }
@@ -92,11 +92,10 @@ export function ChatInput({ onSend, onStop, isStreaming, disabled }: ChatInputPr
     <div className="sticky bg-background/10 backdrop-blur-[.4rem]
  bottom-0 p-4 md:p-6 z-20 ">
       <div
-        className={`motion-focus-shell relative rounded-xl border border-input shadow-sm transition-all bg-background duration-200 focus-within:shadow-md overflow-hidden ${
-          isDragging
-            ? 'border-primary bg-primary/10'
-            : 'focus-within:bg-background'
-        }`}
+        className={`motion-focus-shell relative rounded-xl border border-input shadow-sm transition-all bg-background duration-200 focus-within:shadow-md overflow-hidden ${isDragging
+          ? 'border-primary bg-primary/10'
+          : 'focus-within:bg-background'
+          }`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -154,9 +153,9 @@ export function ChatInput({ onSend, onStop, isStreaming, disabled }: ChatInputPr
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="h-8 w-8 shrink-0 rounded-full border border-input shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+              className="h-8 w-8 shrink-0 rounded-full transition-all hover:bg-accent hover:text-accent-foreground"
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled || isStreaming}
             >
@@ -174,9 +173,9 @@ export function ChatInput({ onSend, onStop, isStreaming, disabled }: ChatInputPr
             />
 
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="h-8 w-8 shrink-0 rounded-full border border-input shadow-sm transition-all hover:bg-accent hover:text-accent-foreground"
+              className="h-8 w-8 shrink-0 rounded-full transition-all hover:bg-accent hover:text-accent-foreground"
               onClick={() => setIsLinkDialogOpen(true)}
               disabled={disabled || isStreaming}
             >

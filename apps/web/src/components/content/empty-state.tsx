@@ -8,7 +8,7 @@ export function EmptyState() {
       </div>
       <p className="text-heading mb-1 text-foreground">No content yet</p>
       <p className="text-body text-muted-foreground max-w-xs">
-        Continue the conversation to generate articles, flashcards, and other learning materials.
+        Continue the conversation to generate podcasts, explanation, flashcards, and other learning materials.
       </p>
     </div>
   )
