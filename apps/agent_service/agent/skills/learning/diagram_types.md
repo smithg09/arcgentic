@@ -196,11 +196,11 @@ await document.fonts.ready;
 mermaid.initialize({
   startOnLoad: false,
   theme: 'base',
-  fontFamily: '"Anthropic Sans", sans-serif',
+  fontFamily: '"Space Grotesk", "Geist Variable", sans-serif',
   themeVariables: {
     darkMode: dark,
     fontSize: '13px',
-    fontFamily: '"Anthropic Sans", sans-serif',
+    fontFamily: '"Space Grotesk", "Geist Variable", sans-serif',
     lineColor: dark ? '#9c9a92' : '#73726c',
     textColor: dark ? '#c2c0b6' : '#3d3d3a',
   },

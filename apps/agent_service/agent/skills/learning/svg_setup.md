@@ -25,7 +25,7 @@
 - No icons or illustrations inside boxes — text only. (Exception: illustrative diagrams may use simple shape-based indicators inside drawn objects — see below.)
 - Sentence case on all labels.
 
-**Font size calibration for diagram text labels** - Here's csv table to give you better sense of the Anthropic Sans font rendering width:
+**Font size calibration for diagram text labels** - Here's csv table to give you better sense of the Platform Sans font rendering width:
 ```csv
 text, chars length, font-weight, font-size, rendered width
 Authentication Service, chars: 22, font-weight: 500, font-size: 14px, width: 167px

@@ -27,12 +27,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   )
 }
 
-// ─── Claude-style Tool Chain Group ───
-
 export function ToolChainGroup({ tools, isRunning }: { tools: ToolCallDisplay[], isRunning: boolean }) {
   const [expanded, setExpanded] = useState(false)
 
-  // Build summary text
   const summaryText = isRunning
     ? 'Planning next steps'
     : tools.length === 1

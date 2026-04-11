@@ -9,72 +9,6 @@ export const getWidgetFrameCode = ({ widgetCode, title }: { widgetCode: string, 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Visualize Widget</title>
-    <style>
-      @font-face {
-        font-family: 'Anthropic Serif';
-        src: url('https://assets.claude.ai/Fonts/AnthropicSerif-Text-Regular-Static.otf')
-          format('opentype');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-      }
-      @font-face {
-        font-family: 'Anthropic Serif';
-        src: url('https://assets.claude.ai/Fonts/AnthropicSerif-Text-RegularItalic-Static.otf')
-          format('opentype');
-        font-weight: 400;
-        font-style: italic;
-        font-display: swap;
-      }
-      @font-face {
-        font-family: 'Anthropic Serif';
-        src: url('https://assets.claude.ai/Fonts/AnthropicSerif-Text-Medium-Static.otf')
-          format('opentype');
-        font-weight: 500;
-        font-style: normal;
-        font-display: swap;
-      }
-      @font-face {
-        font-family: 'Anthropic Serif';
-        src: url('https://assets.claude.ai/Fonts/AnthropicSerif-Text-MediumItalic-Static.otf')
-          format('opentype');
-        font-weight: 500;
-        font-style: italic;
-        font-display: swap;
-      }
-      @font-face {
-        font-family: 'Anthropic Serif';
-        src: url('https://assets.claude.ai/Fonts/AnthropicSerif-Text-Semibold-Static.otf')
-          format('opentype');
-        font-weight: 600;
-        font-style: normal;
-        font-display: swap;
-      }
-      @font-face {
-        font-family: 'Anthropic Serif';
-        src: url('https://assets.claude.ai/Fonts/AnthropicSerif-Text-SemiboldItalic-Static.otf')
-          format('opentype');
-        font-weight: 600;
-        font-style: italic;
-        font-display: swap;
-      }
-      @font-face {
-        font-family: 'Anthropic Serif';
-        src: url('https://assets.claude.ai/Fonts/AnthropicSerif-Text-Bold-Static.otf')
-          format('opentype');
-        font-weight: 700;
-        font-style: normal;
-        font-display: swap;
-      }
-      @font-face {
-        font-family: 'Anthropic Serif';
-        src: url('https://assets.claude.ai/Fonts/AnthropicSerif-Text-BoldItalic-Static.otf')
-          format('opentype');
-        font-weight: 700;
-        font-style: italic;
-        font-display: swap;
-      }
-    </style>
     <style id="mcp-host-variables">
       :root {
         --color-background-primary: light-dark(rgba(255, 255, 255, 1), rgba(48, 48, 46, 1));
@@ -114,7 +48,7 @@ export const getWidgetFrameCode = ({ widgetCode, title }: { widgetCode: string, 
         --color-ring-danger: light-dark(rgba(167, 61, 57, 0.5), rgba(205, 92, 88, 0.5));
         --color-ring-success: light-dark(rgba(67, 116, 38, 0.5), rgba(89, 145, 48, 0.5));
         --color-ring-warning: light-dark(rgba(128, 92, 31, 0.5), rgba(168, 120, 41, 0.5));
-        --font-sans: Anthropic Sans, sans-serif;
+        --font-sans: "Space Grotesk", "Geist Variable", sans-serif;
         --font-mono: ui-monospace, monospace;
         --font-weight-normal: 400;
         --font-weight-medium: 500;
@@ -158,7 +92,7 @@ export const getWidgetFrameCode = ({ widgetCode, title }: { widgetCode: string, 
     <style>
       :root {
         color-scheme: light dark;
-        --font-serif: 'Anthropic Serif', Georgia, 'Times New Roman', serif;
+        --font-serif: 'Space Grotesk', 'Geist Variable', Georgia, 'Times New Roman', serif;
       }
       * {
         box-sizing: border-box;
@@ -173,8 +107,7 @@ export const getWidgetFrameCode = ({ widgetCode, title }: { widgetCode: string, 
       }
       body {
         font-family:
-          'Anthropic Sans',
-          -apple-system,
+          'Space Grotesk', 'Geist Variable', -apple-system,
           BlinkMacSystemFont,
           'Segoe UI',
           sans-serif;
@@ -680,7 +613,7 @@ export const getWidgetFrameCode = ({ widgetCode, title }: { widgetCode: string, 
         background: var(--bg-300, light-dark(#f0eee6, #141413));
       }
       /* Popover — drops down-left from the trigger.
-   Styled to match the native claude.ai Radix dropdown: white bg, backdrop
+   Styled to match the native Radix dropdown: white bg, backdrop
    blur, 0.5px border, subtle shadow. Items are single-line icon + label,
    matching the conversation menu (Star/Rename/Add to project). */
       #more-popover {

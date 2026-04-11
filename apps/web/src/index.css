@@ -715,8 +715,6 @@ html[data-theme="light"] {
   background: var(--muted-foreground);
 }
 
-/* ─── Claude-style Tool Chain ─── */
-
 .tool-chain-group {
   border-radius: var(--radius-lg);
   overflow: hidden;
