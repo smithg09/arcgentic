@@ -4,12 +4,12 @@
   <img src="apps/web/public/favicon.svg" alt="Devbox Logo" width="90" height="90">
 </p>
 
-<!-- <p align="center"><strong>Ask, Learn, Master.</strong></p> -->
-<p align="center">https://devbox.smithgajjar.dev</p>
+<p align="center"><strong>Ask, Learn, Master.</strong></p>
+<!-- <p align="center">https://.smithgajjar.dev</p> -->
 <p align="center">An open-source, multi-agent learning platform where AI agents research, teach, and create personalized learning content for any topic.</p>
 
 <p align="center">
-  <img src="public/appscreenshot.png" width="800px" alt="Devbox Screenshot">
+  <img src="public/appscreenshot.png" width="800px" alt="Platform_demo">
 </p>
 
 
