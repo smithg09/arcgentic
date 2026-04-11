@@ -6,7 +6,7 @@
 
 <p align="center"><strong>Ask, Learn, Master.</strong></p>
 <!-- <p align="center">https://.smithgajjar.dev</p> -->
-<p align="center">An open-source, multi-agent learning platform where AI agents research, teach, and create personalized learning content for any topic.</p>
+<p align="center">Your personal AI learning ecosystem. An open-source, multi-agent platform that autonomously crafts highly personalized learning content to help you master any subject.</p>
 
 <p align="center">
   <img src="public/appscreenshot.png" width="800px" alt="Platform_demo">
