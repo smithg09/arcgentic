@@ -1,126 +1,92 @@
-# Arcgentic
+<div align="center">
+  <h1>Arcgentic</h1>
+  <p><b>Ask, Learn, Master.</b></p>
+  <p>An open-source, multi-agent learning platform where AI agents research, teach, and create personalized learning content for any topic.</p>
+</div>
 
-> Ask, Learn, Master.
+---
 
-Arcgentic is an open-source, multi-agent learning platform where AI agents research, teach, and create personalised learning content for any topic.
+<!-- [Demo Video / Image Placeholder - To be added] -->
+<div align="center">
+  <em>[Demo video or SVG placeholder]</em>
+</div>
 
-## What it does
+---
 
-- **Ask** anything — start a learning session on any topic or upload your own study materials (PDFs, URLs).
-- **Learn** interactively — a tutor agent teaches you concept-by-concept with inline visualisations, diagrams, and interactive widgets.
-- **Master** the material — the system generates a full curriculum pack: rich explanations, podcast scripts, presentations, flashcards, and concept roadmaps.
+## 🎯 What is Arcgentic?
 
-## Architecture
+Arcgentic is a comprehensive AI-powered learning environment designed to transform how you study and explore new topics. By leveraging multi-agent orchestration, the platform builds an adaptive curriculum specifically for you.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Monorepo (Turborepo + pnpm)              │
-├───────────────┬───────────────┬───────────────┬─────────────────┤
-│   apps/web    │ apps/agent    │ apps/user     │   packages/*    │
-│               │   _service    │   _service    │                 │
-│  React 19     │  Flask +      │  Go + GraphQL │  @arcgentic/ui  │
-│  Vite         │  LangGraph    │  Echo + SQLC  │  eslint-config  │
-│  TanStack     │  Multi-agent  │  PostgreSQL   │  ts-config      │
-│  Tailwind v4  │  orchestr.    │               │                 │
-└───────────────┴───────────────┴───────────────┴─────────────────┘
-```
+### How it Works
 
-### Agent Flow
+- **Ask anything** — Start a learning session on any topic from scratch, or provide your own study materials (PDFs, URLs) for the agents to analyze.
+- **Learn interactively** — Engage with a dedicated tutor agent that guides you step-by-step. The chat experience is enhanced with inline visualizations, dynamic diagrams, and interactive widgets.
+- **Master the material** — Unlike standard chatbot interfaces, Arcgentic automatically generates a complete asset pack to help you master the material:
+  - Deep-dive explanations
+  - Interactive concept roadmaps
+  - Presentation slides
+  - Podcast scripts
+  - Spaced-repetition flashcards
 
-```mermaid
-graph LR
-    User -->|message| Supervisor
-    Supervisor -->|route| Architect
-    Supervisor -->|route| Builder
-    Supervisor -->|route| Learning
-    Architect -->|spec ready| Builder
-    Builder -->|resources| User
-    Learning -->|teach| User
-```
+### 📦 Generated Learning Content
 
-- **Supervisor** — routes user messages to the right agent.
-- **Architect** — gathers learning requirements through conversation.
-- **Builder** — generates content resources (explanation, podcast, presentation, flashcards, roadmap).
-- **Learning** — interactive tutor with widget rendering.
+Arcgentic acts as your personal curriculum factory. Once it understands what you are trying to learn, our multi-agent workflow autonomously researches and synthesizes a complete, structured study-pack:
+- **Deep-Dive Explanations**: Long-form, beautifully formatted reading materials.
+- **Roadmaps**: Interactive diagrams showing how topics interconnect.
+- **Audio Podcasts**: Generated dialog-style podcasts exploring the subject matter.
+- **Slide Decks**: Ready-to-read presentations summarizing key takeaways.
+- **Flashcard Sets**: Spaced-repetition cards designed for active recall.
 
-## Tech Stack
+### 🎨 Interactive "Artifact" Chat
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 19, Vite, TanStack Router/Query, Tailwind CSS v4, shadcn/ui |
-| Agent Service | Python, Flask, LangGraph, LangChain, multi-provider LLM support |
-| User Service | Go, Echo, gqlgen (GraphQL), SQLC, PostgreSQL |
-| Infrastructure | Docker Compose, Turborepo, pnpm workspaces |
+Drawing inspiration from systems like Claude's Artifacts, your Arcgentic Tutor doesn't just reply with simple text. During a session, the tutoring agent will actively generate and render living UI components directly in your chat stream. When explaining complex ideas, the agent can auto-generate:
+- Custom SVG illustrations
+- Dynamic data visualizations and charts
+- Mermaid-based architectural diagrams and flowcharts
+- Interactive learning widgets
 
-## Quick Start
+## 🚀 Quick Start
+
+Get Arcgentic up and running locally with just a few commands. This builds and launches the full platform (UI, APIs, and Database) via Docker.
 
 ### Prerequisites
-
-- Node.js ≥ 18
-- pnpm ≥ 10
+Make sure you have installed on your machine:
+- Node.js ≥ 18 & pnpm ≥ 10
 - Python ≥ 3.11
 - Go ≥ 1.21
-- Docker (for PostgreSQL)
+- Docker Desktop (or another Docker engine)
 
-### Setup
+### Setup & Launch
 
-```bash
-# Clone and install
-git clone <repo-url> && cd arcgentic
+1. **Clone the repository**
+   ```bash
+   git clone <repo-url>
+   cd arcgentic
+   ```
 
-# First time setup (installs deps, starts db, runs migrations, copies envs)
-make setup
+2. **Automated Setup**
+   Run the initial setup to install dependencies, boot the database, run migrations, and scaffold `.env` files.
+   ```bash
+   make setup
+   ```
 
-# Add at least one LLM API key to apps/agent_service/.env
-# e.g. OPENAI_API_KEY=sk-...
+3. **Start the Platform**
+   Bring up the complete application stack using Docker Compose:
+   ```bash
+   docker compose up -d
+   ```
 
-# Start the full application stack in Docker
-docker compose up -d
-```
+The application is now running locally!
+- **Web UI**: [http://localhost:5173](http://localhost:5173) (Open this in your browser)
+- Agent API: http://localhost:5001
+- User/GraphQL API: http://localhost:8080
 
-The app will be available at:
-- **Web UI**: http://localhost:5173
-- **Agent API**: http://localhost:5001
-- **User API (GraphQL)**: http://localhost:8080
+---
 
-## Directory Structure
+## 📚 Documentation
 
-```
-arcgentic/
-├── apps/
-│   ├── web/                 # React frontend
-│   ├── agent_service/       # Python agent orchestration
-│   └── user_service/        # Go user & session backend
-├── packages/
-│   ├── ui/                  # Shared UI component library
-│   ├── eslint-config/       # Shared ESLint configuration
-│   └── typescript-config/   # Shared TypeScript configuration
-├── docs/                    # Project documentation
-├── docker-compose.yml       # PostgreSQL dev database
-├── turbo.json               # Turborepo pipeline config
-└── Makefile                 # Development commands
-```
+For developers, contributors, and those looking to run services outside of Docker, please refer to our dedicated documentation guides:
 
-## Development Commands
-
-```bash
-pnpm dev              # Start all services
-pnpm build            # Build all apps
-pnpm lint             # Lint all code
-make db-up            # Start PostgreSQL
-make db-down          # Stop PostgreSQL
-make migrate-up       # Run migrations
-make migrate-down     # Rollback last migration
-```
-
-See [docs/getting-started.md](docs/getting-started.md) for detailed setup instructions.
-
-## Documentation
-
-- [Architecture Overview](docs/architecture.md)
-- [Getting Started](docs/getting-started.md)
-- [Contributing](docs/contributing.md)
-
-## License
-
-MIT
+- **[Getting Started / Local Dev](docs/getting-started.md)** — Detailed setup instructions, hot-reloading configurations, and troubleshooting tips.
+- **[Architecture Overview](docs/architecture.md)** — Deep dive into the monorepo structure, multi-agent LangGraph flows, and tech stack details.
+- **[Contributing](docs/contributing.md)** — Pull request guidelines, code of conduct, and development standards.
