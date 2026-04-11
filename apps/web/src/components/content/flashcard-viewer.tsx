@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, RotateCcw, Shuffle, Lightbulb } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@arcgentic/ui/button';
+import { Badge } from '@arcgentic/ui/badge';
 
 interface FlashcardViewerProps {
   content: string;

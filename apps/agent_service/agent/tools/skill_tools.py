@@ -14,7 +14,7 @@ from langchain_core.tools import tool, InjectedToolCallId
 from langgraph.prebuilt import InjectedState
 from langgraph.types import Command
 
-from agent.prompts.builder import RESOURCE_PROMPTS, get_resource_prompt
+from agent.skills.builder import RESOURCE_PROMPTS, get_resource_prompt
 
 
 SKILL_DESCRIPTIONS: dict[str, str] = {
@@ -131,10 +131,4 @@ def get_skills(
     )
 
 
-# Flat list — no factory function needed
 SKILL_TOOLS = [list_skills, get_skills]
-
-
-def get_skill_tools(*args, **kwargs):
-    """Backwards-compatible shim. Returns the module-level SKILL_TOOLS list."""
-    return SKILL_TOOLS

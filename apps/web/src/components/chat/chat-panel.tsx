@@ -1,7 +1,7 @@
 import { useRef, useEffect, useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@arcgentic/ui/scroll-area';
 import { MessageBubble, ToolChainGroup } from './message-bubble';
 import { ChatInput } from './chat-input';
 import type { ChatMessage, ToolCallDisplay, StreamState } from '@/types/chat';

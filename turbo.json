@@ -11,8 +11,8 @@
         ".env*"
       ],
       "outputs": [
-        ".svelte-kit/**",
-        ".vercel/**"
+        "dist/**",
+        "build/**"
       ]
     },
     "lint": {

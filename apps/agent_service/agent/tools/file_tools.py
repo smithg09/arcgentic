@@ -261,10 +261,4 @@ def grep(
     return f"Matches ({len(results)}):\n" + "\n".join(results[:50])
 
 
-# Flat list — no factory function needed anymore
 FILE_TOOLS = [read, write, edit, patch, ls, grep]
-
-
-def get_file_tools(*args, **kwargs):
-    """Backwards-compatible shim. Returns the module-level FILE_TOOLS list."""
-    return FILE_TOOLS

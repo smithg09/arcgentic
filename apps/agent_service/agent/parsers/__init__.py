@@ -9,8 +9,11 @@ from __future__ import annotations
 from typing import BinaryIO
 
 from agent.state import Source
+import logging
 from agent.parsers.pdf_parser import extract_from_pdf
 from agent.parsers.url_parser import extract_from_url
+
+logger = logging.getLogger("arcgentic.parsers")
 
 
 def parse_user_input(
@@ -48,9 +51,9 @@ def parse_user_input(
                             content=text_content,
                         ))
                     except UnicodeDecodeError:
-                        print(f"Warning: Unsupported binary file format '{filename}' (ext: '{ext}'). Skipping.")
+                        logger.warning(f"Warning: Unsupported binary file format '{filename}' (ext: '{ext}'). Skipping.")
             except Exception as e:
-                print(f"Warning: Error extracting {filename}: {str(e)}. Skipping.")
+                logger.warning(f"Warning: Error extracting {filename}: {str(e)}. Skipping.")
 
     # Process URLs
     if urls:
@@ -62,7 +65,7 @@ def parse_user_input(
                 source = extract_from_url(url)
                 sources.append(source)
             except Exception as e:
-                print(f"Warning: Error fetching URL {url}: {str(e)}. Skipping.")
+                logger.warning(f"Warning: Error fetching URL {url}: {str(e)}. Skipping.")
 
     return sources
 

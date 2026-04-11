@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef, useId } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Loader2, Sparkles, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@arcgentic/ui/button';
 import mermaid from 'mermaid';
 import {
   Dialog,
@@ -9,7 +9,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@arcgentic/ui/dialog';
 import { createSession } from '@/api/graphql/mutations';
 import { useCurrentUser } from '@/hooks/use-user';
 

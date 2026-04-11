@@ -88,41 +88,24 @@ def route_queue(state: AgentState) -> str:
 
 
 def create_supervisor_graph(checkpointer=None):
+    """Build and compile the top-level supervisor graph."""
     graph = StateGraph(AgentState)
 
-    # ── Nodes ────────────────────────────────────────────────────────────
+    # Nodes
     graph.add_node("supervisor", supervisor_node)
     graph.add_node("queue_processor", queue_processor)
+    graph.add_node("architect", create_architect_graph())
+    graph.add_node("builder", create_builder_graph())
+    graph.add_node("learning", create_learning_graph())
 
-    architect_subgraph = create_architect_graph()
-    graph.add_node("architect", architect_subgraph)
-
-    builder_subgraph = create_builder_graph()
-    graph.add_node("builder", builder_subgraph)
-
-    learning_subgraph = create_learning_graph()
-    graph.add_node("learning", learning_subgraph)
-
-    # ── Entry ────────────────────────────────────────────────────────────
+    # Entry
     graph.set_conditional_entry_point(route_entry)
 
-    # ── Edges ────────────────────────────────────────────────────────────
-
-    # Supervisor populates the queue, then always goes to queue_processor
+    # Edges
     graph.add_edge("supervisor", "queue_processor")
-
-    # Queue processor → dispatches to the correct agent or END
     graph.add_conditional_edges("queue_processor", route_queue)
-
-    # Architect → builder (if spec.is_ready) | END
     graph.add_conditional_edges("architect", route_architect)
-
-    # Builder & Learning always loop back to queue_processor
-    # (which will route to END if no more tasks remain)
     graph.add_edge("builder", "queue_processor")
     graph.add_edge("learning", "queue_processor")
 
     return graph.compile(checkpointer=checkpointer)
-
-
-supervisor_graph = create_supervisor_graph()

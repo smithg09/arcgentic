@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@arcgentic/ui/tabs';
+import { ScrollArea } from '@arcgentic/ui/scroll-area';
 import { ExplanationViewer } from './explanation-viewer';
 import { FlashcardViewer } from './flashcard-viewer';
 import { PodcastPlayer } from './podcast-player';
@@ -20,7 +20,7 @@ import {
   ArrowRight,
   CheckCircle2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@arcgentic/ui/button';
 import type { AgentState } from '@/types/agent';
 
 interface ContentPanelProps {

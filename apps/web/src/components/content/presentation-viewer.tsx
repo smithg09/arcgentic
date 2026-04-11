@@ -15,7 +15,7 @@ import {
   Presentation,
   Bookmark,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@arcgentic/ui/button';
 import { useMarkdownComponents } from './explanation-viewer';
 
 interface Slide {

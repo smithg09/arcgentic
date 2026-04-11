@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@arcgentic/ui/badge';
 
 interface SkillsStripProps {
   skills: string[];

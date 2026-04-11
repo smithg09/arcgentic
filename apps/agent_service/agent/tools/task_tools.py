@@ -1,6 +1,8 @@
 """
-Task management tools for the Builder and Learning agents.
-State-aware via LangGraph Command pattern — mutations persist to AgentState.
+Batch task management tools for the Builder and Learning agents.
+
+Supports creating and updating multiple todos in a single tool call,
+reducing LLM round-trips and token overhead.
 """
 
 from __future__ import annotations
@@ -15,37 +17,59 @@ from langgraph.types import Command
 
 
 @tool
-def write_todo(
-    task: str,
-    category: str,
+def write_todos(
+    items: list[dict],
     state: Annotated[dict, InjectedState],
     tool_call_id: Annotated[str, InjectedToolCallId],
 ) -> Command:
-    """Add a new todo item for tracking progress.
+    """Create one or more todo items for tracking progress.
 
     Args:
-        task: Description of the task
-        category: Category grouping (e.g. 'explanation', 'flashcards', 'setup')
+        items: List of dicts, each with keys:
+            - task (str): Description of the task
+            - category (str): Category grouping (e.g. 'explanation', 'flashcards')
 
     Returns:
-        Command that appends the todo to state.todos.
+        Command that appends all new todos to state.todos.
     """
-    task_id = str(uuid.uuid4())[:8]
-    new_todo = {
-        "id": task_id,
-        "task": task,
-        "category": category,
-        "status": "pending",
-    }
+    if not items:
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(
+                        content="Error: items list is empty.",
+                        tool_call_id=tool_call_id,
+                        name="write_todos",
+                    )
+                ]
+            }
+        )
+
     current_todos: list = list(state.get("todos") or [])
+    new_todos = []
+    summaries = []
+
+    for item in items:
+        task = item.get("task", "")
+        category = item.get("category", "general")
+        task_id = str(uuid.uuid4())[:8]
+
+        new_todos.append({
+            "id": task_id,
+            "task": task,
+            "category": category,
+            "status": "pending",
+        })
+        summaries.append(f"[{task_id}] {task} ({category})")
+
     return Command(
         update={
-            "todos": current_todos + [new_todo],
+            "todos": current_todos + new_todos,
             "messages": [
                 ToolMessage(
-                    content=f"Todo created: [{task_id}] {task} (category: {category})",
+                    content=f"Created {len(new_todos)} todo(s):\n" + "\n".join(summaries),
                     tool_call_id=tool_call_id,
-                    name="write_todo",
+                    name="write_todos",
                 )
             ],
         }
@@ -53,75 +77,76 @@ def write_todo(
 
 
 @tool
-def update_todo(
-    task_id: str,
-    status: str,
+def update_todos(
+    items: list[dict],
     state: Annotated[dict, InjectedState],
     tool_call_id: Annotated[str, InjectedToolCallId],
 ) -> Command:
-    """Update the status of a todo item.
+    """Update the status of one or more todo items.
 
     Args:
-        task_id: ID of the todo to update
-        status: New status — 'pending', 'in_progress', or 'done'
+        items: List of dicts, each with keys:
+            - task_id (str): ID of the todo to update
+            - status (str): New status — 'pending', 'in_progress', or 'done'
 
     Returns:
-        Command that updates the todo in state.todos.
+        Command that updates the matching todos in state.todos.
     """
+    if not items:
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(
+                        content="Error: items list is empty.",
+                        tool_call_id=tool_call_id,
+                        name="update_todos",
+                    )
+                ]
+            }
+        )
+
     valid_statuses = {"pending", "in_progress", "done"}
-    if status not in valid_statuses:
-        return Command(
-            update={
-                "messages": [
-                    ToolMessage(
-                        content=f"Error: Invalid status '{status}'. Must be one of: {valid_statuses}",
-                        tool_call_id=tool_call_id,
-                        name="update_todo",
-                    )
-                ]
-            }
-        )
-
     todos: list = list(state.get("todos") or [])
-    updated_todos = []
-    found = False
-    for todo in todos:
-        if todo["id"] == task_id:
-            updated_todos.append({**todo, "status": status})
-            found = True
-        else:
-            updated_todos.append(todo)
+    todo_map = {t["id"]: t for t in todos}
 
-    if not found:
-        return Command(
-            update={
-                "messages": [
-                    ToolMessage(
-                        content=f"Error: Todo '{task_id}' not found.",
-                        tool_call_id=tool_call_id,
-                        name="update_todo",
-                    )
-                ]
-            }
-        )
+    summaries = []
+    errors = []
+
+    for item in items:
+        task_id = item.get("task_id", "")
+        status = item.get("status", "")
+
+        if status not in valid_statuses:
+            errors.append(f"Invalid status '{status}' for [{task_id}]")
+            continue
+
+        if task_id not in todo_map:
+            errors.append(f"Todo '{task_id}' not found")
+            continue
+
+        todo_map[task_id] = {**todo_map[task_id], "status": status}
+        summaries.append(f"[{task_id}] → {status}")
+
+    updated_todos = list(todo_map.values())
+    msg_parts = []
+
+    if summaries:
+        msg_parts.append(f"Updated {len(summaries)} todo(s):\n" + "\n".join(summaries))
+    if errors:
+        msg_parts.append(f"Errors:\n" + "\n".join(errors))
 
     return Command(
         update={
             "todos": updated_todos,
             "messages": [
                 ToolMessage(
-                    content=f"Todo [{task_id}] updated to '{status}'",
+                    content="\n\n".join(msg_parts) or "No changes made.",
                     tool_call_id=tool_call_id,
-                    name="update_todo",
+                    name="update_todos",
                 )
             ],
         }
     )
 
-# Flat list — no factory function needed anymore
-TASK_TOOLS = [write_todo, update_todo]
 
-
-def get_task_tools(*args, **kwargs):
-    """Backwards-compatible shim. Returns the module-level TASK_TOOLS list."""
-    return TASK_TOOLS
+TASK_TOOLS = [write_todos, update_todos]

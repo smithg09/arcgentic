@@ -2,13 +2,13 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listSessions } from '@/api/graphql/queries';
 import { updateSession } from '@/api/graphql/mutations';
-import { Button } from '@/components/ui/button';
+import { Button } from '@arcgentic/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+} from '@arcgentic/ui/dropdown-menu';
 import {
   Filter,
   ArrowUpDown,
@@ -210,7 +210,7 @@ function SessionListItem({
       onKeyDown={(e) => e.key === 'Enter' && onClick()}
       style={{ animationDelay: `${520 + index * 50}ms` }}
       className="group animate-in-up flex w-full items-center justify-between rounded-lg px-3 py-3 text-left
-        hover:bg-secondary/60 transition-all duration-200 cursor-pointer"
+        hover:bg-secondary/60 transition-all duration-200 border border-border bg-background shadow-sm cursor-pointer"
     >
       <div className="flex items-center gap-3 min-w-0">
         <div className="flex-shrink-0">

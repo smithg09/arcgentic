@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@arcgentic/ui/badge';
 import {
   Globe,
   BookOpen,
@@ -18,10 +18,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+} from '@arcgentic/ui/dialog';
+import { ScrollArea } from '@arcgentic/ui/scroll-area';
+import { Button } from '@arcgentic/ui/button';
+import { Input } from '@arcgentic/ui/input';
 import { addSources } from '@/api/agent/queries';
 
 interface SessionDetailsProps {
@@ -101,7 +101,7 @@ export function SessionDetails({ agentState }: SessionDetailsProps) {
                 <p className="text-caption text-muted-foreground mb-1">Status</p>
                 <Badge
                   variant={spec.is_ready ? 'default' : 'secondary'}
-                  className="rounded-full text-caption py-0 mt-0.5"
+                  className="rounded-full py-0 mt-0.5"
                 >
                   {spec.is_ready ? 'Ready' : 'Drafting'}
                 </Badge>
@@ -173,77 +173,77 @@ export function SessionDetails({ agentState }: SessionDetailsProps) {
             ))}
           </div>
 
-          <div className="pt-1">
-            {!isAddingSource ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsAddingSource(true)}
-                className="w-full text-muted-foreground hover:text-foreground border-dashed"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add More Sources
-              </Button>
-            ) : (
-              <form
-                onSubmit={handleAddSource}
-                className="space-y-3.5 rounded-lg border border-border bg-card/50 p-3.5"
-              >
-                <p className="text-caption font-medium text-foreground">Add Context</p>
-
-                <div className="space-y-3">
-                  <div className="flex gap-2 items-center">
-                    <LinkIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <Input
-                      placeholder="Paste a URL..."
-                      value={newUrl}
-                      onChange={(e) => setNewUrl(e.target.value)}
-                      className="h-8 text-sm"
-                      disabled={isUploading}
-                    />
-                  </div>
-
-                  <div className="flex gap-2 items-center">
-                    <Upload className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <Input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".pdf,.txt,.md"
-                      multiple
-                      className="h-8 text-sm cursor-pointer file:cursor-pointer"
-                      disabled={isUploading}
-                      onChange={(e) =>
-                        setHasFiles(e.target.files !== null && e.target.files.length > 0)
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-2 justify-end pt-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsAddingSource(false)}
-                    disabled={isUploading}
-                    className="h-7 text-xs px-3"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    size="sm"
-                    disabled={isUploading || (!newUrl && !hasFiles)}
-                    className="h-7 text-xs gap-1.5 px-3"
-                  >
-                    {isUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Upload'}
-                  </Button>
-                </div>
-              </form>
-            )}
-          </div>
         </div>
       )}
+      <div className="pt-1">
+        {!isAddingSource ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsAddingSource(true)}
+            className="w-full text-muted-foreground hover:text-foreground border-dashed"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {sources.length ? 'Add More Sources' : 'Add Sources'}
+          </Button>
+        ) : (
+          <form
+            onSubmit={handleAddSource}
+            className="space-y-3.5 rounded-lg border border-border bg-card/50 p-3.5"
+          >
+            <p className="text-caption font-medium text-foreground">Add Context</p>
+
+            <div className="space-y-3">
+              <div className="flex gap-2 items-center">
+                <LinkIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+                <Input
+                  placeholder="Paste a URL..."
+                  value={newUrl}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewUrl(e.target.value)}
+                  className="h-8 text-sm"
+                  disabled={isUploading}
+                />
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <Upload className="h-4 w-4 text-muted-foreground shrink-0" />
+                <Input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.txt,.md"
+                  multiple
+                  className="h-8 text-sm cursor-pointer file:cursor-pointer"
+                  disabled={isUploading}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setHasFiles(e.target.files !== null && e.target.files.length > 0)
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 justify-end pt-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsAddingSource(false)}
+                disabled={isUploading}
+                className="h-7 text-xs px-3"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={isUploading || (!newUrl && !hasFiles)}
+                className="h-7 text-xs gap-1.5 px-3"
+              >
+                {isUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Upload'}
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
 
       {/* Empty */}
       {!spec && sources.length === 0 && (
@@ -256,7 +256,7 @@ export function SessionDetails({ agentState }: SessionDetailsProps) {
       )}
 
       {/* Source Detail Modal */}
-      <Dialog open={!!selectedSource} onOpenChange={(open) => !open && setSelectedSource(null)}>
+      <Dialog open={!!selectedSource} onOpenChange={(open: boolean) => !open && setSelectedSource(null)}>
         <DialogContent className="max-w-3xl w-[90vw] sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl pr-8 text-left">

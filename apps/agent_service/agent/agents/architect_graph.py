@@ -58,7 +58,6 @@ async def architect_agent_node(state: AgentState, config: RunnableConfig) -> dic
 
     llm_messages = [SystemMessage(content=system_prompt)] + messages
     response = await llm_with_tools.ainvoke(llm_messages, config=config)
-    
 
     return {
         "messages": [response],

@@ -6,9 +6,9 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+} from '@arcgentic/ui/dialog'
+import { Button } from '@arcgentic/ui/button'
+import { Input } from '@arcgentic/ui/input'
 import { useModelSettings } from '@/hooks/use-model-settings'
 import { PROVIDERS, DEFAULT_MODEL_CONFIG, type ModelConfig, type ProviderId } from '@/types/model-settings'
 import { cn } from '@/lib/utils'

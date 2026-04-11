@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { Play, Pause, RotateCcw, SkipForward, SkipBack, Volume2, ChevronDown, Settings2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@arcgentic/ui/button';
 
 interface PodcastSegment {
   type: 'intro' | 'discussion' | 'example' | 'analogy' | 'deep_dive' | 'qa' | 'recap' | 'outro';

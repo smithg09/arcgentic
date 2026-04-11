@@ -31,7 +31,9 @@ def get_checkpointer(db_url: str) -> PostgresSaver:
                 temp_saver = PostgresSaver(conn)
                 temp_saver.setup()
         except Exception as e:
-            print(f"Error during Postgres setup: {e}")
+            import logging
+            logger = logging.getLogger("arcgentic.db")
+            logger.error(f"Error during Postgres setup: {e}")
             pass
 
     import asyncio

@@ -6,8 +6,8 @@ import {
   Outlet
 } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@arcgentic/ui/tooltip';
+import { Toaster } from '@arcgentic/ui/sonner';
 import { Header } from '@/components/layout/header';
 import { ModelSettingsModal } from '@/components/layout/model-settings-modal';
 import { ModelSettingsProvider } from '@/hooks/use-model-settings';

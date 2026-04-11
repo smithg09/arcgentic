@@ -3,6 +3,8 @@
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/geist';
 
+@source "../../../packages/ui";
+
 @custom-variant dark (&:is(.dark *));
 
 /* ─── Arcgentic — Energetic Confidence Design System ─── */
@@ -120,14 +122,14 @@
   --card: oklch(0.18 0 0);
   --card-foreground: oklch(0.92 0.008 55);
 
-  --popover: oklch(0.17 0.015 45);
+  --popover: oklch(0.17 0 0);
   --popover-foreground: oklch(0.92 0.008 55);
 
   /* Primary — warm vermillion for dark */
   --primary: oklch(0.62 0.19 25);
   --primary-foreground: oklch(0.98 0.005 55);
 
-  --secondary: oklch(0.21 0.015 45);
+  --secondary: oklch(0.21 0 0);
   --secondary-foreground: oklch(0.9 0.008 55);
 
   --muted: oklch(0.21 0.01 45);

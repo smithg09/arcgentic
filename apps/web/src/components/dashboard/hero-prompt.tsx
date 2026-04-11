@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { ArrowUp, Paperclip, X, FileText, Link2, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@arcgentic/ui/button';
+import { Input } from '@arcgentic/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter
-} from '@/components/ui/dialog';
+} from '@arcgentic/ui/dialog';
 
 interface HeroPromptProps {
   onSubmit: (message: string, files?: File[], urls?: string[]) => void;

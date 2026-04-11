@@ -14,7 +14,7 @@ help:
 	@echo "$(GREEN)Development:$(NC)"
 	@echo "  make dev              - Start all services in development mode"
 	@echo "  make dev-backend      - Start Go backend with hot reload"
-	@echo "  make dev-frontend     - Start SvelteKit frontend"
+	@echo "  make dev-frontend     - Start web frontend"
 	@echo ""
 	@echo "$(GREEN)Database:$(NC)"
 	@echo "  make db-up            - Start PostgreSQL with Docker"
@@ -31,14 +31,14 @@ help:
 	@echo "$(GREEN)Build & Test:$(NC)"
 	@echo "  make build            - Build all services"
 	@echo "  make build-backend    - Build Go backend"
-	@echo "  make build-frontend   - Build SvelteKit frontend"
+	@echo "  make build-frontend   - Build web frontend"
 	@echo "  make test             - Run all tests"
 	@echo "  make test-backend     - Run Go tests with coverage"
 	@echo ""
 	@echo "$(GREEN)Code Quality:$(NC)"
 	@echo "  make lint             - Run linters for all code"
 	@echo "  make format           - Format all code"
-	@echo "  make check-types      - Type check TypeScript/Svelte"
+	@echo "  make check-types      - Type check TypeScript"
 	@echo ""
 	@echo "$(GREEN)Cleanup:$(NC)"
 	@echo "  make clean            - Clean build artifacts"
@@ -65,7 +65,7 @@ POSTGRES_HOST ?= localhost
 POSTGRES_PORT ?= 5439
 POSTGRES_USER ?= postgres
 POSTGRES_PASSWORD ?= supersecretpassword
-POSTGRES_DATABASE ?= sveltekit-go-graphql-starter
+POSTGRES_DATABASE ?= aiproject
 
 ifeq ($(POSTGRES_IS_SSL_DISABLED),true)
 	ssl_mode := ?sslmode=disable
@@ -87,7 +87,7 @@ endif
 dev:
 	@echo "$(GREEN)Starting all services...$(NC)"
 	@echo "$(BLUE)Checking if PostgreSQL is running...$(NC)"
-	@if ! docker ps | grep -q golang-sveltekit-postgres; then \
+	@if ! docker ps | grep -q aiproject-postgres-1; then \
 		echo "$(BLUE)PostgreSQL is not running. Starting it...$(NC)"; \
 		make db-up; \
 		echo "$(BLUE)Waiting for PostgreSQL to be ready...$(NC)"; \
@@ -100,7 +100,7 @@ dev:
 dev-backend:
 	@echo "$(GREEN)Starting Go backend...$(NC)"
 	@echo "$(BLUE)Checking if PostgreSQL is running...$(NC)"
-	@if ! docker ps | grep -q golang-sveltekit-postgres; then \
+	@if ! docker ps | grep -q aiproject-postgres-1; then \
 		echo "$(BLUE)PostgreSQL is not running. Starting it...$(NC)"; \
 		make db-up; \
 		echo "$(BLUE)Waiting for PostgreSQL to be ready...$(NC)"; \
@@ -111,7 +111,7 @@ dev-backend:
 	@pnpm run dev --filter=core
 
 dev-frontend:
-	@echo "$(GREEN)Starting SvelteKit frontend...$(NC)"
+	@echo "$(GREEN)Starting Web frontend...$(NC)"
 	@pnpm dev --filter=web
 
 .PHONY: dev dev-backend dev-frontend
@@ -206,7 +206,7 @@ build-backend:
 	@echo "$(BLUE)Binary created at $(BACKEND_DIR)/build/$(NAME)$(NC)"
 
 build-frontend:
-	@echo "$(GREEN)Building SvelteKit frontend...$(NC)"
+	@echo "$(GREEN)Building Web frontend...$(NC)"
 	@pnpm build --filter=web
 
 .PHONY: build build-backend build-frontend
@@ -257,7 +257,7 @@ clean:
 	@echo "$(GREEN)Cleaning build artifacts...$(NC)"
 	@rm -rf $(BACKEND_DIR)/build
 	@rm -rf $(BACKEND_DIR)/tmp
-	@rm -rf $(FRONTEND_DIR)/.svelte-kit
+
 	@rm -rf $(FRONTEND_DIR)/build
 	@rm -rf .turbo
 	@echo "$(BLUE)Clean complete$(NC)"

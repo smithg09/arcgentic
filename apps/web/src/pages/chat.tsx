@@ -13,7 +13,7 @@ import { getAndClearPendingFiles, getAndClearPendingUrls } from '@/lib/pending-u
 import type { AgentState } from '@/types/agent';
 import type { ChatMessage } from '@/types/chat';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@arcgentic/ui/button';
 import { useMediaQuery } from '@/hooks/use-media-query';
 
 export function ChatPage() {

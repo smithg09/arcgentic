@@ -1,147 +1,112 @@
-# Arcgentic User Service (Go Backend)
+# Arcgentic User Service
 
-GraphQL backend for Arcgentic user and learning-progression data.
-
-This service manages:
-
-- users
-- learning sessions
-- earned skills
+GraphQL backend for user management, learning sessions, and skill progression.
 
 ## Architecture
+
+Built with Go, Echo, and gqlgen, backed by PostgreSQL with SQLC-generated queries.
 
 ```
 apps/user_service/
 ├── cmd/core/
-│   ├── graph/                     # gqlgen generated resolvers and models
+│   ├── graph/              # gqlgen generated resolvers and models
 │   ├── gqlgen.yml
-│   └── main.go                    # Application entrypoint (Echo + GraphQL)
-├── db/migration/                  # SQL migrations
+│   └── main.go             # Application entrypoint
+├── db/migration/           # SQL migrations (golang-migrate)
 ├── internal/
 │   ├── actor/
-│   │   ├── db/sql/                # Postgres adapter
-│   │   └── server/                # Echo server wrapper
+│   │   ├── db/sql/         # Postgres adapter
+│   │   └── server/         # Echo server wrapper
 │   ├── module/
-│   │   ├── user/
-│   │   │   └── user-querier/
-│   │   ├── session/
-│   │   │   └── session-querier/
-│   │   └── earnedskill/
-│   │       └── earnedskill-querier/
-│   └── util/                      # Config, filters, GraphQL base schema, logger
+│   │   ├── user/           # User CRUD
+│   │   ├── session/        # Learning session CRUD
+│   │   └── earnedskill/    # Skill progression tracking
+│   └── util/               # Config, filters, GraphQL base schema, logger
 ├── go.mod
 └── package.json
 ```
-
-All build and development commands are orchestrated from the root Makefile.
 
 ## API Surface (GraphQL)
 
 ### Queries
 
-- ping: String
-- getUser(id: Uuid!): User
-- getSession(id: Uuid!): Session
-- listSessions(where: WhereSessionsDto): [Session!]!
-- getEarnedSkills(user_id: Uuid!): EarnedSkills
+| Query | Description |
+|-------|-------------|
+| `ping` | Health check |
+| `getUser(id)` | Get user by ID |
+| `getSession(id)` | Get session by ID |
+| `listSessions(where)` | List sessions with filters |
+| `getEarnedSkills(user_id)` | Get user's earned skills |
 
 ### Mutations
 
-- createUser(data: CreateUserDto!): User
-- updateUser(id: Uuid!, data: UpdateUserDto!): User
-- deleteUser(id: Uuid!): Boolean
-- createSession(data: CreateSessionDto!): Session
-- updateSession(id: Uuid!, data: UpdateSessionDto!): Session
-- upsertEarnedSkills(data: UpsertEarnedSkillsDto!): EarnedSkills
+| Mutation | Description |
+|----------|-------------|
+| `createUser(data)` | Create a new user |
+| `updateUser(id, data)` | Update user profile |
+| `deleteUser(id)` | Delete a user |
+| `createSession(data)` | Create a learning session |
+| `updateSession(id, data)` | Update session metadata |
+| `upsertEarnedSkills(data)` | Add or update earned skills |
 
 ## Runtime Endpoints
 
-- GraphQL Playground: http://localhost:8080/
-- GraphQL API: http://localhost:8080/query
+- **GraphQL Playground**: http://localhost:8080/
+- **GraphQL API**: http://localhost:8080/query
 
 ## Environment Variables
 
-Copy .env.example to .env in this service:
+Copy `.env.example` to `.env`:
 
 ```bash
-cd apps/user_service
 cp .env.example .env
 ```
 
-Current defaults:
-
-```bash
-# Application
-ENVIRONMENT=development
-LOG_LEVEL=debug
-
-# Postgres
-POSTGRES_URI=postgresql://aiproject:aiproject@localhost:5433
-POSTGRES_DATABASE=aiproject
-POSTGRES_IS_SSL_DISABLED=true
-```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ENVIRONMENT` | `development` | Runtime environment |
+| `LOG_LEVEL` | `debug` | Log verbosity |
+| `POSTGRES_URI` | `postgresql://aiproject:aiproject@localhost:5433` | Database host |
+| `POSTGRES_DATABASE` | `aiproject` | Database name |
+| `POSTGRES_IS_SSL_DISABLED` | `true` | Disable SSL for local dev |
 
 ## Development
 
-### Start Dependencies
+### Start the service
 
-From project root:
-
-```bash
-make db-up
-make migrate-up
-```
-
-### Run Backend (Hot Reload)
-
-From project root:
+From the project root:
 
 ```bash
 make dev-backend
 ```
 
-Or directly in this service:
+Or directly:
 
 ```bash
 cd apps/user_service
 pnpm dev
 ```
 
-## Code Generation
-
-After updating GraphQL schema files:
+### Code Generation
 
 ```bash
+# After updating GraphQL schema files
 make gqlgen
-```
 
-### Generate SQLC Queries
-
-After modifying SQL queries in `internal/module/*/sql/`:
-
-```bash
+# After modifying SQLC query files
 make sqlc
 ```
 
 ### Database Migrations
 
-All migration commands should be run from the **root directory**:
+All migration commands from the project root:
 
 ```bash
-# Apply all pending migrations
-make migrate-up
-
-# Rollback last migration
-make migrate-down
-
-# Jump to specific version
-make version=3 migrate-goto
-
-# Force version (use with caution)
-make version=3 migrate-force
-
-# Check current version
-make migrate-version
+make migrate-up              # Apply all pending migrations
+make migrate-down            # Rollback last migration
+make version=3 migrate-goto  # Jump to specific version
+make version=3 migrate-force # Force version (use with caution)
+make migrate-version         # Check current version
 ```
 
 ### Testing
@@ -150,66 +115,18 @@ make migrate-version
 make test-backend
 ```
 
-Run tests directly in this service:
-
-```bash
-make gqlgen
-```
-
-### 3. Implement Resolvers
-
-Edit generated files in `cmd/core/graph/`
-
-### 4. Add Database Layer
-
-- Create migration: `db/migration/XXXXXX_your_feature.up.sql`
-- Add SQLC queries: `internal/module/yourmodule/sql/`
-- Generate: `make sqlc`
-
 ## Build
-
-From project root:
 
 ```bash
 make build-backend
-```
-
-Binary output:
-
-```text
-apps/user_service/build/core
-```
-
-## Migrations
-
-From project root:
-
-```bash
-make migrate-up
-make migrate-down
-make version=3 migrate-goto
-make version=3 migrate-force
-make migrate-version
+# Output: apps/user_service/build/core
 ```
 
 ## Troubleshooting
 
-GraphQL generation fails:
-
-- Validate all schema.graphql files.
-- Check apps/user_service/cmd/core/gqlgen.yml.
-
-Database connection errors:
-
-- Verify Postgres container is running.
-- Verify apps/user_service/.env values match docker-compose settings.
-
-Migration errors:
-
-- Check SQL syntax in apps/user_service/db/migration.
-- Check current migration state with make migrate-version.
-
-Air not found:
-
-- Install Air: go install github.com/cosmtrek/air@latest
-- Or run: go run cmd/core/main.go
+| Issue | Solution |
+|-------|----------|
+| GraphQL generation fails | Validate all `schema.graphql` files, check `gqlgen.yml` |
+| Database connection errors | Verify Postgres container is running, check `.env` values |
+| Migration errors | Check SQL syntax in `db/migration/`, run `make migrate-version` |
+| Air not found | Install Air: `go install github.com/cosmtrek/air@latest` |
