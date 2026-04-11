@@ -25,7 +25,7 @@ CRITICAL INSTRUCTION: If you have gathered enough information and are ready to h
 ## Current Spec
 {current_spec}
 
-## Source Materials
+## Source Materials uploaded by user 
 {source_materials}
 """
 

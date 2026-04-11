@@ -16,7 +16,6 @@ import os
 from typing import Any, Literal
 
 from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_openai import ChatOpenAI
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
@@ -25,6 +24,7 @@ from agent.state import AgentState, LearningSpec
 from agent.prompts.builder import BUILDER_SYSTEM_PROMPT
 from agent.tools.file_tools import FILE_TOOLS
 from agent.tools.task_tools import TASK_TOOLS
+from agent.model_provider import get_chat_model, ModelConfig
 from agent.tools.skill_tools import SKILL_TOOLS
 
 # All tools available to the builder
@@ -46,12 +46,10 @@ async def builder_agent_node(state: AgentState, config: RunnableConfig) -> dict[
     Uses `current_user_request` from state as the focused instruction
     extracted by the supervisor for this specific task.
     """
-    llm = ChatOpenAI(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        api_key=os.getenv("OPENAI_API_KEY"),
-        temperature=1.0,
-        top_p=1.0,
-        streaming=True,
+    model_cfg = state.get("model_config")
+    llm = get_chat_model(
+        ModelConfig(**model_cfg) if model_cfg else None,
+        defaults={"temperature": 1.0, "top_p": 1.0, "streaming": True},
     )
 
     spec = state.get("spec") or LearningSpec()

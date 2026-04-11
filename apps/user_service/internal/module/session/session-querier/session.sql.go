@@ -14,19 +14,20 @@ import (
 )
 
 const createOne = `-- name: CreateOne :one
-INSERT INTO sessions (user_id, title, is_marked_completed, created_at, updated_at)
-VALUES ($1, $2, $3, NOW(), NOW())
-RETURNING session_id, user_id, is_marked_completed, created_at, updated_at, title
+INSERT INTO sessions (user_id, title, is_marked_completed, is_archived, created_at, updated_at)
+VALUES ($1, $2, $3, $4, NOW(), NOW())
+RETURNING session_id, user_id, is_marked_completed, created_at, updated_at, title, is_archived
 `
 
 type CreateOneParams struct {
 	UserID            uuid.UUID
 	Title             string
 	IsMarkedCompleted bool
+	IsArchived        bool
 }
 
 func (q *Queries) CreateOne(ctx context.Context, arg CreateOneParams) (Session, error) {
-	row := q.db.QueryRowContext(ctx, createOne, arg.UserID, arg.Title, arg.IsMarkedCompleted)
+	row := q.db.QueryRowContext(ctx, createOne, arg.UserID, arg.Title, arg.IsMarkedCompleted, arg.IsArchived)
 	var i Session
 	err := row.Scan(
 		&i.SessionID,
@@ -35,12 +36,13 @@ func (q *Queries) CreateOne(ctx context.Context, arg CreateOneParams) (Session, 
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Title,
+		&i.IsArchived,
 	)
 	return i, err
 }
 
 const getMany = `-- name: GetMany :many
-SELECT session_id, user_id, is_marked_completed, created_at, updated_at, title
+SELECT session_id, user_id, is_marked_completed, created_at, updated_at, title, is_archived
 FROM sessions
 WHERE
   (
@@ -58,20 +60,25 @@ WHERE
   (
     is_marked_completed = $3 OR $3 IS NULL
   )
+  AND
+  (
+    is_archived = $4 OR $4 IS NULL
+  )
 ORDER BY
-  CASE WHEN $4::text = 'created_at__asc' THEN created_at END ASC,
-  CASE WHEN $4::text = 'created_at__desc' THEN created_at END DESC,
-  CASE WHEN $4::text = 'updated_at__asc' THEN updated_at END ASC,
-  CASE WHEN $4::text = 'updated_at__desc' THEN updated_at END DESC,
-  CASE WHEN $4::text = 'is_marked_completed__asc' THEN is_marked_completed END ASC,
-  CASE WHEN $4::text = 'is_marked_completed__desc' THEN is_marked_completed END DESC
-LIMIT $6 OFFSET $5
+  CASE WHEN $5::text = 'created_at__asc' THEN created_at END ASC,
+  CASE WHEN $5::text = 'created_at__desc' THEN created_at END DESC,
+  CASE WHEN $5::text = 'updated_at__asc' THEN updated_at END ASC,
+  CASE WHEN $5::text = 'updated_at__desc' THEN updated_at END DESC,
+  CASE WHEN $5::text = 'is_marked_completed__asc' THEN is_marked_completed END ASC,
+  CASE WHEN $5::text = 'is_marked_completed__desc' THEN is_marked_completed END DESC
+LIMIT $7 OFFSET $6
 `
 
 type GetManyParams struct {
 	UserIDEq          uuid.NullUUID
 	UserIDIn          []uuid.UUID
 	IsMarkedCompleted sql.NullBool
+	IsArchived        sql.NullBool
 	SortQuery         sql.NullString
 	Offset            sql.NullInt32
 	Limit             sql.NullInt32
@@ -82,6 +89,7 @@ func (q *Queries) GetMany(ctx context.Context, arg GetManyParams) ([]Session, er
 		arg.UserIDEq,
 		pq.Array(arg.UserIDIn),
 		arg.IsMarkedCompleted,
+		arg.IsArchived,
 		arg.SortQuery,
 		arg.Offset,
 		arg.Limit,
@@ -100,6 +108,7 @@ func (q *Queries) GetMany(ctx context.Context, arg GetManyParams) ([]Session, er
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Title,
+			&i.IsArchived,
 		); err != nil {
 			return nil, err
 		}
@@ -115,7 +124,7 @@ func (q *Queries) GetMany(ctx context.Context, arg GetManyParams) ([]Session, er
 }
 
 const getOneById = `-- name: GetOneById :one
-SELECT session_id, user_id, is_marked_completed, created_at, updated_at, title FROM sessions
+SELECT session_id, user_id, is_marked_completed, created_at, updated_at, title, is_archived FROM sessions
 WHERE session_id = $1
 `
 
@@ -129,6 +138,7 @@ func (q *Queries) GetOneById(ctx context.Context, sessionID uuid.UUID) (Session,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Title,
+		&i.IsArchived,
 	)
 	return i, err
 }
@@ -138,14 +148,16 @@ UPDATE sessions SET
   user_id = coalesce($1, user_id),
   title = coalesce($2, title),
   is_marked_completed = coalesce($3, is_marked_completed),
+  is_archived = coalesce($4, is_archived),
   updated_at = now()
-WHERE session_id = $4 RETURNING session_id, user_id, is_marked_completed, created_at, updated_at, title
+WHERE session_id = $5 RETURNING session_id, user_id, is_marked_completed, created_at, updated_at, title, is_archived
 `
 
 type UpdateOneByIdParams struct {
 	UserID            uuid.NullUUID
 	Title             sql.NullString
 	IsMarkedCompleted sql.NullBool
+	IsArchived        sql.NullBool
 	ID                uuid.UUID
 }
 
@@ -154,6 +166,7 @@ func (q *Queries) UpdateOneById(ctx context.Context, arg UpdateOneByIdParams) (S
 		arg.UserID,
 		arg.Title,
 		arg.IsMarkedCompleted,
+		arg.IsArchived,
 		arg.ID,
 	)
 	var i Session
@@ -164,6 +177,7 @@ func (q *Queries) UpdateOneById(ctx context.Context, arg UpdateOneByIdParams) (S
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Title,
+		&i.IsArchived,
 	)
 	return i, err
 }

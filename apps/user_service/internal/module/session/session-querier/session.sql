@@ -1,6 +1,6 @@
 -- name: CreateOne :one
-INSERT INTO sessions (user_id, title, is_marked_completed, created_at, updated_at)
-VALUES ($1, $2, $3, NOW(), NOW())
+INSERT INTO sessions (user_id, title, is_marked_completed, is_archived, created_at, updated_at)
+VALUES ($1, $2, $3, $4, NOW(), NOW())
 RETURNING *;
 
 -- name: GetOneById :one
@@ -26,6 +26,10 @@ WHERE
   (
     is_marked_completed = sqlc.narg('is_marked_completed') OR sqlc.narg('is_marked_completed') IS NULL
   )
+  AND
+  (
+    is_archived = sqlc.narg('is_archived') OR sqlc.narg('is_archived') IS NULL
+  )
 ORDER BY
   CASE WHEN sqlc.narg('sort_query')::text = 'created_at__asc' THEN created_at END ASC,
   CASE WHEN sqlc.narg('sort_query')::text = 'created_at__desc' THEN created_at END DESC,
@@ -40,5 +44,6 @@ UPDATE sessions SET
   user_id = coalesce(sqlc.narg(user_id), user_id),
   title = coalesce(sqlc.narg(title), title),
   is_marked_completed = coalesce(sqlc.narg(is_marked_completed), is_marked_completed),
+  is_archived = coalesce(sqlc.narg(is_archived), is_archived),
   updated_at = now()
 WHERE session_id = sqlc.arg(id) RETURNING *;

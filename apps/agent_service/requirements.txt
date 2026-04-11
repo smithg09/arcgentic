@@ -7,6 +7,9 @@ pydantic>=2.0
 langgraph
 langchain
 langchain-openai
+langchain-anthropic
+langchain-google-genai
+langchain-ollama
 
 # Postgres checkpointer
 langgraph-checkpoint-postgres

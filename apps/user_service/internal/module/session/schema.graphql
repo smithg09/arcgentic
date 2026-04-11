@@ -3,6 +3,7 @@ type Session @goModel(model: "github.com/smithg09/core/internal/module/session.S
   user_id: Uuid! @goField(name: "UserID")
   title: String!
   is_marked_completed: Boolean! @goField(name: "IsMarkedCompleted")
+  is_archived: Boolean! @goField(name: "IsArchived")
   created_at: Time!
   updated_at: Time!
 }
@@ -16,6 +17,7 @@ input CreateSessionDto @goModel(model: "github.com/smithg09/core/internal/module
 input WhereSessionsDto @goModel(model: "github.com/smithg09/core/internal/module/session.WhereDto") {
   user_id: UuidFilter @goField(name: "UserID")
   is_marked_completed: Boolean @goField(name: "IsMarkedCompleted")
+  is_archived: Boolean @goField(name: "IsArchived")
   sort: SortFilter
   pagination: PaginationFilter
 }
@@ -24,6 +26,7 @@ input UpdateSessionDto @goModel(model: "github.com/smithg09/core/internal/module
   user_id: Uuid @goField(name: "UserID")
   title: String @goField(name: "Title")
   is_marked_completed: Boolean @goField(name: "IsMarkedCompleted")
+  is_archived: Boolean @goField(name: "IsArchived")
 }
 
 extend type Query {

@@ -3,12 +3,12 @@ from typing import Literal
 
 from langchain_core.messages import HumanMessage
 from langchain_core.messages import SystemMessage
-from langchain_openai import ChatOpenAI
 from langchain_core.runnables.config import RunnableConfig
 from pydantic import BaseModel, Field
 
 from agent.state import AgentState, AgentTask
 from agent.prompts.supervisor import SUPERVISOR_SYSTEM_PROMPT
+from agent.model_provider import get_chat_model, ModelConfig
 
 
 class SupervisorDecision(BaseModel):
@@ -67,11 +67,10 @@ def _fallback_queue(state: AgentState) -> list[AgentTask]:
 
 
 async def supervisor_node(state: AgentState, config: RunnableConfig):
-    llm = ChatOpenAI(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        api_key=os.getenv("OPENAI_API_KEY"),
-        temperature=0,
-        top_p=1.0,
+    model_cfg = state.get("model_config")
+    llm = get_chat_model(
+        ModelConfig(**model_cfg) if model_cfg else None,
+        defaults={"temperature": 0, "top_p": 1.0},
     )
 
     messages = state.get("messages", [])

@@ -17,13 +17,13 @@ import os
 from typing import Any, Literal
 
 from langchain_core.messages import SystemMessage
-from langchain_openai import ChatOpenAI
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 
 from agent.state import AgentState
 from agent.tools.learning_tools import LEARNING_TOOLS
+from agent.model_provider import get_chat_model, ModelConfig
 
 LEARNING_SYSTEM_PROMPT = """You are an interactive and helpful learning assistant that helps users learn and understand topics clearly.
 Your goal is to help the user learn and master their requested topic.
@@ -83,11 +83,10 @@ async def learning_agent_node(state: AgentState, config: RunnableConfig) -> dict
     Uses `current_user_request` from state as the focused instruction
     extracted by the supervisor for this specific task.
     """
-    llm = ChatOpenAI(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        api_key=os.getenv("OPENAI_API_KEY"),
-        temperature=0.4,
-        streaming=True,
+    model_cfg = state.get("model_config")
+    llm = get_chat_model(
+        ModelConfig(**model_cfg) if model_cfg else None,
+        defaults={"temperature": 0.4, "streaming": True},
     )
 
     messages = state.get("messages", [])

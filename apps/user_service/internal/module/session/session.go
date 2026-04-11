@@ -30,6 +30,7 @@ type Session struct {
 	UserID            uuid.UUID `json:"userId"`
 	Title             string    `json:"title"`
 	IsMarkedCompleted bool      `json:"isMarkedCompleted"`
+	IsArchived        bool      `json:"isArchived"`
 	CreatedAt         time.Time `json:"createdAt"`
 	UpdatedAt         time.Time `json:"updatedAt"`
 }
@@ -43,6 +44,7 @@ type CreateDto struct {
 type WhereDto struct {
 	UserID            *filter.UuidFilter       `json:"userId"`
 	IsMarkedCompleted *bool                    `json:"isMarkedCompleted"`
+	IsArchived        *bool                    `json:"isArchived"`
 	Sort              *filter.SortFilter       `json:"sort"`
 	Pagination        *filter.PaginationFilter `json:"pagination"`
 }
@@ -51,4 +53,5 @@ type UpdateDto struct {
 	UserID            *uuid.UUID `json:"userId"`
 	Title             *string    `json:"title"`
 	IsMarkedCompleted *bool      `json:"isMarkedCompleted"`
+	IsArchived        *bool      `json:"isArchived"`
 }

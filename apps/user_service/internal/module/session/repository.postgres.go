@@ -45,6 +45,7 @@ func (r *postgresSessionRepository) CreateOne(ctx context.Context, data CreateDt
 		UserID:            data.UserID,
 		Title:             title,
 		IsMarkedCompleted: isMarkedCompleted,
+		IsArchived:        false,
 	}
 
 	qm, err := r.querier.CreateOne(ctx, params)
@@ -93,6 +94,9 @@ func (r *postgresSessionRepository) GetMany(ctx context.Context, where *WhereDto
 		if where.IsMarkedCompleted != nil {
 			params.IsMarkedCompleted = sql.NullBool{Bool: *where.IsMarkedCompleted, Valid: true}
 		}
+		if where.IsArchived != nil {
+			params.IsArchived = sql.NullBool{Bool: *where.IsArchived, Valid: true}
+		}
 
 		orderBy := "updated_at"
 		sortOrder := "desc"
@@ -140,6 +144,9 @@ func (r *postgresSessionRepository) UpdateOneById(ctx context.Context, id uuid.U
 	if data.IsMarkedCompleted != nil {
 		params.IsMarkedCompleted = sql.NullBool{Valid: true, Bool: *data.IsMarkedCompleted}
 	}
+	if data.IsArchived != nil {
+		params.IsArchived = sql.NullBool{Valid: true, Bool: *data.IsArchived}
+	}
 
 	qm, err := r.querier.UpdateOneById(ctx, params)
 	if err != nil {
@@ -164,6 +171,7 @@ func (r *postgresSessionRepository) buildModelFromQuerier(qm sessionQuerier.Sess
 		UserID:            qm.UserID,
 		Title:             qm.Title,
 		IsMarkedCompleted: qm.IsMarkedCompleted,
+		IsArchived:        qm.IsArchived,
 		CreatedAt:         qm.CreatedAt,
 		UpdatedAt:         qm.UpdatedAt,
 	}

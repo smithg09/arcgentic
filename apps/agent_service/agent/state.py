@@ -116,3 +116,4 @@ class AgentState(TypedDict):
     todos: Annotated[list[dict], merge_todos]
     agent_queue: list[AgentTask]  # ordered queue of agents to execute
     current_user_request: str  # extracted user prompt for the current agent task
+    model_config: dict | None  # ModelConfig dict from FE, flows through all nodes

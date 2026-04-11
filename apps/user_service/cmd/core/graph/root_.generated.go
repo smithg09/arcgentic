@@ -73,6 +73,7 @@ type ComplexityRoot struct {
 
 	Session struct {
 		CreatedAt         func(childComplexity int) int
+		IsArchived        func(childComplexity int) int
 		IsMarkedCompleted func(childComplexity int) int
 		SessionID         func(childComplexity int) int
 		Title             func(childComplexity int) int
@@ -296,6 +297,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Session.CreatedAt(childComplexity), true
+
+	case "Session.is_archived":
+		if e.complexity.Session.IsArchived == nil {
+			break
+		}
+
+		return e.complexity.Session.IsArchived(childComplexity), true
 
 	case "Session.is_marked_completed":
 		if e.complexity.Session.IsMarkedCompleted == nil {
@@ -635,6 +643,7 @@ extend type Mutation {
   user_id: Uuid! @goField(name: "UserID")
   title: String!
   is_marked_completed: Boolean! @goField(name: "IsMarkedCompleted")
+  is_archived: Boolean! @goField(name: "IsArchived")
   created_at: Time!
   updated_at: Time!
 }
@@ -648,6 +657,7 @@ input CreateSessionDto @goModel(model: "github.com/smithg09/core/internal/module
 input WhereSessionsDto @goModel(model: "github.com/smithg09/core/internal/module/session.WhereDto") {
   user_id: UuidFilter @goField(name: "UserID")
   is_marked_completed: Boolean @goField(name: "IsMarkedCompleted")
+  is_archived: Boolean @goField(name: "IsArchived")
   sort: SortFilter
   pagination: PaginationFilter
 }
@@ -656,6 +666,7 @@ input UpdateSessionDto @goModel(model: "github.com/smithg09/core/internal/module
   user_id: Uuid @goField(name: "UserID")
   title: String @goField(name: "Title")
   is_marked_completed: Boolean @goField(name: "IsMarkedCompleted")
+  is_archived: Boolean @goField(name: "IsArchived")
 }
 
 extend type Query {

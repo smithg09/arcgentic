@@ -17,7 +17,6 @@ import os
 from typing import Any, Literal
 
 from langchain_core.messages import SystemMessage
-from langchain_openai import ChatOpenAI
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
@@ -25,6 +24,7 @@ from langgraph.prebuilt import ToolNode
 from agent.state import AgentState, LearningSpec
 from agent.prompts.architect import ARCHITECT_SYSTEM_PROMPT, format_source_materials
 from agent.tools.spec_tools import SPEC_TOOLS
+from agent.model_provider import get_chat_model, ModelConfig
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -38,12 +38,10 @@ async def architect_agent_node(state: AgentState, config: RunnableConfig) -> dic
     Reads the current spec from state (including any tool-updated values from
     prior iterations) and decides the next question or handoff.
     """
-    llm = ChatOpenAI(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        api_key=os.getenv("OPENAI_API_KEY"),
-        temperature=0.7,
-        top_p=1.0,
-        streaming=True,
+    model_cfg = state.get("model_config")
+    llm = get_chat_model(
+        ModelConfig(**model_cfg) if model_cfg else None,
+        defaults={"temperature": 0.7, "top_p": 1.0, "streaming": True},
     )
 
     spec: LearningSpec = state.get("spec") or LearningSpec()

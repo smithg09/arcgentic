@@ -736,6 +736,8 @@ func (ec *executionContext) fieldContext_Mutation_createSession(ctx context.Cont
 				return ec.fieldContext_Session_title(ctx, field)
 			case "is_marked_completed":
 				return ec.fieldContext_Session_is_marked_completed(ctx, field)
+			case "is_archived":
+				return ec.fieldContext_Session_is_archived(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Session_created_at(ctx, field)
 			case "updated_at":
@@ -802,6 +804,8 @@ func (ec *executionContext) fieldContext_Mutation_updateSession(ctx context.Cont
 				return ec.fieldContext_Session_title(ctx, field)
 			case "is_marked_completed":
 				return ec.fieldContext_Session_is_marked_completed(ctx, field)
+			case "is_archived":
+				return ec.fieldContext_Session_is_archived(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Session_created_at(ctx, field)
 			case "updated_at":
@@ -1161,6 +1165,8 @@ func (ec *executionContext) fieldContext_Query_getSession(ctx context.Context, f
 				return ec.fieldContext_Session_title(ctx, field)
 			case "is_marked_completed":
 				return ec.fieldContext_Session_is_marked_completed(ctx, field)
+			case "is_archived":
+				return ec.fieldContext_Session_is_archived(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Session_created_at(ctx, field)
 			case "updated_at":
@@ -1230,6 +1236,8 @@ func (ec *executionContext) fieldContext_Query_listSessions(ctx context.Context,
 				return ec.fieldContext_Session_title(ctx, field)
 			case "is_marked_completed":
 				return ec.fieldContext_Session_is_marked_completed(ctx, field)
+			case "is_archived":
+				return ec.fieldContext_Session_is_archived(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Session_created_at(ctx, field)
 			case "updated_at":
@@ -1723,6 +1731,50 @@ func (ec *executionContext) _Session_is_marked_completed(ctx context.Context, fi
 }
 
 func (ec *executionContext) fieldContext_Session_is_marked_completed(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_is_archived(ctx context.Context, field graphql.CollectedField, obj *session.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_is_archived(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsArchived, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_is_archived(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Session",
 		Field:      field,
@@ -2498,7 +2550,7 @@ func (ec *executionContext) unmarshalInputUpdateSessionDto(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user_id", "title", "is_marked_completed"}
+	fieldsInOrder := [...]string{"user_id", "title", "is_marked_completed", "is_archived"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -2526,6 +2578,13 @@ func (ec *executionContext) unmarshalInputUpdateSessionDto(ctx context.Context, 
 				return it, err
 			}
 			it.IsMarkedCompleted = data
+		case "is_archived":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_archived"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsArchived = data
 		}
 	}
 
@@ -2662,7 +2721,7 @@ func (ec *executionContext) unmarshalInputWhereSessionsDto(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user_id", "is_marked_completed", "sort", "pagination"}
+	fieldsInOrder := [...]string{"user_id", "is_marked_completed", "is_archived", "sort", "pagination"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -2683,6 +2742,13 @@ func (ec *executionContext) unmarshalInputWhereSessionsDto(ctx context.Context, 
 				return it, err
 			}
 			it.IsMarkedCompleted = data
+		case "is_archived":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_archived"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsArchived = data
 		case "sort":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
 			data, err := ec.unmarshalOSortFilter2ᚖgithubᚗcomᚋsmithg09ᚋcoreᚋinternalᚋutilᚋfilterᚐSortFilter(ctx, v)
@@ -3056,6 +3122,11 @@ func (ec *executionContext) _Session(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "is_marked_completed":
 			out.Values[i] = ec._Session_is_marked_completed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "is_archived":
+			out.Values[i] = ec._Session_is_archived(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
