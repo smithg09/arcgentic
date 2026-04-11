@@ -1,6 +1,7 @@
 <div align="center">
   <h3><b>Arcgentic</b></h3>
-  <p><b>Ask, Learn, Master.</b></p>
+  <h4 style="margin-top: -10px;">Ask, Learn, Master.</h4>
+  
   <p>An open-source, multi-agent learning platform where AI agents research, teach, and create personalized learning content for any topic.</p>
 </div>
 
