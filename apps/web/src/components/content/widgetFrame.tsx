@@ -9,6 +9,9 @@ export const getWidgetFrameCode = ({ widgetCode, title }: { widgetCode: string, 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Visualize Widget</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <style id="mcp-host-variables">
       :root {
         --color-background-primary: light-dark(rgba(255, 255, 255, 1), rgba(48, 48, 46, 1));
