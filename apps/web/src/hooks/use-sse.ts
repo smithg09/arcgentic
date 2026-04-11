@@ -1,13 +1,15 @@
 import { useState, useRef, useCallback } from 'react'
 import { AGENT_API_BASE } from '@/lib/constants'
+import { getStoredModelConfig, toApiModelConfig } from '@/hooks/use-model-settings'
 import type { ChatMessage, ToolCallDisplay, StreamState } from '@/types/chat'
 
 interface UseSSEOptions {
   sessionId: string
   onComplete?: (state: Record<string, unknown>) => void
+  onNoProvider?: (message: string) => void
 }
 
-export function useSSE({ sessionId, onComplete }: UseSSEOptions) {
+export function useSSE({ sessionId, onComplete, onNoProvider }: UseSSEOptions) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [streamState, setStreamState] = useState<StreamState>({
     isStreaming: false,
@@ -57,6 +59,12 @@ export function useSSE({ sessionId, onComplete }: UseSSEOptions) {
         }
         if (urls && urls.length > 0) {
           formData.append('urls', urls.join(','))
+        }
+
+        // Attach model config from localStorage
+        const storedConfig = getStoredModelConfig()
+        if (storedConfig) {
+          formData.append('model_config', JSON.stringify(toApiModelConfig(storedConfig)))
         }
 
         const res = await fetch(
@@ -123,7 +131,7 @@ export function useSSE({ sessionId, onComplete }: UseSSEOptions) {
   )
 
   const handleEvent = useCallback(
-    (event: { type: string; [key: string]: unknown }, aiMsgId: string) => {
+    (event: { type: string;[key: string]: unknown }, aiMsgId: string) => {
       switch (event.type) {
         case 'token': {
           const content = (event.content as string) || ''
@@ -175,9 +183,14 @@ export function useSSE({ sessionId, onComplete }: UseSSEOptions) {
           break
         }
         case 'error': {
+          const errorCode = event.code as string | undefined
+          const errorMsg = (event.message as string) || 'Unknown error'
+          if (errorCode === 'NO_PROVIDER' || errorCode === 'INVALID_API_KEY') {
+            onNoProvider?.(errorMsg)
+          }
           setStreamState(prev => ({
             ...prev,
-            error: (event.message as string) || 'Unknown error',
+            error: errorMsg,
           }))
           break
         }

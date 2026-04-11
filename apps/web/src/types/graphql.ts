@@ -15,6 +15,7 @@ export interface Session {
   user_id: string
   title: string
   is_marked_completed: boolean
+  is_archived: boolean
   created_at: string
   updated_at: string
 }
@@ -46,6 +47,7 @@ export interface UpdateSessionDto {
   user_id?: string
   title?: string
   is_marked_completed?: boolean
+  is_archived?: boolean
 }
 
 // ─── GraphQL Responses ───

@@ -30,6 +30,7 @@ export async function createSession(data: CreateSessionDto): Promise<Session> {
         user_id
         title
         is_marked_completed
+        is_archived
         created_at
         updated_at
       }
@@ -46,6 +47,7 @@ export async function updateSession(id: string, data: UpdateSessionDto): Promise
         user_id
         title
         is_marked_completed
+        is_archived
         created_at
         updated_at
       }

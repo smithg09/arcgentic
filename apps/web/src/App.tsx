@@ -9,6 +9,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/sonner';
 import { Header } from '@/components/layout/header';
+import { ModelSettingsModal } from '@/components/layout/model-settings-modal';
+import { ModelSettingsProvider } from '@/hooks/use-model-settings';
 import { DashboardPage } from '@/pages/dashboard';
 import { ChatPage } from '@/pages/chat';
 import { FloatingGeometry } from '@/components/ui/floating-geometry';
@@ -81,9 +83,12 @@ declare module '@tanstack/react-router' {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <RouterProvider router={router} />
-      </TooltipProvider>
+      <ModelSettingsProvider>
+        <TooltipProvider>
+          <RouterProvider router={router} />
+          <ModelSettingsModal />
+        </TooltipProvider>
+      </ModelSettingsProvider>
     </QueryClientProvider>
   );
 }

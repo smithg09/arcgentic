@@ -17,7 +17,9 @@ import {
   Clock,
   CheckCircle2,
   Circle,
-  MoreHorizontal
+  MoreHorizontal,
+  Archive,
+  ArchiveRestore
 } from 'lucide-react';
 import type { Session } from '@/types/graphql';
 
@@ -26,7 +28,7 @@ interface SessionsListProps {
   onSessionClick: (sessionId: string) => void;
 }
 
-type FilterType = 'all' | 'active' | 'completed';
+type FilterType = 'all' | 'active' | 'completed' | 'archived';
 type SortType = 'newest' | 'oldest';
 type LayoutType = 'list' | 'card';
 
@@ -52,11 +54,22 @@ export function SessionsList({ userId, onSessionClick }: SessionsListProps) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] })
   });
 
+  const toggleArchive = useMutation({
+    mutationFn: ({ id, is_archived }: { id: string; is_archived: boolean }) =>
+      updateSession(id, { is_archived }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] })
+  });
+
   const filtered = useMemo(() => {
     let result = [...sessions];
 
-    if (filter === 'active') result = result.filter((s) => !s.is_marked_completed);
-    if (filter === 'completed') result = result.filter((s) => s.is_marked_completed);
+    if (filter === 'archived') {
+      result = result.filter((s) => s.is_archived);
+    } else {
+      result = result.filter((s) => !s.is_archived);
+      if (filter === 'active') result = result.filter((s) => !s.is_marked_completed);
+      if (filter === 'completed') result = result.filter((s) => s.is_marked_completed);
+    }
 
     result.sort((a, b) => {
       const dateA = new Date(a.created_at).getTime();
@@ -109,6 +122,9 @@ export function SessionsList({ userId, onSessionClick }: SessionsListProps) {
               <DropdownMenuItem onClick={() => setFilter('completed')}>
                 <CheckCircle2 className="h-3.5 w-3.5 mr-2" /> Completed
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilter('archived')}>
+                <Archive className="h-3.5 w-3.5 mr-2" /> Archived
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -148,6 +164,7 @@ export function SessionsList({ userId, onSessionClick }: SessionsListProps) {
               index={idx}
               onClick={() => onSessionClick(session.session_id)}
               onMarkComplete={() => markComplete.mutate(session.session_id)}
+              onToggleArchive={() => toggleArchive.mutate({ id: session.session_id, is_archived: !session.is_archived })}
             />
           ))}
         </div>
@@ -160,6 +177,7 @@ export function SessionsList({ userId, onSessionClick }: SessionsListProps) {
               index={idx}
               onClick={() => onSessionClick(session.session_id)}
               onMarkComplete={() => markComplete.mutate(session.session_id)}
+              onToggleArchive={() => toggleArchive.mutate({ id: session.session_id, is_archived: !session.is_archived })}
             />
           ))}
         </div>
@@ -172,12 +190,14 @@ function SessionListItem({
   session,
   index,
   onClick,
-  onMarkComplete
+  onMarkComplete,
+  onToggleArchive
 }: {
   session: Session;
   index: number;
   onClick: () => void;
   onMarkComplete: () => void;
+  onToggleArchive: () => void;
 }) {
   const date = new Date(session.created_at);
   const title = session.title || 'Untitled Session';
@@ -230,6 +250,18 @@ function SessionListItem({
               <CheckCircle2 className="h-3.5 w-3.5 mr-2" /> Mark complete
             </DropdownMenuItem>
           )}
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleArchive();
+            }}
+          >
+            {session.is_archived ? (
+              <><ArchiveRestore className="h-3.5 w-3.5 mr-2" /> Unarchive</>
+            ) : (
+              <><Archive className="h-3.5 w-3.5 mr-2" /> Archive</>
+            )}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -240,12 +272,14 @@ function SessionCardItem({
   session,
   index,
   onClick,
-  onMarkComplete
+  onMarkComplete,
+  onToggleArchive
 }: {
   session: Session;
   index: number;
   onClick: () => void;
   onMarkComplete: () => void;
+  onToggleArchive: () => void;
 }) {
   const date = new Date(session.created_at);
   const title = session.title || 'Untitled Session';
@@ -289,9 +323,21 @@ function SessionCardItem({
                   onMarkComplete();
                 }}
               >
-                Mark complete
+                <CheckCircle2 className="h-3.5 w-3.5 mr-2" /> Mark complete
               </DropdownMenuItem>
             )}
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleArchive();
+              }}
+            >
+              {session.is_archived ? (
+                <><ArchiveRestore className="h-3.5 w-3.5 mr-2" /> Unarchive</>
+              ) : (
+                <><Archive className="h-3.5 w-3.5 mr-2" /> Archive</>
+              )}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

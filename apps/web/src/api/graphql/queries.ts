@@ -42,6 +42,7 @@ export async function getUser(id: string): Promise<User | null> {
 interface ListSessionsWhere {
   user_id?: { eq?: string; in?: string[] }
   is_marked_completed?: boolean
+  is_archived?: boolean
   sort?: { sortBy: string; sortOrder: string }
   pagination?: { limit: number; skip: number }
 }
@@ -54,6 +55,7 @@ export async function listSessions(where?: ListSessionsWhere): Promise<Session[]
         user_id
         title
         is_marked_completed
+        is_archived
         created_at
         updated_at
       }
@@ -70,6 +72,7 @@ export async function getSession(id: string): Promise<Session | null> {
         user_id
         title
         is_marked_completed
+        is_archived
         created_at
         updated_at
       }

@@ -6,6 +6,7 @@ import { getSessionState } from '@/api/agent/queries';
 import { getSession } from '@/api/graphql/queries';
 import { updateSession } from '@/api/graphql/mutations';
 import { useSSE } from '@/hooks/use-sse';
+import { useModelSettings } from '@/hooks/use-model-settings';
 import { ChatPanel } from '@/components/chat/chat-panel';
 import { ContentPanel } from '@/components/content/content-panel';
 import { getAndClearPendingFiles, getAndClearPendingUrls } from '@/lib/pending-uploads';
@@ -20,6 +21,7 @@ export function ChatPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const { openSettings } = useModelSettings();
 
   // GraphQL Session
   const { data: session } = useQuery({
@@ -61,7 +63,10 @@ export function ChatPage() {
       if (title && session?.title !== title) {
         updateSession(sessionId, { title }).catch(() => { });
       }
-    }
+    },
+    onNoProvider: (message) => {
+      openSettings(message);
+    },
   });
 
   // Sync title from spec to session if needed (e.g. from GraphQL query load)
@@ -156,11 +161,13 @@ export function ChatPage() {
   useEffect(() => {
     const initialMessage = localStorage.getItem('pending_message');
     if (initialMessage && messages.length === 0 && !streamState.isStreaming) {
-      const pendingFiles = getAndClearPendingFiles();
-      const pendingUrls = getAndClearPendingUrls();
-
       // Small delay to let the component mount
       const timer = setTimeout(() => {
+        // Read & clear pending data inside the timer so React Strict Mode's
+        // double-invocation doesn't consume them before the timer fires.
+        const pendingFiles = getAndClearPendingFiles();
+        const pendingUrls = getAndClearPendingUrls();
+
         sendMessage(
           initialMessage,
           pendingFiles.length > 0 ? pendingFiles : undefined,

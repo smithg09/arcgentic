@@ -1,12 +1,14 @@
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Settings } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import { useCurrentUser } from '@/hooks/use-user';
+import { useModelSettings } from '@/hooks/use-model-settings';
 import { Logo } from '@/components/ui/logo';
 import { cn } from '@/lib/utils';
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
   const { user } = useCurrentUser();
+  const { openSettings, isConfigured } = useModelSettings();
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background backdrop-blur-xl border-b border-border/50">
@@ -44,7 +46,7 @@ export function Header() {
             onClick={toggleTheme}
             className={cn(
               'relative flex h-8 w-8 items-center justify-center rounded-full bg-transparent transition-colors',
-              'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-foreground/60 hover:text-foreground'
+              'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-foreground/60 hover:text-foreground cursor-pointer'
             )}
             aria-label="Toggle theme"
           >
@@ -56,6 +58,24 @@ export function Header() {
               )}
             </div>
           </button>
+
+          {/* Settings button */}
+          <button
+            onClick={() => openSettings()}
+            className={cn(
+              'relative flex h-8 w-8 items-center justify-center rounded-full bg-transparent transition-colors',
+              'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-foreground/60 hover:text-foreground cursor-pointer'
+            )}
+            aria-label="Model settings"
+          >
+            <div className="relative flex h-full items-center justify-center">
+              <Settings className="h-[18px] w-[18px]" strokeWidth={2} />
+              {isConfigured && (
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
+              )}
+            </div>
+          </button>
+
         </div>
       </div>
     </header>
