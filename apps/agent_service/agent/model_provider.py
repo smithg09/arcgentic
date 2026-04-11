@@ -19,18 +19,10 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Custom exception
-# ─────────────────────────────────────────────────────────────────────────────
-
 class NoProviderConfiguredError(Exception):
     """Raised when no LLM provider is configured (neither FE config nor ENV)."""
     pass
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Model configuration schema
-# ─────────────────────────────────────────────────────────────────────────────
 
 class ModelConfig(BaseModel):
     """User-supplied model configuration from the frontend."""
@@ -100,10 +92,6 @@ def _get_env_fallback_provider() -> tuple[str, str, str]:
         "or configure a provider in the settings."
     )
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Factory
-# ─────────────────────────────────────────────────────────────────────────────
 
 def get_chat_model(config: ModelConfig | None = None, defaults: dict | None = None):
     """
