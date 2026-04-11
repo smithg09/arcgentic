@@ -121,17 +121,17 @@ dev-frontend:
 #
 db-up:
 	@echo "$(GREEN)Starting PostgreSQL...$(NC)"
-	@docker-compose up -d
+	@docker compose up -d
 	@echo "$(BLUE)PostgreSQL is running on port 5439$(NC)"
 
 db-down:
 	@echo "$(GREEN)Stopping PostgreSQL...$(NC)"
-	@docker-compose down
+	@docker compose down
 
 db-reset:
 	@echo "$(GREEN)Resetting database...$(NC)"
-	@docker-compose down -v
-	@docker-compose up -d
+	@docker compose down -v
+	@docker compose up -d
 	@sleep 3
 	@make migrate-up
 
@@ -279,6 +279,7 @@ setup:
 	@make db-up
 	@sleep 3
 	@cd $(BACKEND_DIR) && cp .env.example .env || true
+	@cd apps/agent_service && cp .env.example .env || true
 	@make migrate-up
 	@echo "$(BLUE)Setup complete! Run 'make dev' to start development$(NC)"
 

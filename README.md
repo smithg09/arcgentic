@@ -67,23 +67,15 @@ graph LR
 ```bash
 # Clone and install
 git clone <repo-url> && cd arcgentic
-pnpm install
 
-# Start the database
-make db-up
-
-# Run migrations
-make migrate-up
-
-# Copy env files
-cp apps/agent_service/.env.example apps/agent_service/.env
-cp apps/user_service/.env.example apps/user_service/.env
+# First time setup (installs deps, starts db, runs migrations, copies envs)
+make setup
 
 # Add at least one LLM API key to apps/agent_service/.env
 # e.g. OPENAI_API_KEY=sk-...
 
-# Start all services
-pnpm dev
+# Start the full application stack in Docker
+docker compose up -d
 ```
 
 The app will be available at:

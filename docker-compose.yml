@@ -10,10 +10,49 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U aiproject"]
+      test: [ "CMD-SHELL", "pg_isready -U aiproject" ]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  user_service:
+    build:
+      context: ./apps/user_service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRES_URI=postgresql://aiproject:aiproject@postgres:5432
+      - POSTGRES_DATABASE=aiproject
+      - POSTGRES_IS_SSL_DISABLED=true
+      - NODE_ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  agent_service:
+    build:
+      context: ./apps/agent_service
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - DATABASE_URL=postgresql://aiproject:aiproject@postgres:5432/aiproject
+    env_file:
+      - ./apps/agent_service/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - user_service
+      - agent_service
 
 volumes:
   pgdata:
