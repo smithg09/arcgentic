@@ -43,32 +43,25 @@ _graph = None
 _checkpointer = None
 
 
-_graph_cache = {}
-
 async def get_graph():
-    """Get or initialize the graph in the current event loop."""
-    global _graph_cache
-    loop = asyncio.get_running_loop()
-    
-    # Check if we already have a graph for this loop
-    if loop in _graph_cache:
-        return _graph_cache[loop]
+    """Get or initialize the global graph."""
+    global _graph
+    if _graph is not None:
+        return _graph
         
     db_url = os.getenv("DATABASE_URL", "postgresql://aiproject:aiproject@127.0.0.1:5433/aiproject")
     print(f"DEBUG: Connecting to Postgres at: {db_url}")
 
     try:
-        checkpointer = await get_checkpointer(db_url)
-        graph = create_supervisor_graph(checkpointer=checkpointer)
-        _graph_cache[loop] = graph
-        print(f"DEBUG: Postgres checkpointer initialized successfully for loop {id(loop)}!")
-        return graph
+        checkpointer = get_checkpointer(db_url)
+        _graph = create_supervisor_graph(checkpointer=checkpointer)
+        print("DEBUG: Postgres checkpointer initialized successfully!")
+        return _graph
     except Exception as e:
         print(f"Warning: Could not connect to Postgres: {e}")
         print("Running without persistence (in-memory only)")
-        graph = create_supervisor_graph(checkpointer=None)
-        _graph_cache[loop] = graph
-        return graph
+        _graph = create_supervisor_graph(checkpointer=None)
+        return _graph
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -126,12 +119,16 @@ async def chat(session_id: str):
         try:
             # Use an async iterator to allow heartbeat injection
             event_iterator = graph.astream_events(input_state, config=config, version="v2").__aiter__()
+            next_event_task = asyncio.create_task(event_iterator.__anext__())
             
             while True:
-                try:
-                    # Wait for an event with a timeout for heartbeats
-                    # 15 seconds is usually safe for most proxies/gateways
-                    event = await asyncio.wait_for(event_iterator.__anext__(), timeout=15.0)
+                done, pending = await asyncio.wait([next_event_task], timeout=15.0)
+                if next_event_task in done:
+                    try:
+                        event = next_event_task.result()
+                        next_event_task = asyncio.create_task(event_iterator.__anext__())
+                    except StopAsyncIteration:
+                        break
                     
                     kind = event["event"]
                     name = event["name"]
@@ -161,7 +158,25 @@ async def chat(session_id: str):
                         yield f"data: {json.dumps({'type': 'tool_start', 'tool': event['name'], 'input': event.get('data', {}).get('input')})}\n\n"
                     elif kind == "on_tool_end":
                         output = event.get('data', {}).get('output')
-                        output_str = str(output.content) if hasattr(output, 'content') else str(output)
+                        output_str = ""
+                        
+                        if type(output).__name__ == "Command":
+                            update_data = getattr(output, "update", {})
+                            
+                            # Give a clean summary if this is a content/file update
+                            if isinstance(update_data, dict) and "content" in update_data and isinstance(update_data["content"], dict):
+                                files = list(update_data["content"].keys())
+                                if files:
+                                    output_str = f"Updated files: {', '.join(files)}"
+                                    
+                            if not output_str:
+                                try:
+                                    output_str = json.dumps(update_data)
+                                except Exception:
+                                    output_str = str(update_data)
+                        else:
+                            output_str = str(output.content) if hasattr(output, 'content') else str(output)
+                            
                         tool_end_data = {'type': 'tool_end', 'tool': event['name'], 'output': output_str}
                         # Include tool input for show_widget so frontend can render even if chunks were missed
                         tool_input = event.get('data', {}).get('input')
@@ -175,14 +190,12 @@ async def chat(session_id: str):
                         if node != "__start__":
                              yield f"data: {json.dumps({'type': 'node_start', 'node': node})}\n\n"
 
-                except asyncio.TimeoutError:
-                    # Send a heartbeat to keep the connection alive
+                else:
+                    # Timeout reached, send a heartbeat to keep the connection alive
                     yield f"data: {json.dumps({'type': 'heartbeat'})}\n\n"
-                except StopAsyncIteration:
-                    break
 
             # Get final state to send as the complete event
-            state = await graph.aget_state(config)
+            state = await asyncio.to_thread(graph.get_state, config)
             
             # Format the final state dictionary
             final_data = {
@@ -244,7 +257,7 @@ async def get_session(session_id: str):
     config = {"configurable": {"thread_id": session_id}}
 
     try:
-        state = await graph.aget_state(config)
+        state = await asyncio.to_thread(graph.get_state, config)
 
         if not state.values:
             return jsonify({
@@ -339,7 +352,7 @@ async def add_sources(session_id: str):
 
     config = {"configurable": {"thread_id": session_id}}
     try:
-        state = await graph.aget_state(config)
+        state = await asyncio.to_thread(graph.get_state, config)
         spec = state.values.get("spec")
         
         # Default spec if it doesn't exist
@@ -350,7 +363,7 @@ async def add_sources(session_id: str):
             spec.sources.extend(new_sources)
             
         # Update the state in langgraph
-        await graph.aupdate_state(config, {"spec": spec})
+        await asyncio.to_thread(graph.update_state, config, {"spec": spec})
 
         # Return the updated list of sources
         serialized = [s.model_dump() for s in spec.sources]
@@ -372,7 +385,7 @@ async def get_resources(session_id: str):
     config = {"configurable": {"thread_id": session_id}}
 
     try:
-        state = await graph.aget_state(config)
+        state = await asyncio.to_thread(graph.get_state, config)
         content = state.values.get("content", {})
         spec = state.values.get("spec")
 
@@ -406,7 +419,7 @@ async def get_resource(session_id: str, resource_type: str):
     config = {"configurable": {"thread_id": session_id}}
 
     try:
-        state = await graph.aget_state(config)
+        state = await asyncio.to_thread(graph.get_state, config)
         content = state.values.get("content", {})
 
         if resource_type not in content:

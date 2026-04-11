@@ -25,7 +25,7 @@ def write_todo(
 
     Args:
         task: Description of the task
-        category: Category grouping (e.g. 'article', 'flashcards', 'setup')
+        category: Category grouping (e.g. 'explanation', 'flashcards', 'setup')
 
     Returns:
         Command that appends the todo to state.todos.
@@ -45,6 +45,7 @@ def write_todo(
                 ToolMessage(
                     content=f"Todo created: [{task_id}] {task} (category: {category})",
                     tool_call_id=tool_call_id,
+                    name="write_todo",
                 )
             ],
         }
@@ -75,6 +76,7 @@ def update_todo(
                     ToolMessage(
                         content=f"Error: Invalid status '{status}'. Must be one of: {valid_statuses}",
                         tool_call_id=tool_call_id,
+                        name="update_todo",
                     )
                 ]
             }
@@ -97,6 +99,7 @@ def update_todo(
                     ToolMessage(
                         content=f"Error: Todo '{task_id}' not found.",
                         tool_call_id=tool_call_id,
+                        name="update_todo",
                     )
                 ]
             }
@@ -109,6 +112,7 @@ def update_todo(
                 ToolMessage(
                     content=f"Todo [{task_id}] updated to '{status}'",
                     tool_call_id=tool_call_id,
+                    name="update_todo",
                 )
             ],
         }

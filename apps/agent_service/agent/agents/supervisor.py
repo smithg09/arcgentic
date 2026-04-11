@@ -36,29 +36,37 @@ def _fallback_queue(state: AgentState) -> list[AgentTask]:
     last_lower = last_content.lower()
 
     builder_keywords = [
-        "article.md",
+        "explanation.md",
         "presentation.json",
         "podcast.json",
+        "flashcards.json",
+        "roadmap.json",
         "generate resources",
         "build learning resources",
         "create learning resources",
         "curriculum pack",
         "study package",
-        "update the article",
+        "update the explanation",
         "update the presentation",
         "update the podcast",
-        "regenerate the article",
+        "update the flashcards",
+        "update the roadmap",
+        "regenerate the explanation",
         "regenerate the presentation",
         "regenerate the podcast",
+        "regenerate the flashcards",
+        "regenerate the roadmap",
         "change the podcast",
-        "change the article",
+        "change the explanation",
+        "rebuild the roadmap",
+        "add more flashcards",
     ]
     if any(keyword in last_lower for keyword in builder_keywords):
         return [AgentTask(agent="builder", user_request=last_content)]
     return [AgentTask(agent="learning", user_request=last_content)]
 
 
-def supervisor_node(state: AgentState, config: RunnableConfig):
+async def supervisor_node(state: AgentState, config: RunnableConfig):
     llm = ChatOpenAI(
         model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
         api_key=os.getenv("OPENAI_API_KEY"),
@@ -67,19 +75,11 @@ def supervisor_node(state: AgentState, config: RunnableConfig):
     )
 
     messages = state.get("messages", [])
-    # latest_user_message = next(
-    #     (
-    #         msg
-    #         for msg in reversed(messages)
-    #         if isinstance(msg, HumanMessage)
-    #     ),
-    #     None,
-    # )
 
     llm_with_schema = llm.with_structured_output(SupervisorDecision)
 
     try:
-        decision = llm_with_schema.invoke(
+        decision = await llm_with_schema.ainvoke(
             [SystemMessage(content=SUPERVISOR_SYSTEM_PROMPT)] + messages,
             config=config,
         )

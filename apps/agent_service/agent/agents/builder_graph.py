@@ -35,7 +35,7 @@ ALL_BUILDER_TOOLS = FILE_TOOLS + TASK_TOOLS + SKILL_TOOLS
 # Builder agent node
 # ─────────────────────────────────────────────────────────────────────────────
 
-def builder_agent_node(state: AgentState, config: RunnableConfig) -> dict[str, Any]:
+async def builder_agent_node(state: AgentState, config: RunnableConfig) -> dict[str, Any]:
     """
     Builder LLM reasoning node.
 
@@ -89,20 +89,24 @@ You are fully autonomous. Use your tools to build content:
         first_build_block = """
 ## First Build — Required Resources
 
-This is the FIRST build. No content exists yet. You MUST generate these three:
-  1. `article.md`        — comprehensive markdown article
-  2. `presentation.json` — slide deck JSON
-  3. `podcast.json`      — conversational podcast script
+This is the FIRST build. No content exists yet. You MUST generate ALL FIVE of these:
+  1. `explanation.md`    — comprehensive markdown explanation with diagrams, tables, and rich formatting
+  2. `podcast.json`      — conversational podcast script
+  3. `presentation.json` — slide deck JSON
+  4. `flashcards.json`   — spaced-repetition flashcard set
+  5. `roadmap.json`  — roadmap with nodes and edges
 
 Recommended workflow (efficient):
-  a. get_skills(["article.md", "presentation.json", "podcast.json"])  ← fetch all at once
-  b. Generate article.md  → write("article.md", <content>)
-  c. Generate presentation.json → write("presentation.json", <content>)
-  d. Generate podcast.json → write("podcast.json", <content>)
+  a. get_skills(["explanation.md", "podcast.json", "presentation.json", "flashcards.json", "roadmap.json"])  ← fetch all at once
+  b. Generate explanation.md    → write("explanation.md", <content>)
+  c. Generate podcast.json      → write("podcast.json", <content>)
+  d. Generate presentation.json → write("presentation.json", <content>)
+  e. Generate flashcards.json   → write("flashcards.json", <content>)
+  f. Generate roadmap.json  → write("roadmap.json", <content>)
 
-After all three are written, output your completion message (no more tool calls).
+After all five are written, output your completion message (no more tool calls).
 """
-        system_prompt += autonomy_block + first_build_block
+        system_prompt += first_build_block
     else:
         already_built = ", ".join(content.keys()) or "none"
         system_prompt += (
@@ -119,7 +123,7 @@ After all three are written, output your completion message (no more tool calls)
         )
 
     llm_messages = [SystemMessage(content=system_prompt)] + messages
-    response = llm_with_tools.invoke(llm_messages, config=config)
+    response = await llm_with_tools.ainvoke(llm_messages, config=config)
 
     return {
         "messages": [response],

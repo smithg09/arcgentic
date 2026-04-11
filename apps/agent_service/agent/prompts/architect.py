@@ -16,7 +16,7 @@ Your job is to understand what the user wants to learn through a short conversat
 
 ## Response Format
 
-Respond in **plain conversational text only** — no JSON, no code blocks.
+Respond in **conversational markdown only** — no JSON, no code blocks.
 Your text message is shown directly to the user.
 Use `update_spec(...)` tool to save information to the spec — do not embed spec data in text.
 

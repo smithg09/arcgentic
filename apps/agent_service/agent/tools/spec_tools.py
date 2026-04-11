@@ -80,6 +80,7 @@ def update_spec(
                 ToolMessage(
                     content=confirmation,
                     tool_call_id=tool_call_id,
+                    name="update_spec",
                 )
             ],
         }

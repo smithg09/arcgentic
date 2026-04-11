@@ -31,7 +31,7 @@ from agent.tools.spec_tools import SPEC_TOOLS
 # Architect agent node
 # ─────────────────────────────────────────────────────────────────────────────
 
-def architect_agent_node(state: AgentState, config: RunnableConfig) -> dict[str, Any]:
+async def architect_agent_node(state: AgentState, config: RunnableConfig) -> dict[str, Any]:
     """
     Architect LLM node — asks questions, calls update_spec tool to persist info.
 
@@ -59,7 +59,7 @@ def architect_agent_node(state: AgentState, config: RunnableConfig) -> dict[str,
     )
 
     llm_messages = [SystemMessage(content=system_prompt)] + messages
-    response = llm_with_tools.invoke(llm_messages, config=config)
+    response = await llm_with_tools.ainvoke(llm_messages, config=config)
     
 
     return {

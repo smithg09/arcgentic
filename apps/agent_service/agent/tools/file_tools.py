@@ -25,7 +25,7 @@ def read(
     """Read content from a file by filename.
 
     Args:
-        filename: Name of the file to read (e.g. 'article.md', 'flashcards.json')
+        filename: Name of the file to read (e.g. 'explanation.md', 'flashcards.json')
 
     Returns:
         The file content as a string, or an error message if not found.
@@ -46,7 +46,7 @@ def write(
     """Write/create a file in the content store (persists to agent state).
 
     Args:
-        filename: Name of the file to create (e.g. 'article.md', 'flashcards.json')
+        filename: Name of the file to create (e.g. 'explanation.md', 'flashcards.json')
         content: The content to write
 
     Returns:
@@ -59,6 +59,7 @@ def write(
                 ToolMessage(
                     content=f"Successfully wrote {len(content)} chars to '{filename}'",
                     tool_call_id=tool_call_id,
+                    name="write",
                 )
             ],
         }
@@ -91,6 +92,7 @@ def edit(
                     ToolMessage(
                         content=f"Error: File '{filename}' not found.",
                         tool_call_id=tool_call_id,
+                        name="edit",
                     )
                 ]
             }
@@ -104,6 +106,7 @@ def edit(
                     ToolMessage(
                         content=f"Error: Could not find old_content in '{filename}'.",
                         tool_call_id=tool_call_id,
+                        name="edit",
                     )
                 ]
             }
@@ -117,6 +120,7 @@ def edit(
                 ToolMessage(
                     content=f"Successfully edited '{filename}'",
                     tool_call_id=tool_call_id,
+                    name="edit",
                 )
             ],
         }
@@ -147,6 +151,7 @@ def patch(
                     ToolMessage(
                         content=f"Error: File '{filename}' not found.",
                         tool_call_id=tool_call_id,
+                        name="patch",
                     )
                 ]
             }
@@ -175,6 +180,7 @@ def patch(
                     ToolMessage(
                         content=f"Successfully patched '{filename}'",
                         tool_call_id=tool_call_id,
+                        name="patch",
                     )
                 ],
             }
@@ -186,6 +192,7 @@ def patch(
                     ToolMessage(
                         content=f"Error applying patch to '{filename}': {str(e)}",
                         tool_call_id=tool_call_id,
+                        name="patch",
                     )
                 ]
             }

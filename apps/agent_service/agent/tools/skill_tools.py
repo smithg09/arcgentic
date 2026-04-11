@@ -18,13 +18,13 @@ from agent.prompts.builder import RESOURCE_PROMPTS, get_resource_prompt
 
 
 SKILL_DESCRIPTIONS: dict[str, str] = {
-    "article.md": "Long-form markdown article with sections, code examples, and key takeaways",
+    "explanation.md": "Rich markdown explanation with diagrams, tables, blockquotes, and comprehensive breakdowns",
     "podcast.json": "Conversational podcast script with multiple speakers, intro/outro, and timed segments",
     "presentation.json": "Slide deck JSON with title, bullets, speaker notes, and visual suggestions",
     "video_script.json": "Video narration script with scenes, visuals descriptions, and timing",
     "flashcards.json": "Spaced-repetition flashcard set with front/back and difficulty ratings",
     "interactive_lesson.json": "Step-by-step interactive lesson with explanations, exercises, and quizzes",
-    "concept_map.json": "Graph of key concepts and their relationships (nodes + edges)",
+    "roadmap.json": "Roadmap Graph of key concepts and their relationships (nodes + edges)",
     "images.json": "Set of educational image descriptions / AI image generation prompts",
 }
 
@@ -49,6 +49,7 @@ def list_skills(tool_call_id: Annotated[str, InjectedToolCallId]) -> Command:
                 ToolMessage(
                     content=final_output,
                     tool_call_id=tool_call_id,
+                    name="list_skills",
                 )
             ]
         }
@@ -69,7 +70,7 @@ def get_skills(
 
     Args:
         resource_types: List of resource/skill keys, e.g.
-                        ['article.md', 'podcast.json', 'presentation.json']
+                        ['explanation.md', 'podcast.json', 'presentation.json']
 
     Returns:
         Generation instructions for each requested type, separated by headers.
@@ -123,6 +124,7 @@ def get_skills(
                 ToolMessage(
                     content=final_output,
                     tool_call_id=tool_call_id,
+                    name="get_skills",
                 )
             ]
         }
