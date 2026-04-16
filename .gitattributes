@@ -1,3 +1,4 @@
 assets/* linguist-vendored
 packages/* linguist-vendored
 docs/* linguist-vendored
+apps/* linguist-vendored
