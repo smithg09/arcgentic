@@ -6,23 +6,23 @@ Arcgentic is built as a highly modular, multi-service application inside a Turbo
 
 ```mermaid
 graph TD
-    Client[Web Client (React)]
+    Client["Web Client (React)"]
     
     subgraph "Frontend"
         Client
     end
     
     subgraph "Backend Services"
-        UserSvc[User Service (Go/GraphQL)]
-        AgentSvc[Agent Service (Python/Flask)]
+        UserSvc["User Service (Go/GraphQL)"]
+        AgentSvc["Agent Service (Python/Flask)"]
     end
     
     subgraph "Data Storage"
-        Postgres[(PostgreSQL)]
+        Postgres["(PostgreSQL)"]
     end
     
     subgraph "AI Providers"
-        LLM[LLM APIs (OpenAI, Anthropic, etc)]
+        LLM["LLM APIs (OpenAI, Anthropic, etc)"]
     end
     
     Client <--> |GraphQL| UserSvc

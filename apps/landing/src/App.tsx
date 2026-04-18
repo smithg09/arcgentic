@@ -231,6 +231,24 @@ const modeExamples: Record<
   },
 };
 
+function GithubIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+      <path d="M9 18c-4.51 2-5-2-7-2" />
+    </svg>
+  );
+}
+
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -283,22 +301,28 @@ function App() {
             </div>
           </a>
 
-          <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-            <a href="#demo" className="nav-link" onClick={resetWalkthrough}>
-              Walkthrough
+          <div className="flex items-center gap-4 sm:gap-6">
+            <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
+              <a href="#demo" className="nav-link" onClick={resetWalkthrough}>
+                Walkthrough
+              </a>
+              <a href="#features" className="nav-link">
+                Features
+              </a>
+            </nav>
+            <a href={repoBaseUrl} target="_blank" rel="noreferrer" className="text-foreground/80 hover:text-foreground transition-all hover:-translate-y-0.5 duration-200">
+              <GithubIcon className="h-5 w-5" />
+              <span className="sr-only">GitHub</span>
             </a>
-            <a href="#features" className="nav-link">
-              Features
-            </a>
-            <Button asChild variant="outline" size="lg" className="rounded-full px-5">
+            <Button asChild variant="outline" size="sm" className="hidden sm:flex rounded-full px-4 lg:px-5 lg:size-lg">
               <a href="#get-started">Get started</a>
             </Button>
-          </nav>
+          </div>
         </div>
       </header>
 
       <main id="top" className="relative z-10">
-        <section className="relative mb-0 lg:mb-16">
+        <section className="relative overflow-hidden pb-0 lg:pb-16">
           <div className="hero-glow hero-glow-left" />
           <div className="hero-glow hero-glow-right" />
           <div className="mx-auto grid max-w-360 gap-14 px-5 pb-20 pt-16 sm:px-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-16 lg:pb-28 lg:pt-24">
@@ -341,7 +365,7 @@ function App() {
                     <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-100 p-4 border border-emerald-100 dark:from-emerald-950 dark:to-teal-900 dark:border-emerald-800">
                       <Compass className="mb-2 h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                       <p className="text-sm font-bold text-emerald-900 dark:text-emerald-100">Roadmap</p>
-                      <p className="text-xs text-emerald-700/80 dark:text-emerald-300/80">Concepts, foundations, connections</p>
+                      <p className="text-xs text-emerald-700/80 dark:text-emerald-300/80">Explore concepts and connections</p>
                     </div>
                     <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-rose-100 p-4 border border-rose-100 dark:from-orange-950 dark:to-rose-900 dark:border-rose-800">
                       <AudioLines className="mb-2 h-6 w-6 text-rose-600 dark:text-rose-400" />

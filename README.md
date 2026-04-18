@@ -5,11 +5,11 @@
 </p>
 
 <p align="center"><strong>Ask, Learn, Master.</strong></p>
-<!-- <p align="center">https://.smithgajjar.dev</p> -->
+<p align="center">https://arcgentic.smithgajjar.dev</p>
 <p align="center">Your personal AI learning ecosystem. An open-source, multi-agent platform that autonomously crafts highly personalized learning content to help you master any subject.</p>
 
 <p align="center">
-  <video src="./apps/landing/public/product_assets/platform_demo_5x.mp4" width="800px" alt="Platform_demo" autoplay muted loop playsinline>
+  <img src="./apps/landing/public/product_assets/platform_demo.gif" width="800px" alt="Platform_demo">
 </p>
 
 
