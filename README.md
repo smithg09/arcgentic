@@ -9,7 +9,7 @@
 <p align="center">Your personal AI learning ecosystem. An open-source, multi-agent platform that autonomously crafts highly personalized learning content to help you master any subject.</p>
 
 <p align="center">
-  <img src="public/appscreenshot.png" width="800px" alt="Platform_demo">
+  <img src="./apps/landing/public/product_assets/platform_demo.gif" width="800px" alt="Platform_demo">
 </p>
 
 
