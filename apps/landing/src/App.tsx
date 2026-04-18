@@ -298,7 +298,7 @@ function App() {
       </header>
 
       <main id="top" className="relative z-10">
-        <section className="relative overflow-hidden">
+        <section className="relative mb-0 lg:mb-16">
           <div className="hero-glow hero-glow-left" />
           <div className="hero-glow hero-glow-right" />
           <div className="mx-auto grid max-w-360 gap-14 px-5 pb-20 pt-16 sm:px-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-16 lg:pb-28 lg:pt-24">
@@ -334,7 +334,7 @@ function App() {
             </div>
 
             <div className="relative">
-              <div className="relative h-[30rem] sm:h-[36rem] w-full max-w-[90rem] mx-auto group perspective-[2000px]">
+              <div className="relative h-[30rem] sm:h-[29rem] w-full max-w-[90rem] mx-auto group perspective-[2000px]">
                 {/* Overlapping Middle Shell (Artifacts Bento) - Behind Video */}
                 <div className="absolute -right-24 lg:-right-30 -top-18 w-[18rem] sm:w-[22rem] rounded-[2rem] border border-border/50 bg-background/80 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all duration-700 group-hover:-translate-y-4 group-hover:translate-x-4 z-99 hidden lg:block opacity-90 scale-85">
                   <div className="grid grid-cols-2 gap-3">
@@ -365,9 +365,9 @@ function App() {
                     loop
                     muted
                     playsInline
-                    className="h-full w-full object-cover opacity-90 transition-opacity duration-700 group-hover:opacity-100"
+                    className="h-full w-full object-cover sm:object-fill opacity-90 transition-opacity duration-700 group-hover:opacity-100"
                   >
-                    <source src="/product_assets/platform_demo.mp4" type="video/mp4" />
+                    <source src="/product_assets/platform_demo_5x.mp4" type="video/mp4" />
                   </video>
 
                   {/* Custom Controls Overlay */}
@@ -383,7 +383,7 @@ function App() {
                 </div>
 
                 {/* Floating Front Shell (Interactive Chat) */}
-                <div className="absolute -left-4 lg:-left-24 -bottom-28 w-[22rem] sm:w-[24rem] rounded-[2rem] border border-border/60 bg-card/95 p-6 shadow-[0_30px_80px_rgba(0,0,0,0.15)] backdrop-blur-2xl transition-all duration-700 group-hover:-translate-y-6 group-hover:-translate-x-2 z-20 opacity-90 scale-80 hidden lg:block">
+                <div className="absolute -left-4 lg:-left-24 -bottom-40 w-[22rem] sm:w-[24rem] rounded-[2rem] border border-border/60 bg-card/95 p-6 shadow-[0_30px_80px_rgba(0,0,0,0.15)] backdrop-blur-2xl transition-all duration-700 group-hover:-translate-y-6 group-hover:-translate-x-2 z-20 opacity-90 scale-70 hidden lg:block">
                   <div className="mb-5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
                     <MessageSquareMore className="h-4 w-4" /> Live Tutor
                   </div>
@@ -732,7 +732,7 @@ function App() {
               controls
               className="w-full h-full object-contain"
             >
-              <source src="/product_assets/platform_demo.mp4" type="video/mp4" />
+              <source src="/product_assets/platform_demo_5x.mp4" type="video/mp4" />
             </video>
           </div>
         </div>
