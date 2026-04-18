@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   AudioLines,
@@ -13,6 +13,7 @@ import {
   GraduationCap,
   ImagePlay,
   Layers3,
+  Maximize2,
   MessageSquareMore,
   Pause,
   PlayCircle,
@@ -21,6 +22,7 @@ import {
   Sparkles,
   SquareDashedMousePointer,
   Waypoints,
+  X,
 } from 'lucide-react';
 import { Button } from '@arcgentic/ui/button';
 import {
@@ -230,6 +232,9 @@ const modeExamples: Record<
 };
 
 function App() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
   const [activeMode, setActiveMode] = useState<ModeId>('deep-dives');
   const [activeWalkthrough, setActiveWalkthrough] = useState(0);
   const [isWalkthroughPaused, setIsWalkthroughPaused] = useState(false);
@@ -265,7 +270,7 @@ function App() {
       <FloatingGeometry />
       <div className="page-noise" />
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/88 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
+        <div className="mx-auto flex max-w-360 items-center justify-between px-5 py-4 sm:px-8">
           <a href="#top" className="flex items-center gap-3">
             <div className="brand-mark">
               <img src="/Atom.svg" alt="Arcgentic logo" className="h-full w-full" />
@@ -296,7 +301,7 @@ function App() {
         <section className="relative overflow-hidden">
           <div className="hero-glow hero-glow-left" />
           <div className="hero-glow hero-glow-right" />
-          <div className="mx-auto grid max-w-7xl gap-14 px-5 pb-20 pt-16 sm:px-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-16 lg:pb-28 lg:pt-24">
+          <div className="mx-auto grid max-w-360 gap-14 px-5 pb-20 pt-16 sm:px-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-16 lg:pb-28 lg:pt-24">
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/80 px-4 py-2 text-sm text-muted-foreground shadow-[0_10px_30px_rgba(58,35,20,0.06)]">
                 <GraduationCap className="h-4 w-4 text-primary" />
@@ -308,9 +313,8 @@ function App() {
                 <h1 className="hero-title max-w-2xl text-balance">
                   Learn with an AI tutor that also builds the study materials.
                 </h1>
-                <p className="max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-                  Arcgentic turns one prompt into a complete learning system: guided tutoring,
-                  visual explainers, roadmaps, flashcards, podcasts, and slide decks you can
+                <p className="max-w-lg text-lg leading-8 text-muted-foreground sm:text-xl">
+                  Arcgentic turns one prompt into a complete learning system that you can
                   revisit when the first spark of motivation wears off.
                 </p>
               </div>
@@ -327,94 +331,70 @@ function App() {
                 </Button>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-3">
-                {[
-                  'Ask anything or upload your own material',
-                  'Learn through chat plus generated artifacts',
-                  'Keep a reusable study pack for revision',
-                ].map((item) => (
-                  <div key={item} className="rounded-3xl border border-border/60 bg-card/75 p-4 shadow-soft">
-                    <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                      <Check className="h-4 w-4 text-primary" />
-                    </div>
-                    <p className="text-sm leading-6 text-foreground/85">{item}</p>
-                  </div>
-                ))}
-              </div>
             </div>
 
             <div className="relative">
-              <div className="artifact-stage">
-                <div className="artifact-shell artifact-shell-main">
-                  <div className="artifact-header">
-                    <span className="status-pill">Live tutoring</span>
-                    <span className="status-copy">Session: Systems design for beginners</span>
+              <div className="relative h-[30rem] sm:h-[36rem] w-full max-w-[90rem] mx-auto group perspective-[2000px]">
+                {/* Overlapping Middle Shell (Artifacts Bento) - Behind Video */}
+                <div className="absolute -right-24 lg:-right-30 -top-18 w-[18rem] sm:w-[22rem] rounded-[2rem] border border-border/50 bg-background/80 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all duration-700 group-hover:-translate-y-4 group-hover:translate-x-4 z-99 hidden lg:block opacity-90 scale-85">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-100 p-4 border border-emerald-100 dark:from-emerald-950 dark:to-teal-900 dark:border-emerald-800">
+                      <Compass className="mb-2 h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                      <p className="text-sm font-bold text-emerald-900 dark:text-emerald-100">Roadmap</p>
+                      <p className="text-xs text-emerald-700/80 dark:text-emerald-300/80">Concepts, foundations, connections</p>
+                    </div>
+                    <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-rose-100 p-4 border border-rose-100 dark:from-orange-950 dark:to-rose-900 dark:border-rose-800">
+                      <AudioLines className="mb-2 h-6 w-6 text-rose-600 dark:text-rose-400" />
+                      <p className="text-sm font-bold text-rose-900 dark:text-rose-100">Podcast</p>
+                      <p className="text-xs text-rose-700/80 dark:text-rose-300/80">12 min recap</p>
+                    </div>
                   </div>
-                  <div className="artifact-chat">
-                    <div className="chat-bubble chat-bubble-user">
+                </div>
+
+                {/* Background Main Shell (Video Demo) */}
+                <div className="absolute inset-0 rounded-[2.5rem] border border-border/40 bg-card/40 backdrop-blur-3xl shadow-[0_36px_90px_rgba(73,45,28,0.12)] transition-all duration-700 group-hover:rotate-x-2 overflow-hidden z-10 hover:z-[100]">
+                  <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-6 bg-gradient-to-b from-black/50 to-transparent">
+                    <span className="rounded-full bg-primary/90 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground shadow-[0_0_15px_rgba(240,111,63,0.5)] backdrop-blur-sm">
+                      Live Demo
+                    </span>
+                    <span className="text-sm font-medium text-white/90 drop-shadow-md">Arcgentic Platform</span>
+                  </div>
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="h-full w-full object-cover opacity-90 transition-opacity duration-700 group-hover:opacity-100"
+                  >
+                    <source src="/product_assets/platform_demo.mp4" type="video/mp4" />
+                  </video>
+
+                  {/* Custom Controls Overlay */}
+                  <div className="absolute inset-0 z-20 flex items-center justify-center transition-opacity duration-300">
+                    <button
+                      onClick={() => setIsVideoModalOpen(true)}
+                      type="button"
+                      className="absolute bottom-5 right-5 flex h-11 w-11 items-center justify-center rounded-xl bg-black/50 text-white backdrop-blur-sm transition-all hover:scale-110 hover:bg-black/70"
+                    >
+                      <Maximize2 className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Floating Front Shell (Interactive Chat) */}
+                <div className="absolute -left-4 lg:-left-24 -bottom-28 w-[22rem] sm:w-[24rem] rounded-[2rem] border border-border/60 bg-card/95 p-6 shadow-[0_30px_80px_rgba(0,0,0,0.15)] backdrop-blur-2xl transition-all duration-700 group-hover:-translate-y-6 group-hover:-translate-x-2 z-20 opacity-90 scale-80 hidden lg:block">
+                  <div className="mb-5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
+                    <MessageSquareMore className="h-4 w-4" /> Live Tutor
+                  </div>
+                  <div className="space-y-4">
+                    <img src="/product_assets/interactive_image2.png" alt="Live tutor" className="w-full h-full object-cover border border-border/60 rounded-[1rem]" />
+                    {/* <div className="ml-auto w-10/12 rounded-[1.25rem] rounded-tr-sm bg-primary p-3.5 text-sm leading-6 text-primary-foreground shadow-md">
                       Explain event-driven architecture like I am learning it from scratch.
                     </div>
-                    <div className="chat-bubble chat-bubble-agent">
-                      Great starting point. I’ll teach it in layers and generate a roadmap, slides,
-                      and flashcards while we go.
-                    </div>
-                  </div>
-                  <div className="artifact-grid">
-                    <div className="artifact-card artifact-card-map">
-                      <Compass className="h-5 w-5" />
-                      <div>
-                        <p className="artifact-label">Concept roadmap</p>
-                        <p className="artifact-caption">Services, events, queues, consumers</p>
-                      </div>
-                    </div>
-                    <div className="artifact-card artifact-card-podcast">
-                      <AudioLines className="h-5 w-5" />
-                      <div>
-                        <p className="artifact-label">Podcast recap</p>
-                        <p className="artifact-caption">12 minute revision episode</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="artifact-shell artifact-shell-side artifact-shell-side-top">
-                  <div className="artifact-mini-header">
-                    <BookOpenText className="h-4 w-4" />
-                    Deep-dive explainer
-                  </div>
-                  <div className="space-y-3">
-                    <div className="h-2 rounded-full bg-primary/15" />
-                    <div className="h-2 w-10/12 rounded-full bg-primary/12" />
-                    <div className="h-2 w-8/12 rounded-full bg-primary/10" />
-                    <div className="rounded-2xl border border-border/60 bg-background/90 p-3 text-xs leading-5 text-muted-foreground">
-                      Event-driven systems react to changes instead of forcing every part of the
-                      application to wait on a direct response.
-                    </div>
-                  </div>
-                </div>
-
-                <div className="artifact-shell artifact-shell-side artifact-shell-side-bottom">
-                  <div className="artifact-mini-header">
-                    <PlayCircle className="h-4 w-4" />
-                    Flashcards in progress
-                  </div>
-                  <div className="grid gap-2">
-                    <div className="rounded-2xl border border-border/60 bg-background/75 p-3">
-                      <p className="text-[0.72rem] uppercase tracking-[0.22em] text-muted-foreground">
-                        Question
-                      </p>
-                      <p className="mt-2 text-sm">
-                        Why would teams publish events instead of calling services directly?
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-border/60 bg-primary/8 p-3">
-                      <p className="text-[0.72rem] uppercase tracking-[0.22em] text-primary/70">
-                        Answer cue
-                      </p>
-                      <p className="mt-2 text-sm">
-                        Loose coupling, resilience, and asynchronous scaling.
-                      </p>
-                    </div>
+                    <div className="mr-auto w-11/12 rounded-[1.25rem] rounded-tl-sm border border-border/50 bg-background/80 backdrop-blur-md p-3.5 text-sm leading-6 text-foreground shadow-sm">
+                      Great starting point. I’ll teach it in layers and generate a roadmap, slides, and flashcards while we go.
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -423,7 +403,7 @@ function App() {
         </section>
 
         <section className="border-y border-border/60 bg-card/35">
-          <div className="mx-auto grid max-w-7xl gap-8 px-5 py-8 sm:px-8 md:grid-cols-3">
+          <div className="mx-auto grid max-w-360 gap-8 px-5 py-8 sm:px-8 md:grid-cols-3">
             {[
               {
                 icon: BrainCircuit,
@@ -454,9 +434,9 @@ function App() {
           </div>
         </section>
 
-        <section id="demo" className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:pb-30 lg:pt-40">
-          <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
-            <div className="space-y-4">
+        <section id="demo" className="mx-auto max-w-360 px-5 py-20 sm:px-8 lg:pb-30 lg:pt-40">
+          <div className="grid gap-18 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+            <div className="space-y-4 pt-12">
               <p className="eyebrow">{activeSlide.eyebrow}</p>
               <h2 className="section-title">{activeSlide.title}</h2>
               <p className="section-copy">
@@ -566,7 +546,7 @@ function App() {
           </div>
         </section>
 
-        <section id="features" className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-24">
+        <section id="features" className="mx-auto max-w-360 px-5 py-20 sm:px-8 lg:py-24">
           <div className="mb-10 max-w-3xl space-y-4">
             <p className="eyebrow">Feature showcase</p>
             <h2 className="section-title">One topic in, an entire study system out.</h2>
@@ -611,7 +591,7 @@ function App() {
         </section>
 
         <section id="workflow" className="relative overflow-hidden border-y border-border/60 bg-card/30">
-          <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-24">
+          <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 lg:py-24">
             <div className="mb-12 max-w-3xl space-y-4">
               <p className="eyebrow">How it works</p>
               <h2 className="section-title">Ask, learn, master without stitching together five tools.</h2>
@@ -655,7 +635,7 @@ function App() {
           </div>
         </section>
 
-        <section id="get-started" className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-24">
+        <section id="get-started" className="mx-auto max-w-360 px-5 py-20 sm:px-8 lg:py-24">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div className="space-y-4">
               <p className="eyebrow">Get started locally</p>
@@ -717,7 +697,7 @@ function App() {
       </main>
 
       <footer className="border-t border-border/60 bg-card/45">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-10 sm:px-8 md:flex-row md:items-end md:justify-between">
+        <div className="mx-auto flex max-w-360 flex-col gap-8 px-5 py-10 sm:px-8 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <p className="font-heading text-2xl tracking-tight">Arcgentic</p>
             <p className="mt-3 text-base leading-7 text-muted-foreground">
@@ -726,7 +706,7 @@ function App() {
             </p>
           </div>
 
-          <div className="grid gap-3 text-sm text-muted-foreground">
+          <div className="flex gap-3 text-sm text-muted-foreground">
             {docsLinks.map(({ label, href }) => (
               <a key={label} href={href} className="footer-link" target="_blank" rel="noreferrer">
                 <span>{label}</span>
@@ -736,6 +716,27 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {isVideoModalOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background/95 p-4 backdrop-blur-xl sm:p-8">
+          <div className="relative w-full max-w-[90vw] overflow-hidden rounded-[2rem] border border-border/50 bg-black shadow-2xl">
+            <button
+              onClick={() => setIsVideoModalOpen(false)}
+              className="absolute right-6 top-6 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-md transition-all hover:scale-110 hover:bg-white/20"
+            >
+              <X className="h-6 w-6" />
+            </button>
+            <video
+              autoPlay
+              loop
+              controls
+              className="w-full h-full object-contain"
+            >
+              <source src="/product_assets/platform_demo.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -784,7 +785,7 @@ function FeaturePreview({
     return (
       <div className="preview-surface">
         <div className="embed-placeholder">
-          <img src="/product_assets/interactive_image.png" alt="Interactive explanation" className="w-full h-full object-cover border border-border/60 rounded-[1rem]" />
+          <img src="/product_assets/interactive_image.png" alt="Interactive explanation" className="w-full h-full max-w-90 object-cover border border-border/60 rounded-[1rem]" />
           <p className="mt-2 text-base font-medium text-foreground/90">Visual explanations inside the lesson</p>
           <p className="max-w-md text-center text-sm leading-6 text-muted-foreground">
             Diagrams, widgets, and interactive visuals help learners understand difficult ideas
@@ -799,7 +800,7 @@ function FeaturePreview({
     return (
       <div className="preview-surface">
         <div className="embed-placeholder embed-placeholder-roadmap">
-          <img src="/product_assets/roadmap_image.png" alt="Interactive explanation" className="w-full h-full object-cover border border-border/60 rounded-[1rem]" />
+          <img src="/product_assets/roadmap_image.png" alt="Interactive explanation" className="w-full h-full object-cover border border-border/60 max-w-90 rounded-[1rem]" />
           <p className="mt-2 text-base font-medium text-foreground/90">Roadmaps that make the path visible</p>
           <p className="max-w-md text-center text-sm leading-6 text-muted-foreground">
             See how concepts relate, what needs to come first, and where the next branch of the

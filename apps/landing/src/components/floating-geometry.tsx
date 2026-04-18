@@ -19,9 +19,14 @@ export const FloatingGeometry = memo(() => {
       />
 
       <div className="floating-shape absolute left-[5%] top-[8%] text-[oklch(0.62_0.14_240)]">
-        <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-          <circle cx="16" cy="16" r="13" stroke="currentColor" strokeWidth="2.5" strokeDasharray="4 3" />
-          <circle cx="16" cy="16" r="5" fill="currentColor" opacity="0.16" />
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none" className="text-purple-400">
+          <path
+            d="M17 17C17 14.5 15 13 13 13C10 13 8 15.5 8 18C8 22 11 25 15 25C20.5 25 24 21 24 16C24 9.5 19 5 13 5"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            fill="none"
+          />
         </svg>
       </div>
 

@@ -46,18 +46,18 @@
   --card-foreground: oklch(0.2 0.025 44);
   --popover: oklch(0.995 0.003 70);
   --popover-foreground: oklch(0.2 0.025 44);
-  --primary: oklch(0.62 0.17 34);
-  --primary-foreground: oklch(0.985 0.004 70);
+  --primary: oklch(0.52 0.2 25);
+  --primary-foreground: oklch(0.98 0.005 65);
   --secondary: oklch(0.95 0.013 62);
   --secondary-foreground: oklch(0.28 0.025 44);
   --muted: oklch(0.958 0.008 62);
   --muted-foreground: oklch(0.53 0.02 44);
   --accent: oklch(0.944 0.022 38);
   --accent-foreground: oklch(0.32 0.07 32);
-  --destructive: oklch(0.62 0.17 34);
+  --destructive: oklch(0.52 0.2 25);
   --border: oklch(0.89 0.01 62);
   --input: oklch(0.89 0.01 62);
-  --ring: oklch(0.62 0.17 34);
+  --ring: oklch(0.52 0.2 25);
 }
 
 @layer base {
@@ -113,7 +113,7 @@
     font-family: var(--font-hero-heading);
     font-size: clamp(2.8rem, 5vw, 4.8rem);
     line-height: 0.94;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.02em;
   }
 
   .section-title {
