@@ -930,3 +930,196 @@ html[data-theme="light"] {
     opacity: 0.8;
   }
 }
+
+/* ─── Todo Card ─── */
+.todo-card {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: var(--card);
+  overflow: hidden;
+  box-shadow: 0 1px 3px oklch(0 0 0 / 0.04);
+}
+
+.todo-card-header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  transition: background var(--duration-instant) var(--ease-out-quart);
+}
+
+.todo-card-header:hover {
+  background: var(--secondary);
+}
+
+.todo-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.625rem;
+  width: 1.625rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--primary);
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
+}
+
+.todo-card-title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+
+.todo-card-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: color-mix(in oklab, var(--primary), transparent 88%);
+  border: 1px solid color-mix(in oklab, var(--primary), transparent 75%);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.todo-card-chevron {
+  color: var(--muted-foreground);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.todo-card-body {
+  padding: 0 0.875rem 0.75rem;
+  animation: fade-in var(--duration-fast) var(--ease-out-quart) both;
+}
+
+/* Thin progress bar */
+.todo-progress-track {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--border);
+  margin-bottom: 0.625rem;
+  overflow: hidden;
+}
+
+.todo-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+  transition: width 500ms var(--ease-out-expo);
+}
+
+/* Todos list */
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--background);
+  transition: background var(--duration-instant) var(--ease-out-quart);
+}
+
+.todo-item:hover {
+  background: var(--secondary);
+}
+
+.todo-priority-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.3125rem;
+}
+
+.todo-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.todo-item-title {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--foreground);
+  line-height: 1.45;
+}
+
+.todo-item-desc {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  line-height: 1.45;
+}
+
+.todo-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border-width: 1px;
+  border-style: solid;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+/* ─── Source Content Viewer ─── */
+.source-content-body {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+.source-content-line {
+  display: flex;
+  gap: 0;
+  min-height: 1.375rem;
+}
+
+.source-content-line:hover .source-line-num {
+  color: var(--muted-foreground);
+}
+
+.source-line-num {
+  display: inline-block;
+  min-width: 2.75rem;
+  padding-right: 1rem;
+  text-align: right;
+  font-size: 0.6875rem;
+  color: var(--border);
+  flex-shrink: 0;
+  user-select: none;
+  padding-top: 0.0625rem;
+  transition: color var(--duration-instant);
+}
+
+.source-line-text {
+  flex: 1;
+  color: var(--foreground);
+  white-space: pre-wrap;
+}

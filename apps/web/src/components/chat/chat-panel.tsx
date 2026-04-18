@@ -6,13 +6,15 @@ import { MessageBubble, ToolChainGroup } from './message-bubble';
 import { ChatInput } from './chat-input';
 import type { ChatMessage, ToolCallDisplay, StreamState } from '@/types/chat';
 import { Bot } from 'lucide-react';
-import { getWidgetFrameCode } from '../content/widgetFrame';
+import { WidgetFrameCode } from '../content/widgetFrame';
 
 interface ChatPanelProps {
   messages: ChatMessage[];
   streamState: StreamState;
   onSend: (message: string, files?: File[], urls?: string[]) => void;
   onStop: () => void;
+  /** Full todos list from agentState — used to enrich update_todos display */
+  stateTodos?: Array<{ id: string; task: string; category?: string; status?: string }>;
 }
 
 // ─── Render segment types ───
@@ -108,7 +110,12 @@ function buildSegments(messages: ChatMessage[]): RenderSegment[] {
 
 // ─── Chat Panel ───
 
-export function ChatPanel({ messages, streamState, onSend, onStop }: ChatPanelProps) {
+export function ChatPanel({ messages, streamState, onSend, onStop, stateTodos = [] }: ChatPanelProps) {
+  // Build id→todo map — memoized so it's stable across renders
+  const stateTodosMap = useMemo(
+    () => Object.fromEntries(stateTodos.map(t => [t.id, t])),
+    [stateTodos]
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const groups = useMemo(() => groupMessages(messages), [messages]);
   const [thinkingMessageIndex, setThinkingMessageIndex] = useState(0);
@@ -205,6 +212,7 @@ export function ChatPanel({ messages, streamState, onSend, onStop }: ChatPanelPr
                 messages={group.messages}
                 isStreaming={streamState.isStreaming && gi === groups.length - 1} // Only the last assistant group can be streaming
                 thinkingLabel={thinkingMessages[thinkingMessageIndex]}
+                stateTodosMap={stateTodosMap}
               />
             )
           )}
@@ -231,10 +239,12 @@ function AssistantGroup({
   messages,
   thinkingLabel,
   isStreaming,
+  stateTodosMap,
 }: {
   messages: ChatMessage[];
-    thinkingLabel: string;
-    isStreaming: boolean;
+  thinkingLabel: string;
+  isStreaming: boolean;
+  stateTodosMap: Record<string, { task: string; category?: string; status?: string }>;
 }) {
   const segments = useMemo(() => buildSegments(messages), [messages]);
 
@@ -259,6 +269,7 @@ function AssistantGroup({
                   key={`seg-${i}`}
                   tools={seg.tools}
                   isRunning={Boolean(showCursor)}
+                  stateTodos={stateTodosMap}
                 />
               );
             case 'text':
@@ -271,12 +282,13 @@ function AssistantGroup({
               return (
                 <div
                   key={`seg-${i}`}
+                  style={{ width: "115%" }}
                   className="motion-soft-in my-3 overflow-hidden rounded-xl border border-border bg-card shadow-sm ring-0"
                 >
-                  {getWidgetFrameCode({
-                    widgetCode: (seg.tool.args.widget_code as string) || '',
-                    title: (seg.tool.args.title as string) || ''
-                  })}
+                  <WidgetFrameCode
+                    widgetCode={(seg.tool.args.widget_code as string) || ''}
+                    title={(seg.tool.args.title as string) || ''}
+                  />
                 </div>
               );
             case 'thinking':

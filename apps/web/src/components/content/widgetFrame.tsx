@@ -1,7 +1,25 @@
-import { getStoredTheme } from "@/hooks/use-theme"
+import { useEffect, useRef, useState } from "react";
 
-export const getWidgetFrameCode = ({ widgetCode, title }: { widgetCode: string, title: string }) => {
-  const currentTheme = getStoredTheme()
+export const WidgetFrameCode = ({ widgetCode, title }: { widgetCode: string, title: string }) => {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [iframeHeight, setIframeHeight] = useState(300);
+
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      if (
+        event.data?.method === 'ui/notifications/size-changed' &&
+        typeof event.data?.params?.height === 'number'
+      ) {
+        if (iframeRef.current && event.source === iframeRef.current.contentWindow) {
+          const newHeight = Math.max(300, Math.ceil(event.data.params.height));
+          setIframeHeight(newHeight);
+        }
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
   const baseWidgetCode = `
   <!doctype html>
 <html lang="en">
@@ -1479,12 +1497,15 @@ export const getWidgetFrameCode = ({ widgetCode, title }: { widgetCode: string, 
 </html>
   `
 
-  return <iframe
-    srcDoc={baseWidgetCode}
-    className="w-full h-[400px] border-0"
-    sandbox="allow-scripts allow-same-origin allow-forms"
-    allow="clipboard-write *"
-    style={{ width: '100%', border: 'none', backgroundColor: 'transparent' }}
-    title={typeof title === 'string' ? title : 'Widget'}
-  />
+  return (
+    <iframe
+      ref={iframeRef}
+      srcDoc={baseWidgetCode}
+      className="w-full border-0"
+      sandbox="allow-scripts allow-same-origin allow-forms"
+      allow="clipboard-write *"
+      style={{ border: 'none', width: '100%', padding: '12px', backgroundColor: 'transparent', height: iframeHeight }}
+      title={typeof title === 'string' ? title : 'Widget'}
+    />
+  );
 }

@@ -23,7 +23,7 @@ export const FloatingGeometry = memo(() => {
       {/* ═══ TOP SECTION - Wide spread ═══ */}
 
       {/* Top-left: Dotted Circle */}
-      <div
+      {/* <div
         className="absolute top-[8%] left-[5%] opacity-[0.3] animate-spin-slow"
         style={{ animationDuration: '15s' }}
       >
@@ -39,7 +39,7 @@ export const FloatingGeometry = memo(() => {
           />
           <circle cx="16" cy="16" r="5" fill="currentColor" opacity="0.2" />
         </svg>
-      </div>
+      </div> */}
 
       {/* Top-mid-left: Neon Cross */}
       <div className="absolute top-[15%] left-[12%] opacity-[0.4] animate-bounce-vertical">
@@ -84,7 +84,7 @@ export const FloatingGeometry = memo(() => {
       </div>
 
       {/* Top-mid-right: Triangle */}
-      <div className="absolute top-[18%] right-[4%] opacity-[0.35] animate-drift-medium">
+      {/* <div className="absolute top-[18%] right-[4%] opacity-[0.35] animate-drift-medium">
         <svg width="24" height="24" viewBox="0 0 28 28" fill="none" className="text-emerald-400">
           <polygon
             points="14,3 26,25 2,25"
@@ -95,7 +95,7 @@ export const FloatingGeometry = memo(() => {
             fillOpacity="0.08"
           />
         </svg>
-      </div>
+      </div> */}
 
       {/* ═══ PROMPT / HEADING FOCUS SECTION - Dense Cluster ═══ */}
 
@@ -144,52 +144,6 @@ export const FloatingGeometry = memo(() => {
 
       {/* Cluster Right 1: Dotted Circle */}
       <div className="absolute top-[45%] right-[10%] opacity-[0.3] animate-float-fast">
-        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" className="text-purple-400">
-          <circle
-            cx="16"
-            cy="16"
-            r="13"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeDasharray="4 3"
-            fill="none"
-          />
-          <circle cx="16" cy="16" r="5" fill="currentColor" opacity="0.2" />
-        </svg>
-      </div>
-
-      {/* Cluster Right 2: Cross */}
-      <div
-        className="absolute top-[35%] right-[18%] opacity-[0.4] animate-bounce-vertical"
-        style={{ animationDelay: '0.5s' }}
-      >
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-yellow-400">
-          <line
-            x1="12"
-            y1="4"
-            x2="12"
-            y2="20"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-          <line
-            x1="4"
-            y1="12"
-            x2="20"
-            y2="12"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
-
-      {/* Cluster Right 3: Triangle */}
-      <div
-        className="absolute top-[50%] right-[22%] opacity-[0.35] animate-spin-slow"
-        style={{ animationDuration: '20s', animationDirection: 'reverse' }}
-      >
         <svg width="20" height="20" viewBox="0 0 28 28" fill="none" className="text-purple-400">
           <polygon
             points="14,3 26,25 2,25"
@@ -200,6 +154,14 @@ export const FloatingGeometry = memo(() => {
             fillOpacity="0.08"
           />
         </svg>
+      </div>
+
+      {/* Cluster Right 3: Triangle */}
+      <div
+        className="absolute top-[50%] right-[22%] opacity-[0.35] animate-spin-slow"
+        style={{ animationDuration: '20s', animationDirection: 'reverse' }}
+      >
+
       </div>
 
       {/* Cluster Right 4: Small Spiral */}
@@ -243,7 +205,7 @@ export const FloatingGeometry = memo(() => {
       </div>
 
       {/* Inner Cluster Right: Tiny rotated diamond near text */}
-      <div
+      {/* <div
         className="absolute top-[42%] right-[28%] opacity-[0.4] animate-float-slow"
         style={{ animationDelay: '0.8s' }}
       >
@@ -261,7 +223,7 @@ export const FloatingGeometry = memo(() => {
             fillOpacity="0.1"
           />
         </svg>
-      </div>
+      </div> */}
 
       {/* ═══ BOTTOM SECTION ═══ */}
 
@@ -284,7 +246,7 @@ export const FloatingGeometry = memo(() => {
       </div>
 
       {/* Bottom-mid-left: Triangle */}
-      <div
+      {/* <div
         className="absolute bottom-[15%] left-[22%] opacity-[0.35] animate-bounce-vertical"
         style={{ animationDelay: '1s' }}
       >
@@ -298,7 +260,7 @@ export const FloatingGeometry = memo(() => {
             fillOpacity="0.08"
           />
         </svg>
-      </div>
+      </div> */}
 
       {/* Bottom-mid-right: Zigzag */}
       <div className="absolute bottom-[12%] right-[25%] opacity-[0.4] animate-float-fast">
@@ -315,7 +277,7 @@ export const FloatingGeometry = memo(() => {
       </div>
 
       {/* Bottom-right: Spiral */}
-      <div className="absolute bottom-[25%] right-[12%] opacity-[0.3] animate-spin-slow">
+      {/* <div className="absolute bottom-[25%] right-[12%] opacity-[0.3] animate-spin-slow">
         <svg width="36" height="36" viewBox="0 0 34 34" fill="none" className="text-purple-400">
           <path
             d="M17 17C17 14.5 15 13 13 13C10 13 8 15.5 8 18C8 22 11 25 15 25C20.5 25 24 21 24 16C24 9.5 19 5 13 5"
@@ -325,7 +287,7 @@ export const FloatingGeometry = memo(() => {
             fill="none"
           />
         </svg>
-      </div>
+      </div> */}
 
       {/* Deep-Bottom-Left: Small Cross */}
       <div
@@ -373,7 +335,7 @@ export const FloatingGeometry = memo(() => {
       </div>
 
       {/* Extra: Far Right Zigzag */}
-      <div
+      {/* <div
         className="absolute top-[22%] right-[5%] opacity-[0.35] animate-drift-medium"
         style={{ animationDelay: '1.2s' }}
       >
@@ -387,7 +349,7 @@ export const FloatingGeometry = memo(() => {
             fill="none"
           />
         </svg>
-      </div>
+      </div> */}
 
       {/* Extra: Center Top Diamond */}
       <div className="absolute top-[12%] left-[45%] opacity-[0.25] animate-float-slow">
@@ -536,7 +498,7 @@ export const FloatingGeometry = memo(() => {
       </div>
 
       {/* Extra: Deep Center Top Spiral */}
-      <div
+      {/* <div
         className="absolute top-[25%] left-[40%] opacity-[0.25] animate-drift-medium"
         style={{ animationDelay: '1s' }}
       >
@@ -549,7 +511,7 @@ export const FloatingGeometry = memo(() => {
             fill="none"
           />
         </svg>
-      </div>
+      </div> */}
     </div>
   );
 });

@@ -106,7 +106,7 @@ export function ConceptMapViewer({ content }: ConceptMapViewerProps) {
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
     const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
-    setTransform(v => ({ ...v, scale: Math.max(0.2, Math.min(v.scale * scaleFactor, 5)) }));
+    setTransform(v => ({ ...v, scale: Math.max(0.2, Math.min(v.scale * scaleFactor, 10)) }));
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {

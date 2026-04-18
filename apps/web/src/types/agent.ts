@@ -31,6 +31,13 @@ export interface AgentTask {
   result: string
 }
 
+export interface AgentStateTodo {
+  id: string
+  task: string
+  category?: string
+  status?: 'pending' | 'in_progress' | 'done' | string
+}
+
 export interface AgentState {
   session_id: string
   exists: boolean
@@ -41,7 +48,7 @@ export interface AgentState {
   resources_count: number
   tasks: AgentTask[]
   current_agent: string
-  todos: string[]
+  todos: AgentStateTodo[]
 }
 
 export interface AgentMessage {

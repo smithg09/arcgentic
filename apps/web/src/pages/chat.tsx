@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
@@ -20,7 +20,7 @@ export function ChatPage() {
   const { sessionId } = useParams({ from: '/chat/$sessionId' });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isDesktop = useMediaQuery('(min-width: 724px)');
   const { openSettings } = useModelSettings();
 
   // GraphQL Session
@@ -81,9 +81,16 @@ export function ChatPage() {
     }
   }, [agentState?.spec?.topic, session, sessionId, queryClient]);
 
+  // Keep track of streaming state safely
+  const isStreamingRef = useRef(streamState.isStreaming);
+  useEffect(() => {
+    isStreamingRef.current = streamState.isStreaming;
+  }, [streamState.isStreaming]);
+
   // Hydrate messages from agent state
   useEffect(() => {
     if (!agentState?.messages) return;
+    if (isStreamingRef.current) return;
 
     const hydrated: ChatMessage[] = [];
 
@@ -207,15 +214,15 @@ export function ChatPage() {
         className="flex-1 min-h-0 bg-background"
       >
         <Panel
-          defaultSize={isDesktop ? 400 : 52}
-          minSize={isDesktop ? 220 : 360}
-          maxSize={isDesktop ? 580 : 480}
+          defaultSize={"40%"}
+          minSize={"30%"}
         >
           <ChatPanel
             messages={messages}
             streamState={streamState}
             onSend={sendMessage}
             onStop={stopStream}
+            stateTodos={agentState?.todos ?? []}
           />
         </Panel>
 
@@ -236,8 +243,8 @@ export function ChatPage() {
         </PanelResizeHandle>
 
         <Panel
-          defaultSize={isDesktop ? 36 : 38}
-          minSize={isDesktop ? 22 : 22}
+          defaultSize={"70%"}
+          minSize={"40%"}
           className="bg-background"
         >
           <ContentPanel agentState={agentState ?? null} isLoading={stateLoading} />
