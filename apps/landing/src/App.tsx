@@ -261,6 +261,16 @@ function App() {
   const ActiveModeIcon = activeModePreview.icon;
   const activeSlide = walkthroughSlides[activeWalkthrough];
 
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsVideoModalOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, []);
+
   const resetWalkthrough = () => {
     setActiveWalkthrough(0);
     setWalkthroughCycleKey((current) => current + 1);
@@ -289,7 +299,7 @@ function App() {
       <div className="page-noise" />
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/88 backdrop-blur-xl">
         <div className="mx-auto flex max-w-360 items-center justify-between px-5 py-4 sm:px-8">
-          <a href="#top" className="flex items-center gap-3">
+          <a href="#home" className="flex items-center gap-3">
             <div className="brand-mark">
               <img src="/Atom.svg" alt="Arcgentic logo" className="h-full w-full" />
             </div>
@@ -303,7 +313,7 @@ function App() {
 
           <div className="flex items-center gap-4 sm:gap-6">
             <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-              <a href="#demo" className="nav-link" onClick={resetWalkthrough}>
+              <a href="#walkthrough" className="nav-link" onClick={resetWalkthrough}>
                 Walkthrough
               </a>
               <a href="#features" className="nav-link">
@@ -321,7 +331,7 @@ function App() {
         </div>
       </header>
 
-      <main id="top" className="relative z-10">
+      <main id="home" className="relative z-10">
         <section className="relative overflow-hidden pb-0 lg:pb-16">
           <div className="hero-glow hero-glow-left" />
           <div className="hero-glow hero-glow-right" />
@@ -345,7 +355,7 @@ function App() {
 
               <div className="flex flex-col gap-4 sm:flex-row">
                 <Button asChild size="lg" className="rounded-full px-6 text-base">
-                  <a href="#demo" onClick={resetWalkthrough}>
+                  <a href="#walkthrough" onClick={resetWalkthrough}>
                     Explore platform
                     <ArrowRight className="h-4 w-4" />
                   </a>
@@ -458,7 +468,7 @@ function App() {
           </div>
         </section>
 
-        <section id="demo" className="mx-auto max-w-360 px-5 py-20 sm:px-8 lg:pb-30 lg:pt-40">
+        <section id="walkthrough" className="mx-auto max-w-360 px-5 py-20 sm:px-8 lg:pb-30 lg:pt-40">
           <div className="grid gap-18 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
             <div className="space-y-4 pt-12">
               <p className="eyebrow">{activeSlide.eyebrow}</p>
@@ -746,7 +756,7 @@ function App() {
           <div className="relative w-full max-w-[90vw] overflow-hidden rounded-[2rem] border border-border/50 bg-black shadow-2xl">
             <button
               onClick={() => setIsVideoModalOpen(false)}
-              className="absolute right-6 top-6 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-md transition-all hover:scale-110 hover:bg-white/20"
+              className="absolute right-6 top-6 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-all hover:scale-110 hover:bg-black/70 cursor-pointer"
             >
               <X className="h-6 w-6" />
             </button>
