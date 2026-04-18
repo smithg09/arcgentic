@@ -45,7 +45,7 @@ jobs:
         run: |
           cd apps/landing
           pnpm run check-types
-          pnpm exec vite build --base=/${{ github.event.repository.name }}/
+          pnpm exec vite build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
