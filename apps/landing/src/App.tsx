@@ -110,8 +110,8 @@ const repoBaseUrl = 'https://github.com/smithg09/arcgentic';
 
 const docsLinks = [
   { label: 'GitHub Repo', href: repoBaseUrl },
-  { label: 'Getting Started', href: `${repoBaseUrl}/blob/main/docs/getting-started.md` },
-  { label: 'Contributing', href: `${repoBaseUrl}/blob/main/docs/contributing.md` },
+  { label: 'Getting Started', href: '/docs/#/getting-started.md' },
+  { label: 'Contributing', href: '/docs/#/contributing.md' },
 ];
 
 type WalkthroughSlide = {
@@ -719,7 +719,7 @@ function App() {
                     </a>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="rounded-full px-6">
-                    <a href={`${repoBaseUrl}/blob/main/docs/getting-started.md`} target="_blank" rel="noreferrer">
+                    <a href="/docs/#/getting-started.md" target="_blank" rel="noreferrer">
                       Read the setup guide
                     </a>
                   </Button>
