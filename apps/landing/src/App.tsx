@@ -670,7 +670,7 @@ function App() {
         </section>
 
         <section id="get-started" className="mx-auto max-w-360 px-5 py-20 sm:px-8 lg:py-24">
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div className="grid gap-10 grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div className="space-y-4">
               <p className="eyebrow">Get started locally</p>
               <h2 className="section-title">Launch the full platform in three moves.</h2>
