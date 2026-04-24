@@ -9,7 +9,7 @@ By participating in this project, you agree to abide by our Code of Conduct. Ple
 ## General Workflow
 
 1. **Fork the repository** to your own GitHub account.
-2. **Clone your fork** locally: `git clone https://github.com/YOUR_USERNAME/arcgentic.git`
+2. **Clone your fork** locally: `git clone https://github.com/smithg09/arcgentic.git`
 3. **Set up the project** following the instructions in [`getting-started.md`](./getting-started.md).
 4. **Create a branch** for your work: `git checkout -b feature/your-feature-name` or `fix/your-fix-name`.
 5. **Make your changes**.
