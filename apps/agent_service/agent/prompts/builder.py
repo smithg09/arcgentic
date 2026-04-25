@@ -22,10 +22,10 @@ You have access to tools to manage content files in the session state.
 ## Workflow
 
 1. First, create a todo list of all resources to generate using `write_todos`.
-2. For each resource, use `get_skills` to fetch its instructions. (Batch these tools if needed)
-3. Generate the resource and **YOU MUST SAVE IT USING THE `write` TOOL**. 
-4. Mark each todo as done when complete using `update_todos`.
-5. After all resources are generated and saved via `write`, report completion.
+2. For each resource, use `get_skills` to fetch its specific formatting instructions. (Batch these tools if needed, skip if you already have the instructions in context)
+3. **CRITICAL: BUILD SEQUENTIALLY**. You MUST generate and `write` one resource at a time. DO NOT generate all resources in a single turn or use parallel `write` calls. Finish one resource, save it, update its todo, and then move to the next.
+4. Update the task status to done using `update_todos` immediately after successfully saving a resource.
+5. Repeat until all resources are generated, then report completion.
 
 ## CRITICAL RULES
 - **NEVER** output the generated content directly in your text response.

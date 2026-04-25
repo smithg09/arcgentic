@@ -86,6 +86,8 @@ def get_skills(
         focus_areas = spec.focus_areas
         preferred_depth = spec.preferred_depth
         source_summary = spec.source_summary or ""
+        learning_goals = spec.learning_goals or []
+        source_names = [s.name for s in (spec.sources or [])]
     else:
         spec_dict = spec or {}
         topic = spec_dict.get("topic", "")
@@ -93,6 +95,12 @@ def get_skills(
         focus_areas = spec_dict.get("focus_areas", [])
         preferred_depth = spec_dict.get("preferred_depth", "moderate")
         source_summary = spec_dict.get("source_summary", "")
+        learning_goals = spec_dict.get("learning_goals", [])
+        raw_sources = spec_dict.get("sources", [])
+        source_names = [
+            s.get("name", "") if isinstance(s, dict) else getattr(s, "name", "")
+            for s in raw_sources
+        ]
 
     available = set(RESOURCE_PROMPTS.keys())
     results = []
@@ -112,6 +120,8 @@ def get_skills(
             focus_areas=focus_areas,
             preferred_depth=preferred_depth,
             source_summary=source_summary,
+            learning_goals=learning_goals,
+            source_names=source_names,
         )
         results.append(f"=== Instructions for '{resource_type}' ===\n\n{prompt}")
 

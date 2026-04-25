@@ -25,8 +25,8 @@ CRITICAL INSTRUCTION: If you have gathered enough information and are ready to h
 ## Current Spec
 {current_spec}
 
-## Source Materials uploaded by user 
-{source_materials}
+## Source Materials uploaded by user (Always use source material for grounding your response and also forming questions accordingly)
+{source_materials} 
 """
 
 
