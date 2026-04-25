@@ -131,9 +131,18 @@ export function ChatPanel({ messages, streamState, onSend, onStop, stateTodos = 
 
   const thinkingMessages = useMemo(
     () => [
-      'Mapping your sources and recent context...',
-      'Assembling a concise next-best response...',
-      'Checking for gaps before I answer...'
+      'Reading your request',
+      'Connecting the dots',
+      'Structuring thoughts',
+      'Pondering concepts',
+      'Synthesizing ideas',
+      'Brewing response',
+      'Consulting the archives',
+      'Analyzing variables',
+      'Assembling logic',
+      'Gathering context',
+      'Evaluating possibilities',
+      'Crafting reply'
     ],
     []
   );
@@ -172,7 +181,7 @@ export function ChatPanel({ messages, streamState, onSend, onStop, stateTodos = 
 
     const timer = window.setInterval(() => {
       setThinkingMessageIndex((prev) => (prev + 1) % thinkingMessages.length);
-    }, 2200);
+    }, 6000 + Math.floor(Math.random() * 500));
 
     return () => window.clearInterval(timer);
   }, [streamState.isStreaming, thinkingMessages.length]);
@@ -298,14 +307,14 @@ function AssistantGroup({
                   className="motion-soft-in flex items-center gap-2 text-caption text-muted-foreground"
                 >
                   <span className="tool-shimmer-dot" />
-                  <span>{thinkingLabel}</span>
+                  <span>Planning next steps...</span>
                 </div>
               );
           }
         })}
         {showCursor && (
           <div className="typing-indicator motion-soft-in" aria-live="polite" aria-label="Assistant is typing">
-            <span className="text-caption text-muted-foreground">Typing</span>
+            <span className="text-caption text-muted-foreground">{thinkingLabel}</span>
             <span className="typing-indicator-dots" aria-hidden="true">
               <span className="typing-dot" />
               <span className="typing-dot" />

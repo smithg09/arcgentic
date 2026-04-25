@@ -2,9 +2,14 @@ import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, RotateCcw, Shuffle, Lightbulb } from 'lucide-react';
 import { Button } from '@arcgentic/ui/button';
 import { Badge } from '@arcgentic/ui/badge';
+import { extractJsonCitations, parseCitationMarkers } from '@/lib/citations';
+import { CitationBadge } from './citation-badge';
+import type { Citation } from '@/lib/citations';
+import { safeParseJson } from '@/lib/json-repair';
 
 interface FlashcardViewerProps {
   content: string;
+  onCitationClick?: (citation: Citation) => void;
 }
 
 interface Flashcard {
@@ -28,21 +33,60 @@ const DIFFICULTY_COLORS: Record<string, string> = {
   hard: 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20',
 };
 
-export function FlashcardViewer({ content }: FlashcardViewerProps) {
-  const flashcardSet = useMemo<FlashcardSet>(() => {
+/* ── Inline citation renderer for text ── */
+function RenderCitedText({
+  text,
+  citations,
+  onCitationClick,
+}: {
+  text: string;
+  citations: Citation[];
+  onCitationClick?: (citation: Citation) => void;
+}) {
+  const segments = parseCitationMarkers(text);
+  const hasCitations = segments.some((s) => s.type === 'citation');
+  if (!hasCitations) return <>{text}</>;
+
+  return (
+    <>
+      {segments.map((seg, i) => {
+        if (seg.type === 'text') return <span key={i}>{seg.value}</span>;
+        const citeId = parseInt(seg.value, 10);
+        const citation = citations.find((c) => c.id === citeId);
+        if (!citation) return <sup key={i}>[{seg.value}]</sup>;
+        return (
+          <CitationBadge
+            key={i}
+            citation={citation}
+            onClick={onCitationClick || (() => {})}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+export function FlashcardViewer({ content, onCitationClick }: FlashcardViewerProps) {
+  const { flashcardSet, citations } = useMemo(() => {
     try {
-      const parsed = JSON.parse(content);
-      // Support both wrapped { title, cards: [] } and flat array []
+      const parsed = safeParseJson<Record<string, unknown>>(content);
+      const cites = extractJsonCitations(parsed);
       if (Array.isArray(parsed)) {
-        return { cards: parsed };
+        return { flashcardSet: { cards: parsed } as FlashcardSet, citations: cites };
       }
       return {
-        title: parsed.title,
-        description: parsed.description,
-        cards: parsed.cards || [{ front: 'Error parsing flashcards', back: content }],
+        flashcardSet: {
+          title: parsed.title,
+          description: parsed.description,
+          cards: parsed.cards || [{ front: 'Error parsing flashcards', back: content }],
+        } as FlashcardSet,
+        citations: cites,
       };
     } catch {
-      return { cards: [{ front: 'Error parsing flashcards', back: content }] };
+      return {
+        flashcardSet: { cards: [{ front: 'Error parsing flashcards', back: content }] } as FlashcardSet,
+        citations: [] as Citation[],
+      };
     }
   }, [content]);
 
@@ -152,7 +196,9 @@ export function FlashcardViewer({ content }: FlashcardViewerProps) {
             style={{ transform: flipped ? 'rotateX(180deg)' : '' }}
           >
             <p className="text-overline text-primary mb-3">Answer</p>
-            <p className="text-body text-foreground">{card.back}</p>
+            <p className="text-body text-foreground">
+              <RenderCitedText text={card.back} citations={citations} onCitationClick={onCitationClick} />
+            </p>
           </div>
         </div>
       </button>

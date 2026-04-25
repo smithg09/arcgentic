@@ -45,7 +45,7 @@ const rootRoute = createRootRoute({
       {/* Main Content Layer */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <Header />
-        <main className="flex-1">
+        <main className="flex-1 overflow-hidden">
           <Outlet />
         </main>
         <Toaster />
