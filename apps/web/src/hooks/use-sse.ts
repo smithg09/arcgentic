@@ -16,6 +16,7 @@ export function useSSE({ sessionId, onComplete, onNoProvider }: UseSSEOptions) {
     currentNode: null,
     error: null,
   })
+  const [builderId, setBuilderId] = useState<string | null>(null)
 
   const abortRef = useRef<AbortController | null>(null)
   const streamingContentRef = useRef('')
@@ -44,6 +45,7 @@ export function useSSE({ sessionId, onComplete, onNoProvider }: UseSSEOptions) {
       setMessages(prev => [...prev, aiMsg])
 
       setStreamState({ isStreaming: true, currentNode: null, error: null })
+      setBuilderId(null)
       streamingContentRef.current = ''
 
       // Abort previous stream
@@ -182,6 +184,10 @@ export function useSSE({ sessionId, onComplete, onNoProvider }: UseSSEOptions) {
           onComplete?.(event.state as Record<string, unknown>)
           break
         }
+        case 'builder_started': {
+          setBuilderId(event.build_id as string)
+          break
+        }
         case 'error': {
           const errorCode = event.code as string | undefined
           const errorMsg = (event.message as string) || 'Unknown error'
@@ -209,6 +215,7 @@ export function useSSE({ sessionId, onComplete, onNoProvider }: UseSSEOptions) {
     messages,
     setMessages,
     streamState,
+    builderId,
     sendMessage,
     stopStream,
   }

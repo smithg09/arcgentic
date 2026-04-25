@@ -39,12 +39,12 @@ def route_architect(state: AgentState) -> str:
     """
     Conditional edge leaving the architect sub-graph.
 
-    If the architect set spec.is_ready = True → route to builder.
+    If the architect set spec.is_ready = True → return END (trigger background builder later).
     Otherwise → END (wait for next user message in the same thread).
     """
     spec = state.get("spec")
     if spec and spec.is_ready:
-        return "builder"
+        return "__end__"
     return "__end__"
 
 
@@ -80,10 +80,13 @@ def route_queue(state: AgentState) -> str:
     """
     Routes from queue_processor to the correct agent sub-graph,
     or to END if the queue is exhausted.
+    For the builder, we return END so the background runner can pick it up.
     """
     current_agent = state.get("current_agent")
-    if current_agent in {"builder", "learning"}:
-        return current_agent
+    if current_agent == "learning":
+        return "learning"
+    if current_agent == "builder":
+        return "__end__"
     return "__end__"
 
 

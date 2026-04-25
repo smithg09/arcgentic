@@ -117,3 +117,4 @@ class AgentState(TypedDict):
     agent_queue: list[AgentTask]  # ordered queue of agents to execute
     current_user_request: str  # extracted user prompt for the current agent task
     model_config: dict | None  # ModelConfig dict from FE, flows through all nodes
+    builder_pending: bool  # Flag to indicate if builder should launch in background
