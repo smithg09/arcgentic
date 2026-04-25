@@ -1,6 +1,10 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { Play, Pause, RotateCcw, SkipForward, SkipBack, Volume2, ChevronDown, Settings2 } from 'lucide-react';
 import { Button } from '@arcgentic/ui/button';
+import { extractJsonCitations, parseCitationMarkers } from '@/lib/citations';
+import { CitationBadge } from './citation-badge';
+import type { Citation } from '@/lib/citations';
+import { safeParseJson } from '@/lib/json-repair';
 
 interface PodcastSegment {
   type: 'intro' | 'discussion' | 'example' | 'analogy' | 'deep_dive' | 'qa' | 'recap' | 'outro';
@@ -17,6 +21,7 @@ interface PodcastData {
 
 interface PodcastPlayerProps {
   content: string;
+  onCitationClick?: (citation: Citation) => void;
 }
 
 const SPEAKER_CONFIG: Record<string, { label: string; pitch: number; rate: number; color: string }> = {
@@ -36,20 +41,60 @@ const SEGMENT_TYPE_LABELS: Record<string, string> = {
   outro: 'Outro',
 };
 
-export function PodcastPlayer({ content }: PodcastPlayerProps) {
-  const podcast = useMemo<PodcastData>(() => {
+/* ── Inline citation renderer for text ── */
+function RenderCitedText({
+  text,
+  citations,
+  onCitationClick,
+}: {
+  text: string;
+  citations: Citation[];
+  onCitationClick?: (citation: Citation) => void;
+}) {
+  const segments = parseCitationMarkers(text);
+  const hasCitations = segments.some((s) => s.type === 'citation');
+  if (!hasCitations) return <>{text}</>;
+
+  return (
+    <>
+      {segments.map((seg, i) => {
+        if (seg.type === 'text') return <span key={i}>{seg.value}</span>;
+        const citeId = parseInt(seg.value, 10);
+        const citation = citations.find((c) => c.id === citeId);
+        if (!citation) return <sup key={i}>[{seg.value}]</sup>;
+        return (
+          <CitationBadge
+            key={i}
+            citation={citation}
+            onClick={onCitationClick || (() => { })}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+export function PodcastPlayer({ content, onCitationClick }: PodcastPlayerProps) {
+  const { podcast, citations } = useMemo(() => {
     try {
-      const parsed = JSON.parse(content);
+      const parsed = safeParseJson<Record<string, unknown>>(content);
+      const cites = extractJsonCitations(parsed);
       return {
-        title: parsed.title || 'Podcast',
-        description: parsed.description || '',
-        segments: parsed.segments || [],
+        podcast: {
+          title: (parsed.title as string) || 'Podcast',
+          description: (parsed.description as string) || '',
+          segments: (parsed.segments as PodcastSegment[]) || [],
+        } as PodcastData,
+        citations: cites,
       };
     } catch {
       return {
-        title: 'Podcast',
-        description: '',
-        segments: [{ type: 'discussion' as const, speaker: 'host' as const, text: content }],
+        podcast: {
+          title: 'Podcast',
+          description: '',
+          segments: [{ type: 'discussion' as const, speaker: 'host' as const, text: content }],
+        } as PodcastData,
+        citations: [] as Citation[],
       };
     }
   }, [content]);
@@ -279,7 +324,7 @@ export function PodcastPlayer({ content }: PodcastPlayerProps) {
               </span>
             </div>
             <p className="text-body text-foreground leading-relaxed line-clamp-3">
-              {currentSegment.text}
+              <RenderCitedText text={currentSegment.text} citations={citations} onCitationClick={onCitationClick} />
             </p>
           </div>
         )}
@@ -389,7 +434,9 @@ export function PodcastPlayer({ content }: PodcastPlayerProps) {
                     </span>
                   )}
                 </div>
-                <p className="text-caption text-foreground/80 line-clamp-2 leading-relaxed">{seg.text}</p>
+                <p className="text-caption text-foreground/80 line-clamp-2 leading-relaxed">
+                  <RenderCitedText text={seg.text} citations={citations} onCitationClick={onCitationClick} />
+                </p>
               </button>
             );
           })}

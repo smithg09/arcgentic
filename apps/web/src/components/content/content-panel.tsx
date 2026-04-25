@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@arcgentic/ui/tabs';
 import { ScrollArea } from '@arcgentic/ui/scroll-area';
 import { ExplanationViewer } from './explanation-viewer';
@@ -8,6 +8,10 @@ import { PresentationViewer } from './presentation-viewer';
 import { ConceptMapViewer } from './concept-map-viewer';
 import { SessionDetails } from './session-details';
 import { EmptyState } from './empty-state';
+import { CitationDrawer } from './citation-drawer';
+import { findSourceByCitation } from '@/lib/citations';
+import type { Citation } from '@/lib/citations';
+import type { Source } from '@/types/agent';
 import {
   FileText,
   Layers,
@@ -26,12 +30,32 @@ import type { AgentState } from '@/types/agent';
 interface ContentPanelProps {
   agentState: AgentState | null;
   isLoading?: boolean;
+  isBuilding?: boolean;
 }
 
-export function ContentPanel({ agentState, isLoading }: ContentPanelProps) {
+export function ContentPanel({ agentState, isLoading, isBuilding }: ContentPanelProps) {
   const resources = agentState?.resources || {};
   const resourceKeys = Object.keys(resources);
   const hasResources = resourceKeys.length > 0;
+  const sources: Source[] = agentState?.sources || [];
+
+  // ── Citation drawer state ──────────────────────────────────────────
+  const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
+  const [activeSource, setActiveSource] = useState<Source | null>(null);
+
+  const handleCitationClick = useCallback(
+    (citation: Citation) => {
+      const source = findSourceByCitation(citation, sources);
+      setActiveCitation(citation);
+      setActiveSource(source || null);
+    },
+    [sources],
+  );
+
+  const handleCitationClose = useCallback(() => {
+    setActiveCitation(null);
+    setActiveSource(null);
+  }, []);
 
   // Sort resource keys in a fixed display order
   const TAB_ORDER: Record<string, number> = {
@@ -103,16 +127,16 @@ export function ContentPanel({ agentState, isLoading }: ContentPanelProps) {
   const renderViewer = (key: string) => {
     const contentStr = resources[key]?.content || '';
     if (key.includes('explanation') || key.endsWith('.md')) {
-      return <ExplanationViewer content={contentStr} />;
+      return <ExplanationViewer content={contentStr} onCitationClick={handleCitationClick} />;
     }
     if (key.includes('podcast')) {
-      return <PodcastPlayer content={contentStr} />;
+      return <PodcastPlayer content={contentStr} onCitationClick={handleCitationClick} />;
     }
     if (key.includes('flashcard')) {
-      return <FlashcardViewer content={contentStr} />;
+      return <FlashcardViewer content={contentStr} onCitationClick={handleCitationClick} />;
     }
     if (key.includes('presentation')) {
-      return <PresentationViewer content={contentStr} />;
+      return <PresentationViewer content={contentStr} onCitationClick={handleCitationClick} />;
     }
     if (key.includes('concept_map') || key.includes('roadmap')) {
       return <ConceptMapViewer content={contentStr} />;
@@ -127,11 +151,11 @@ export function ContentPanel({ agentState, isLoading }: ContentPanelProps) {
       );
     }
     // Fallback: if JSON try as code block, else markdown
-    return <ExplanationViewer content={contentStr} />;
+    return <ExplanationViewer content={contentStr} onCitationClick={handleCitationClick} />;
   };
 
-  // If there's no spec and no resources, we show empty state
-  if (!agentState?.spec && !hasResources) {
+  // If there's no spec and no resources, we show empty state (unless building)
+  if (!agentState?.spec && !hasResources && !isBuilding) {
     return (
       <div className="flex h-full flex-col items-center justify-center border-l border-border bg-card">
         <EmptyState />
@@ -218,6 +242,13 @@ export function ContentPanel({ agentState, isLoading }: ContentPanelProps) {
           })}
         </ScrollArea>
       </Tabs>
+
+      {/* Citation Drawer */}
+      <CitationDrawer
+        citation={activeCitation}
+        source={activeSource}
+        onClose={handleCitationClose}
+      />
     </div>
   );
 }

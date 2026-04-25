@@ -40,7 +40,7 @@ def update_spec(
         focus_areas: Specific areas to focus on (list of strings)
         learning_goals: What the user wants to achieve (list of strings)
         preferred_depth: 'shallow', 'moderate', or 'deep'
-        source_summary: Summary of any uploaded source materials
+        source_summary: Summary of uploaded source materials in few sentences for builder to understand the context and content of the source materials  
         is_ready: Set True when spec is complete — triggers handoff to builder
 
     Returns:

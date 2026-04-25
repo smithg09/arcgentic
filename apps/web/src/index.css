@@ -594,6 +594,10 @@ html[data-theme="light"] {
   max-width: fit-content;
 }
 
+.prose pre:has(.mermaid-diagram) {
+  max-width: 100%;
+}
+
 .prose pre code {
   padding: 0;
   background: none;
@@ -1123,3 +1127,20 @@ html[data-theme="light"] {
   color: var(--foreground);
   white-space: pre-wrap;
 }
+
+/* ─── Citation Highlight ─── */
+.citation-highlight {
+  animation: citation-glow 2s var(--ease-in-out) 1;
+}
+
+@keyframes citation-glow {
+  0% { background: oklch(from var(--primary) l c h / 30%); }
+  50% { background: oklch(from var(--primary) l c h / 20%); }
+  100% { background: oklch(from var(--primary) l c h / 15%); }
+}
+
+.citation-badge {
+  vertical-align: super;
+  line-height: 1;
+}
+

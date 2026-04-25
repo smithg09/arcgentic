@@ -17,6 +17,9 @@ import {
 } from 'lucide-react';
 import { Button } from '@arcgentic/ui/button';
 import { useMarkdownComponents } from './explanation-viewer';
+import { extractJsonCitations } from '@/lib/citations';
+import type { Citation } from '@/lib/citations';
+import { safeParseJson } from '@/lib/json-repair';
 
 interface Slide {
   slide_number: number;
@@ -35,6 +38,7 @@ interface PresentationData {
 
 interface PresentationViewerProps {
   content: string;
+  onCitationClick?: (citation: Citation) => void;
 }
 
 const SLIDE_TYPE_ICONS: Record<string, typeof FileText> = {
@@ -46,57 +50,27 @@ const SLIDE_TYPE_ICONS: Record<string, typeof FileText> = {
   summary: CheckSquare,
 };
 
-function repairJson(str: string): string {
-  let inString = false;
-  let isEscaped = false;
-  let res = "";
-  for (let i = 0; i < str.length; i++) {
-    const char = str[i];
-    if (char === '"' && !isEscaped) {
-      inString = !inString;
-      res += char;
-    } else if (char === '\\') {
-      isEscaped = !isEscaped;
-      res += char;
-    } else {
-      isEscaped = false;
-      if (inString && char === '\n') {
-        res += '\\n';
-      } else if (inString && char === '\r') {
-        // ignore
-      } else if (inString && char === '\t') {
-        res += '\\t';
-      } else {
-        res += char;
-      }
-    }
-  }
-  return res;
-}
-
-export function PresentationViewer({ content }: PresentationViewerProps) {
-  const data = useMemo<PresentationData>(() => {
+export function PresentationViewer({ content, onCitationClick }: PresentationViewerProps) {
+  const { data, citations } = useMemo(() => {
     try {
-      const parsed = JSON.parse(content);
+      const parsed = safeParseJson<Record<string, unknown>>(content);
+      const cites = extractJsonCitations(parsed);
       return {
-        title: parsed.title || 'Presentation',
-        subtitle: parsed.subtitle,
-        slides: parsed.slides || [],
+        data: {
+          title: (parsed.title as string) || 'Presentation',
+          subtitle: parsed.subtitle as string | undefined,
+          slides: (parsed.slides as Slide[]) || [],
+        } as PresentationData,
+        citations: cites,
       };
-    } catch (error) {
-      try {
-        const repaired = JSON.parse(repairJson(content));
-        return {
-          title: repaired.title || 'Presentation',
-          subtitle: repaired.subtitle,
-          slides: repaired.slides || [],
-        };
-      } catch (innerError) {
-        return {
+    } catch {
+      return {
+        data: {
           title: 'Presentation',
           slides: [{ slide_number: 1, type: 'content' as const, title: 'Error', content: 'Error parsing presentation' }],
-        };
-      }
+        } as PresentationData,
+        citations: [] as Citation[],
+      };
     }
   }, [content]);
 
@@ -104,7 +78,7 @@ export function PresentationViewer({ content }: PresentationViewerProps) {
   const [showNotes, setShowNotes] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showThumbnails, setShowThumbnails] = useState(true);
-  const components = useMarkdownComponents();
+  const components = useMarkdownComponents(citations, onCitationClick);
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -193,7 +167,7 @@ export function PresentationViewer({ content }: PresentationViewerProps) {
             : ''
             }`}>
             {slide.type === 'title' || slide.type === 'section' ? (
-              <div className="space-y-6 max-w-4xl mx-auto flex flex-col items-center justify-center h-full">
+              <div className="space-y-6 max-w-4xl mx-auto flex flex-col items-center justify-start h-full">
                 <h1 className="text-fluid-display font-hero-heading text-foreground drop-shadow-sm motion-hero animate-delay-1 text-balance">
                   {slide.title}
                 </h1>
