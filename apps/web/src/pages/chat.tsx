@@ -1,11 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
-import { getSessionState } from '@/api/agent/queries';
+import { getSessionState, getBuildStatus } from '@/api/agent/queries';
 import { getSession } from '@/api/graphql/queries';
 import { updateSession } from '@/api/graphql/mutations';
 import { useSSE } from '@/hooks/use-sse';
+import { useBuilderStream } from '@/hooks/use-builder-stream';
 import { useModelSettings } from '@/hooks/use-model-settings';
 import { ChatPanel } from '@/components/chat/chat-panel';
 import { ContentPanel } from '@/components/content/content-panel';
@@ -30,14 +31,21 @@ export function ChatPage() {
   });
 
   // Agent state
-  const { data: agentState, isLoading: stateLoading } = useQuery({
+  const { data: agentState, isLoading: stateLoading, isFetching: stateFetching } = useQuery({
     queryKey: ['agentState', sessionId],
     queryFn: () => getSessionState(sessionId),
     refetchOnWindowFocus: false
   });
 
+  // Builder Status (on load)
+  const { data: initialBuildStatus } = useQuery({
+    queryKey: ['buildStatus', sessionId],
+    queryFn: () => getBuildStatus(sessionId),
+    refetchOnWindowFocus: false
+  });
+
   // SSE
-  const { messages, setMessages, streamState, sendMessage, stopStream } = useSSE({
+  const { messages, setMessages, streamState, builderId, sendMessage, stopStream } = useSSE({
     sessionId,
     onComplete: (state) => {
       // Refresh agent state and session list
@@ -67,6 +75,30 @@ export function ChatPage() {
     onNoProvider: (message) => {
       openSettings(message);
     },
+  });
+
+  const handleResourceReady = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['agentState', sessionId] });
+  }, [queryClient, sessionId]);
+
+  const handleBuildComplete = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['agentState', sessionId] });
+    queryClient.invalidateQueries({ queryKey: ['sessions'] });
+    queryClient.invalidateQueries({ queryKey: ['session', sessionId] });
+  }, [queryClient, sessionId]);
+
+  const rawActiveBuildId = builderId || (initialBuildStatus?.status === 'running' ? initialBuildStatus.build_id : null);
+
+  // Track builds we've successfully hydrated to prevent duplicate messages
+  const [clearedBuildIds, setClearedBuildIds] = useState<Set<string>>(new Set());
+  const activeBuildId = rawActiveBuildId && !clearedBuildIds.has(rawActiveBuildId) ? rawActiveBuildId : null;
+
+  // Builder Stream
+  const { builderMessages, isBuilding } = useBuilderStream({
+    sessionId,
+    enabled: !!activeBuildId,
+    onResourceReady: handleResourceReady,
+    onComplete: handleBuildComplete
   });
 
   // Sync title from spec to session if needed (e.g. from GraphQL query load)
@@ -164,6 +196,14 @@ export function ChatPage() {
     }
   }, [agentState?.messages, setMessages]);
 
+  // Safely clear the builder stream AFTER the new agent state is fetched
+  // This prevents the duplicate message while avoiding a flicker
+  useEffect(() => {
+    if (rawActiveBuildId && !isBuilding && !stateFetching && builderMessages.length > 0) {
+      setClearedBuildIds(prev => new Set(prev).add(rawActiveBuildId));
+    }
+  }, [rawActiveBuildId, isBuilding, stateFetching, builderMessages.length]);
+
   // Send initial message if navigated from dashboard
   useEffect(() => {
     const initialMessage = localStorage.getItem('pending_message');
@@ -208,6 +248,13 @@ export function ChatPage() {
         </div>
       </div>
 
+      {isBuilding && (
+        <div className="bg-primary/5 border-b border-primary/20 px-4 py-2 text-xs font-medium text-primary flex items-center justify-center gap-2">
+          <div className="h-3 w-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+          Builder is working in the background...
+        </div>
+      )}
+
       {/* Panels */}
       <PanelGroup
         orientation={isDesktop ? 'horizontal' : 'vertical'}
@@ -218,8 +265,11 @@ export function ChatPage() {
           minSize={"30%"}
         >
           <ChatPanel
-            messages={messages}
-            streamState={streamState}
+            messages={[...messages, ...builderMessages]}
+            streamState={{
+              ...streamState,
+              isStreaming: streamState.isStreaming || isBuilding
+            }}
             onSend={sendMessage}
             onStop={stopStream}
             stateTodos={agentState?.todos ?? []}
@@ -247,7 +297,11 @@ export function ChatPage() {
           minSize={"40%"}
           className="bg-background"
         >
-          <ContentPanel agentState={agentState ?? null} isLoading={stateLoading} />
+          <ContentPanel
+            agentState={agentState ?? null}
+            isLoading={stateLoading}
+            isBuilding={isBuilding}
+          />
         </Panel>
       </PanelGroup>
     </div>

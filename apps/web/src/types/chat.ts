@@ -23,6 +23,13 @@ export interface StreamState {
   error: string | null
 }
 
+export interface BuilderStatus {
+  status: 'idle' | 'running' | 'completed' | 'error'
+  resources_ready: string[]
+  error?: string
+  build_id: string | null
+}
+
 // ─── SSE Event Types ───
 
 export type SSEEventType =
@@ -34,6 +41,10 @@ export type SSEEventType =
   | 'heartbeat'
   | 'complete'
   | 'error'
+  | 'builder_started'
+  | 'resource_ready'
+  | 'builder_complete'
+  | 'builder_error'
 
 export interface SSEEvent {
   type: SSEEventType

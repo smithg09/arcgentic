@@ -27,3 +27,9 @@ export async function addSources(sessionId: string, formData: FormData): Promise
   if (!res.ok) throw new Error(`Failed to add sources: ${res.status}`)
   return res.json()
 }
+
+export async function getBuildStatus(sessionId: string): Promise<any> {
+  const res = await fetch(`${AGENT_API_BASE}/sessions/${sessionId}/build-status`)
+  if (!res.ok) throw new Error(`Failed to get build status: ${res.status}`)
+  return res.json()
+}

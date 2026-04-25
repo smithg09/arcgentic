@@ -12,6 +12,7 @@ from config import get_graph
 from agent.state import LearningSpec
 from agent.parsers import parse_user_input
 from agent.model_provider import ModelConfig, NoProviderConfiguredError
+from agent.builder_runner import builder_runner
 from middleware.request_parser import parse_chat_request
 from utils.sse import (
     create_sync_stream,
@@ -123,6 +124,24 @@ async def chat(session_id: str):
             final_data["state"]["response"] = last_message
 
             yield format_sse(final_data)
+            
+            # Check if builder needs to be launched
+            builder_should_run = False
+            
+            if spec and spec.is_ready:
+                content = state.values.get("content", {})
+                if len(content) == 0:
+                    builder_should_run = True
+                    
+            if state.values.get("current_agent") == "builder":
+                builder_should_run = True
+                
+            if builder_should_run and not builder_runner.is_building(session_id):
+                build_id = await builder_runner.start_build(session_id, graph, config)
+                yield format_sse({
+                    "type": "builder_started",
+                    "build_id": build_id,
+                })
 
         except NoProviderConfiguredError as e:
             yield format_sse({

@@ -70,10 +70,12 @@ def create_app() -> Flask:
     from routes.chat import chat_bp
     from routes.sessions import sessions_bp
     from routes.resources import resources_bp
+    from routes.build import build_bp
 
     app.register_blueprint(health_bp)
     app.register_blueprint(chat_bp)
     app.register_blueprint(sessions_bp)
     app.register_blueprint(resources_bp)
+    app.register_blueprint(build_bp)
 
     return app

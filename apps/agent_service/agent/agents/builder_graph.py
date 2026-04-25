@@ -148,7 +148,7 @@ def should_continue(state: AgentState) -> Literal["builder_tools", "__end__"]:
 # Sub-graph factory
 # ─────────────────────────────────────────────────────────────────────────────
 
-def create_builder_graph():
+def create_builder_graph(checkpointer=None):
     """
     Build and compile the builder sub-graph.
 
@@ -169,4 +169,4 @@ def create_builder_graph():
     graph.add_conditional_edges("builder_agent", should_continue)
     graph.add_edge("builder_tools", "builder_agent")
 
-    return graph.compile()
+    return graph.compile(checkpointer=checkpointer)
