@@ -10,6 +10,7 @@ import {
   Compass,
   FileUp,
   GitBranch,
+  Globe,
   GraduationCap,
   ImagePlay,
   Layers3,
@@ -19,10 +20,13 @@ import {
   PlayCircle,
   Play,
   Presentation,
+  Quote,
   Sparkles,
   SquareDashedMousePointer,
+  Terminal,
   Waypoints,
   X,
+  Zap,
 } from 'lucide-react';
 import { Button } from '@arcgentic/ui/button';
 import {
@@ -105,7 +109,8 @@ const repoBaseUrl = 'https://github.com/smithg09/arcgentic';
 const docsLinks = [
   { label: 'GitHub Repo', href: repoBaseUrl },
   { label: 'Getting Started', href: '/docs/#/getting-started.md' },
-  { label: 'Contributing', href: '/docs/#/contributing.md' },
+  { label: 'Agentic Harness', href: '/docs/#/agent-harness.md' },
+  { label: 'Architecture', href: '/docs/#/architecture.md' },
 ];
 
 type WalkthroughSlide = {
@@ -313,6 +318,9 @@ function App() {
               <a href="#features" className="nav-link">
                 Features
               </a>
+              <a href="/docs" className="nav-link">
+                Docs
+              </a>
             </nav>
             <a href={repoBaseUrl} target="_blank" rel="noreferrer" className="text-foreground/80 hover:text-foreground transition-all hover:-translate-y-0.5 duration-200">
               <GithubIcon className="h-5 w-5" />
@@ -461,6 +469,8 @@ function App() {
             ))}
           </div>
         </section>
+
+
 
         <section id="walkthrough" className="mx-auto max-w-360 px-5 py-20 sm:px-8 lg:pb-30 lg:pt-40">
           <div className="grid gap-18 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
@@ -720,6 +730,44 @@ function App() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+        <section className="mx-auto max-w-360 px-5 py-8 sm:px-8 lg:py-24">
+          <div className="group relative overflow-hidden rounded-[2.5rem] border border-border/50 bg-card/40 p-8 backdrop-blur-md transition-all hover:border-primary/30 sm:p-10 lg:p-12">
+            <div className="relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+                  <Terminal className="h-3.5 w-3.5" />
+                  Under the Hood
+                </div>
+                <h3 className="text-2xl font-heading tracking-tight sm:text-3xl lg:text-4xl">
+                  Beyond the interface: <span className="text-primary italic font-bold">A look at the engine.</span>
+                </h3>
+                <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+                  Arcgentic is a polyglot system built for scale, modularity, and autonomy. Explore the
+                  multi-agent orchestration behind the harness and the stack that powers it.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Button asChild className="group/btn1 rounded-2xl px-7 py-6 text-base shadow-lg shadow-primary/10 transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                  <a href="/docs/#/README?id=tech-stack" target="_blank" rel="noreferrer">
+                    Full Tech Stack
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn1:translate-x-1" />
+                  </a>
+                </Button>
+                <Button asChild variant="outline" className="group/btn2 rounded-2xl px-7 py-6 text-base border-border/60 bg-transparent backdrop-blur-sm transition-all hover:bg-card hover:border-primary/30">
+                  <a href="/docs/#/agent-harness.md" target="_blank" rel="noreferrer">
+                    Agentic Harness
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn2:translate-x-1" />
+                  </a>
+                </Button>
+              </div>
+            </div>
+
+            {/* Subtle decorative elements */}
+            <div className="absolute -right-24 -top-24 -z-10 h-72 w-72 rounded-full bg-primary/5 blur-[100px]" />
+            <div className="absolute -bottom-24 -left-24 -z-10 h-72 w-72 rounded-full bg-blue-500/5 blur-[100px]" />
           </div>
         </section>
       </main>

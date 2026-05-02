@@ -85,12 +85,13 @@ A polyglot, multi-service architecture built for modularity and performance. Eac
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | TypeScript, React 19, Vite, TanStack Router & Query, Tailwind CSS v4, shadcn/ui |
-| **User Service** | Go, Echo, GraphQL (gqlgen), sqlc |
-| **Agent Service** | Python, Flask — Agent Harness using LangGraph orchestration (skills, tools, memory) |
-| **Web Server** | Nginx (reverse proxy & static serving) |
+| **Frontend** | TypeScript, React 19, Vite, Tailwind CSS v4, shadcn/ui |
+| **State & Routing** | TanStack Router, TanStack Query, Zustand |
+| **User Service** | Go 1.21+, Echo, GraphQL (gqlgen), sqlc |
+| **Agent Service** | Python 3.11+, Flask, LangGraph, LangChain |
+| **Web Server** | Nginx |
 | **Database** | PostgreSQL |
-| **Containerization** | Docker, Docker Compose |
+| **Containerization**| Docker, Docker Compose |
 | **Monorepo** | Turborepo, pnpm workspaces |
 
 ## ☁️ Deployment Stack
@@ -99,15 +100,14 @@ Production-grade infrastructure on AWS with fully automated CI/CD. Zero static c
 
 | Component | Technology |
 |---|---|
-| **Containerization** | Docker, Amazon ECR |
+| **Containerization**| Amazon ECR |
 | **Orchestration** | Amazon EKS (Kubernetes) |
 | **Ingress / TLS** | AWS ALB + ACM Certificate |
-| **Web Server** | Nginx (reverse proxy, static assets, API routing) |
 | **Secrets** | AWS Secrets Manager → External Secrets Operator |
 | **Database** | Amazon RDS (PostgreSQL) |
-| **CI/CD** | GitHub Actions (OIDC federation, zero static keys) |
-| **Landing Page** | GitHub Pages |
-| **Documentation** | Docsify (GitHub Pages) |
+| **CI/CD** | GitHub Actions |
+| **Landing Page** | GitHub Pages (React build) |
+| **Documentation** | Docsify (via GitHub Pages) |
 
 ---
 

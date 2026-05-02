@@ -34,62 +34,40 @@ graph TD
 
 ## Monorepo Structure
 
-We use Turborepo and pnpm workspaces to manage our multi-package repository.
+We use **Turborepo** and **pnpm workspaces** for efficient monorepo management.
 
-- **`apps/web`**: The main user-facing application built with React 19 and Vite.
-- **`apps/agent_service`**: A Python/Flask backend responsible for all AI interactions and workflows.
-- **`apps/user_service`**: A Go/Echo HTTP server providing a GraphQL API for managing users, sessions, and chat history.
-- **`packages/ui`**: A shared component library (`@arcgentic/ui`) built with Tailwind CSS v4 and shadcn/ui.
-- **`packages/eslint-config`**: Shared ESLint rules for all TypeScript packages.
-- **`packages/typescript-config`**: Shared `tsconfig.json` bases.
+| Package | Type | Description |
+|---|---|---|
+| `apps/web` | React SPA | Main user-facing app (React 19, Vite, TanStack Router). |
+| `apps/agent_service` | Python API | AI orchestration, tools, and LLM communication. |
+| `apps/user_service` | Go API | Core backend for data models (users, sessions, history). |
+| `apps/landing` | React SPA | Marketing and product showcase site. |
+| `packages/ui` | Library | Shared component library (Tailwind v4, shadcn/ui). |
+| `packages/eslint-config` | Config | Shared ESLint rules for TypeScript packages. |
+| `packages/typescript-config` | Config | Shared `tsconfig.json` bases. |
 
-## Component Deep Dive
+## Service Deep Dive
 
 ### 1. Web Application (`apps/web`)
 
-The frontend is a Single Page Application (SPA) prioritizing performance and modern React patterns.
+A fast, client-rendered Single Page Application built for a highly interactive AI chat experience.
 
-- **Framework**: React 19 + Vite
-- **Routing**: `@tanstack/react-router` for type-safe routing.
-- **Data Fetching**: `@tanstack/react-query` for server state management (GraphQL and REST).
-- **Styling**: Tailwind CSS v4 with custom tokens and `shadcn/ui` based components.
-- **State**: React Context for global UI state, URL search params for shareable view state.
+* **Routing & State**: `TanStack Router` provides type-safe routing, while `TanStack Query` handles server state caching.
+* **Component System**: Based on `shadcn/ui` and heavily customized with `Tailwind CSS v4` tokens.
+* **Streaming UX**: Consumes Server-Sent Events (SSE) from the Agent Service to stream AI responses, UI artifacts, and tool execution states in real-time.
 
 ### 2. User Service (`apps/user_service`)
 
-A highly concurrent API gateway built in Go to handle core data models.
+A high-concurrency API gateway built to handle reliable data persistence.
 
-- **Framework**: Echo for HTTP routing.
-- **API**: GraphQL via `gqlgen`, allowing the client to fetch exactly what it needs.
-- **Database Access**: `sqlc` for type-safe, performant SQL queries.
-- **Database**: PostgreSQL for persistent storage of Users, Sessions, and Messages.
+* **GraphQL API**: Built with `gqlgen`, allowing the frontend to flexibly query nested data (Users → Sessions → Messages).
+* **Database Layer**: Uses `sqlc` to generate type-safe Go code directly from raw SQL queries, ensuring zero ORM overhead.
+* **State Syncing**: Acts as the source of truth for chat history, ensuring the Python agent service can safely hydrate context across page reloads.
 
 ### 3. Agent Service (`apps/agent_service`)
 
-The brain of Arcgentic. It handles multi-agent orchestration to facilitate the "Ask, Learn, Master" loop.
+The Python-based intelligence layer that powers Arcgentic's "Ask, Learn, Master" loop.
 
-- **Framework**: Flask (Python).
-- **Core Orchestration**: `LangGraph` and `LangChain`.
-- **Agents**:
-  - **Supervisor**: Intelligently routes user queries to the appropriate sub-agent based on intent and phase.
-  - **Architect**: Gathers requirements and scopes the learning objectives.
-  - **Builder**: Autonomously researches and builds learning materials (presentations, podcasts, flashcards).
-  - **Learning (Tutor)**: Handles the interactive chat, answering questions and teaching concept-by-concept.
-
-#### Agent State Flow
-
-```mermaid
-stateDiagram-v2
-    [*] --> Supervisor
-    Supervisor --> Architect: Planning Phase
-    Supervisor --> Builder: Resource Generation
-    Supervisor --> Learning: Interactive Tutoring
-    
-    Architect --> Supervisor: Spec Ready
-    Builder --> Supervisor: Content Created
-    Learning --> Supervisor: Session Complete
-```
-
-## Deployment Model
-
-All services are containerized via Docker. For production or local "full-stack" execution, `docker-compose` orchestrates the initialization and networking of the Web UI, Agent Service, User Service, and PostgreSQL database.
+* **Architecture**: A multi-agent system built on top of `LangGraph`.
+* **Stateful Workflows**: Uses PostgreSQL checkpointing to maintain persistent, interruptible graphs.
+* **Deep Dive**: See the dedicated **[Agentic Harness](agent-harness.md)** documentation for a comprehensive breakdown of the Supervisor, Architect, Builder, Tools, and Memory systems.
