@@ -13,60 +13,66 @@ Ensure you have the following installed on your system:
 - **Docker Desktop** (or any Docker engine) - Required for running the local PostgreSQL database and containerized deployments.
 - **Make** - Standard build automation tool for running setup scripts.
 
-## Installation & Setup
+## Quick Launch (Docker Compose)
+
+The fastest way to get the full platform running. One command handles everything:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-org/arcgentic.git
+   git clone https://github.com/smithg09/arcgentic.git
    cd arcgentic
    ```
 
-2. **Automated Setup**
-   We provide a Makefile target that handles installing all dependencies, starting the database, running migrations, and setting up initial environment variables.
-   
+2. **Start the platform**
    ```bash
-   make setup
+   make start
    ```
-   *Note: This runs `pnpm install` at the root to bootstrap all JS/TS dependencies across the monorepo.*
 
-3. **Configure Environment Variables**
-   The `make setup` command created default `.env` files across the various apps. You must at least configure an LLM provider for the agent service to function.
-   
-   Open `apps/agent_service/.env` and add an API key for your preferred provider, for example:
+   This will:
+   - Install all dependencies via pnpm
+   - Launch all services (web, user-service, agent-service, database) via Docker Compose
+   - Run database migrations
+   - Scaffold default `.env` files
+
+3. **Configure an LLM provider**
+   Open `apps/agent_service/.env` and add an API key for your preferred provider:
    ```env
    OPENAI_API_KEY=sk-your-openai-key-here
    # or
    ANTHROPIC_API_KEY=sk-ant-your-anthropic-key-here
    ```
    
-   By default, the application will fallback to available providers or prompt you in the Web UI Settings if no keys are found.
+   Then restart the agent service to pick up the new key:
+   ```bash
+   docker compose restart agent_service
+   ```
 
-## Running the Application
-
-### Option A: Local Development (Hot Reloading)
-
-To run the application with hot-reloading across the entire stack, use Turborepo. Ensure your Docker database is running first:
-
-```bash
-# Ensure DB is up
-make db-up
-
-# Start all services (Web, Agent RPC, Go Server)
-pnpm dev
-```
-
+The application is now running:
 - **Web App**: [http://localhost:5173](http://localhost:5173)
 - **Go GraphQL API**: [http://localhost:8080](http://localhost:8080)
 - **Python Agent API**: [http://localhost:5001](http://localhost:5001)
 
-### Option B: Full Docker Deployment
+## Local Development (Hot Reloading)
 
-If you want to run the entire stack exactly as it would run in production:
+For active development with live code reloading, use the local dev flow instead:
 
-```bash
-docker compose up --build
-```
-This builds and orchestrates the database, user service, agent service, and frontend. Everything will be accessible via localhost at the same ports mentioned above.
+1. **Set up the local environment**
+   ```bash
+   make setup-local
+   ```
+   This installs dependencies, starts only the PostgreSQL database, runs migrations, and scaffolds `.env` files.
+
+2. **Configure an LLM provider**
+   Edit `apps/agent_service/.env` and add at least one API key (see Quick Launch step 3 above).
+
+3. **Start all services with hot reload**
+   ```bash
+   make dev
+   ```
+
+- **Web App**: [http://localhost:5173](http://localhost:5173)
+- **Go GraphQL API**: [http://localhost:8080](http://localhost:8080)
+- **Python Agent API**: [http://localhost:5001](http://localhost:5001)
 
 ## Database Management
 
@@ -76,7 +82,6 @@ We use `sqlc` for the Go service and standard PostgreSQL migrations. Common data
 - `make db-down` - Stop the Postgres container.
 - `make migrate-up` - Apply pending database migrations.
 - `make migrate-down` - Rollback the last applied migration.
-- `make psql` - Drop into a Postgres shell connected to the dev DB.
 
 ## Troubleshooting
 

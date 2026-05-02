@@ -154,15 +154,15 @@ helm upgrade --install external-secrets external-secrets/external-secrets \
 ```json
 {
   "POSTGRES_URI": "postgresql://USER:PASSWORD@RDS_ENDPOINT:5432",
-  "POSTGRES_DATABASE": "aiproject",
-  "MIGRATE_DATABASE_URL": "postgres://USER:PASSWORD@RDS_ENDPOINT:5432/aiproject?sslmode=require"
+  "POSTGRES_DATABASE": "arcgentic",
+  "MIGRATE_DATABASE_URL": "postgres://USER:PASSWORD@RDS_ENDPOINT:5432/arcgentic?sslmode=require"
 }
 ```
 
 **`arcgentic/prod/agent-service`**:
 ```json
 {
-  "DATABASE_URL": "postgresql://USER:PASSWORD@RDS_ENDPOINT:5432/aiproject",
+  "DATABASE_URL": "postgresql://USER:PASSWORD@RDS_ENDPOINT:5432/arcgentic",
   "OPENAI_API_KEY": "",
   "ANTHROPIC_API_KEY": "",
   "GOOGLE_API_KEY": "",

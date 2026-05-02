@@ -3,6 +3,7 @@
 # Colors for output
 BLUE := \033[0;34m
 GREEN := \033[0;32m
+YELLOW := \033[0;33m
 NC := \033[0m # No Color
 
 .DEFAULT_GOAL := help
@@ -10,6 +11,11 @@ NC := \033[0m # No Color
 # Help command
 help:
 	@echo "$(BLUE)Available commands:$(NC)"
+	@echo ""
+	@echo "$(GREEN)Setup:$(NC)"
+	@echo "  make start            - One-command full platform launch (Docker Compose)"
+	@echo "  make stop             - Stop all running services"
+	@echo "  make setup-local      - Set up for local development (DB only, hot reload)"
 	@echo ""
 	@echo "$(GREEN)Development:$(NC)"
 	@echo "  make dev              - Start all services in development mode"
@@ -34,6 +40,7 @@ help:
 	@echo "  make build-frontend   - Build web frontend"
 	@echo "  make test             - Run all tests"
 	@echo "  make test-backend     - Run Go tests with coverage"
+	@echo "  make test-frontend    - Run frontend tests"
 	@echo ""
 	@echo "$(GREEN)Code Quality:$(NC)"
 	@echo "  make lint             - Run linters for all code"
@@ -42,9 +49,7 @@ help:
 	@echo ""
 	@echo "$(GREEN)Cleanup:$(NC)"
 	@echo "  make clean            - Clean build artifacts"
-	@echo ""
-	@echo "$(GREEN)Setup:$(NC)"
-	@echo "  make setup            - First-time project setup"
+	@echo "  make clean-all        - Clean everything (node_modules, Go cache)"
 
 .PHONY: help
 
@@ -65,7 +70,7 @@ POSTGRES_HOST ?= localhost
 POSTGRES_PORT ?= 5439
 POSTGRES_USER ?= postgres
 POSTGRES_PASSWORD ?= supersecretpassword
-POSTGRES_DATABASE ?= aiproject
+POSTGRES_DATABASE ?= arcgentic
 
 ifeq ($(POSTGRES_IS_SSL_DISABLED),true)
 	ssl_mode := ?sslmode=disable
@@ -81,33 +86,67 @@ else
 	postgres_uri := postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DATABASE)$(ssl_mode)
 endif
 
+# Internal helper: ensure PostgreSQL is running before dev commands
+_ensure-db:
+	@if ! docker ps --format '{{.Names}}' | grep -q 'postgres'; then \
+		echo "$(BLUE)PostgreSQL is not running. Starting it...$(NC)"; \
+		$(MAKE) db-up; \
+		echo "$(BLUE)Waiting for PostgreSQL to be ready...$(NC)"; \
+		sleep 5; \
+	else \
+		echo "$(BLUE)PostgreSQL is already running$(NC)"; \
+	fi
+
+#
+# Start / Stop (Docker Compose full stack)
+#
+start:
+	@echo "$(GREEN)Installing dependencies...$(NC)"
+	@pnpm install
+	@echo "$(GREEN)Starting all services with Docker Compose...$(NC)"
+	@docker compose up -d
+	@echo "$(BLUE)Waiting for database to be ready...$(NC)"
+	@sleep 5
+	@cd $(BACKEND_DIR) && cp .env.example .env 2>/dev/null || true
+	@cd apps/agent_service && cp .env.example .env 2>/dev/null || true
+	@$(MAKE) migrate-up
+	@echo ""
+	@echo "$(GREEN)✅ Arcgentic is running!$(NC)"
+	@echo "$(BLUE)  Web UI:          http://localhost:5173$(NC)"
+	@echo "$(BLUE)  Agent API:       http://localhost:5001$(NC)"
+	@echo "$(BLUE)  User/GraphQL API: http://localhost:8080$(NC)"
+
+stop:
+	@echo "$(GREEN)Stopping all services...$(NC)"
+	@docker compose down
+	@echo "$(BLUE)All services stopped$(NC)"
+
+.PHONY: start stop
+
+#
+# Setup for local development (DB only, hot reload with pnpm dev)
+#
+setup-local:
+	@echo "$(GREEN)Setting up local development environment...$(NC)"
+	@pnpm install
+	@$(MAKE) db-up
+	@sleep 3
+	@cd $(BACKEND_DIR) && cp .env.example .env 2>/dev/null || true
+	@cd apps/agent_service && cp .env.example .env 2>/dev/null || true
+	@$(MAKE) migrate-up
+	@echo "$(BLUE)Setup complete! Run 'make dev' to start development with hot reload$(NC)"
+
+.PHONY: setup-local
+
 #
 # Development Commands
 #
-dev:
+dev: _ensure-db
 	@echo "$(GREEN)Starting all services...$(NC)"
-	@echo "$(BLUE)Checking if PostgreSQL is running...$(NC)"
-	@if ! docker ps | grep -q aiproject-postgres-1; then \
-		echo "$(BLUE)PostgreSQL is not running. Starting it...$(NC)"; \
-		make db-up; \
-		echo "$(BLUE)Waiting for PostgreSQL to be ready...$(NC)"; \
-		sleep 5; \
-	else \
-		echo "$(BLUE)PostgreSQL is already running$(NC)"; \
-	fi
 	@pnpm dev
 
-dev-backend:
+dev-backend: _ensure-db
 	@echo "$(GREEN)Starting Go backend...$(NC)"
-	@echo "$(BLUE)Checking if PostgreSQL is running...$(NC)"
-	@if ! docker ps | grep -q aiproject-postgres-1; then \
-		echo "$(BLUE)PostgreSQL is not running. Starting it...$(NC)"; \
-		make db-up; \
-		echo "$(BLUE)Waiting for PostgreSQL to be ready...$(NC)"; \
-		sleep 5; \
-	else \
-		echo "$(BLUE)PostgreSQL is already running$(NC)"; \
-	fi
 	@pnpm run dev --filter=core
 
 dev-frontend:
@@ -121,48 +160,48 @@ dev-frontend:
 #
 db-up:
 	@echo "$(GREEN)Starting PostgreSQL...$(NC)"
-	@docker compose up -d
-	@echo "$(BLUE)PostgreSQL is running on port 5439$(NC)"
+	@docker compose up -d postgres
+	@echo "$(BLUE)PostgreSQL is running on port $(POSTGRES_PORT)$(NC)"
 
 db-down:
 	@echo "$(GREEN)Stopping PostgreSQL...$(NC)"
-	@docker compose down
+	@docker compose stop postgres
+	@echo "$(BLUE)PostgreSQL stopped$(NC)"
 
 db-reset:
-	@echo "$(GREEN)Resetting database...$(NC)"
+	@echo "$(YELLOW)Resetting database (all data will be lost)...$(NC)"
 	@docker compose down -v
-	@docker compose up -d
+	@docker compose up -d postgres
 	@sleep 3
-	@make migrate-up
+	@$(MAKE) migrate-up
+	@echo "$(BLUE)Database reset complete$(NC)"
 
 .PHONY: db-up db-down db-reset
 
 #
 # Migration Commands
 #
+MIGRATE_CMD = cd $(BACKEND_DIR) && go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
+	-path db/migration -database $(postgres_uri)
+
 migrate-up:
 	@echo "$(GREEN)Running migrations...$(NC)"
-	@cd $(BACKEND_DIR) && go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
-		-path db/migration -database $(postgres_uri) --verbose up $(version)
+	@$(MIGRATE_CMD) --verbose up $(version)
 
 migrate-down:
 	@echo "$(GREEN)Rolling back migration...$(NC)"
-	@cd $(BACKEND_DIR) && go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
-		-path db/migration -database $(postgres_uri) --verbose down 1
+	@$(MIGRATE_CMD) --verbose down 1
 
 migrate-goto:
 	@echo "$(GREEN)Migrating to version $(version)...$(NC)"
-	@cd $(BACKEND_DIR) && go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
-		-path db/migration -database $(postgres_uri) --verbose goto $(version)
+	@$(MIGRATE_CMD) --verbose goto $(version)
 
 migrate-force:
 	@echo "$(GREEN)Forcing migration version $(version)...$(NC)"
-	@cd $(BACKEND_DIR) && go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
-		-path db/migration -database $(postgres_uri) --verbose force $(version)
+	@$(MIGRATE_CMD) --verbose force $(version)
 
 migrate-version:
-	@cd $(BACKEND_DIR) && go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
-		-path db/migration -database $(postgres_uri) --verbose version
+	@$(MIGRATE_CMD) --verbose version
 
 .PHONY: migrate-up migrate-down migrate-goto migrate-force migrate-version
 
@@ -223,10 +262,10 @@ test-backend:
 	@pnpm run test --filter=core
 
 test-frontend:
-	@echo "$(GREEN)Running Go tests...$(NC)"
+	@echo "$(GREEN)Running frontend tests...$(NC)"
 	@pnpm run test --filter=web
 
-.PHONY: test test-backend
+.PHONY: test test-backend test-frontend
 
 #
 # Code Quality
@@ -242,7 +281,7 @@ format:
 format-check:
 	@echo "$(GREEN)Checking code format...$(NC)"
 	@pnpm format:check
-	@cd $(BACKEND_DIR) && test -z "$(shell gofmt -l .)" || (echo "Go files need formatting. Run 'make format'" && exit 1)
+	@cd $(BACKEND_DIR) && test -z "$$(gofmt -l .)" || (echo "Go files need formatting. Run 'make format'" && exit 1)
 
 check-types:
 	@echo "$(GREEN)Type checking...$(NC)"
@@ -257,7 +296,6 @@ clean:
 	@echo "$(GREEN)Cleaning build artifacts...$(NC)"
 	@rm -rf $(BACKEND_DIR)/build
 	@rm -rf $(BACKEND_DIR)/tmp
-
 	@rm -rf $(FRONTEND_DIR)/build
 	@rm -rf .turbo
 	@echo "$(BLUE)Clean complete$(NC)"
@@ -269,18 +307,3 @@ clean-all: clean
 	@cd $(BACKEND_DIR) && go clean -cache -modcache
 
 .PHONY: clean clean-all
-
-#
-# Setup (for first-time setup)
-#
-setup:
-	@echo "$(GREEN)Setting up project...$(NC)"
-	@pnpm install
-	@make db-up
-	@sleep 3
-	@cd $(BACKEND_DIR) && cp .env.example .env || true
-	@cd apps/agent_service && cp .env.example .env || true
-	@make migrate-up
-	@echo "$(BLUE)Setup complete! Run 'make dev' to start development$(NC)"
-
-.PHONY: setup

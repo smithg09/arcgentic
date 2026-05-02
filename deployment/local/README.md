@@ -134,17 +134,17 @@ spec:
             - containerPort: 5432
           env:
             - name: POSTGRES_USER
-              value: aiproject
+              value: arcgentic
             - name: POSTGRES_PASSWORD
-              value: aiproject
+              value: arcgentic
             - name: POSTGRES_DB
-              value: aiproject
+              value: arcgentic
           volumeMounts:
             - name: pgdata
               mountPath: /var/lib/postgresql/data
           readinessProbe:
             exec:
-              command: ["pg_isready", "-U", "aiproject"]
+              command: ["pg_isready", "-U", "arcgentic"]
             initialDelaySeconds: 5
             periodSeconds: 5
       volumes:
@@ -184,9 +184,9 @@ metadata:
   namespace: arcgentic
 type: Opaque
 stringData:
-  POSTGRES_URI: "postgresql://aiproject:aiproject@postgres:5432"
-  POSTGRES_DATABASE: "aiproject"
-  MIGRATE_DATABASE_URL: "postgres://aiproject:aiproject@postgres:5432/aiproject?sslmode=disable"
+  POSTGRES_URI: "postgresql://arcgentic:arcgentic@postgres:5432"
+  POSTGRES_DATABASE: "arcgentic"
+  MIGRATE_DATABASE_URL: "postgres://arcgentic:arcgentic@postgres:5432/arcgentic?sslmode=disable"
 ---
 apiVersion: v1
 kind: Secret
@@ -195,7 +195,7 @@ metadata:
   namespace: arcgentic
 type: Opaque
 stringData:
-  DATABASE_URL: "postgresql://aiproject:aiproject@postgres:5432/aiproject"
+  DATABASE_URL: "postgresql://arcgentic:arcgentic@postgres:5432/arcgentic"
   OPENAI_API_KEY: "${OPENAI_API_KEY}"       # Replace or set via envsubst
   ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY}"
   GOOGLE_API_KEY: "${GOOGLE_API_KEY}"

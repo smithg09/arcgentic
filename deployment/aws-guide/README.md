@@ -44,7 +44,7 @@ Create an RDS PostgreSQL database in the EKS VPC. Minimum production shape:
 - storage encryption enabled
 - deletion protection enabled
 - security group allows PostgreSQL `5432` from the EKS worker node or pod security group
-- database name: `aiproject`, or update the secret values below
+- database name: `arcgentic`, or update the secret values below
 
 Request or import an ACM certificate in the same region as the ALB:
 
@@ -142,8 +142,8 @@ aws secretsmanager create-secret \
   --name arcgentic/prod/user-service \
   --secret-string '{
     "POSTGRES_URI": "postgresql://DB_USER:DB_PASSWORD@RDS_ENDPOINT:5432",
-    "POSTGRES_DATABASE": "aiproject",
-    "MIGRATE_DATABASE_URL": "postgres://DB_USER:DB_PASSWORD@RDS_ENDPOINT:5432/aiproject?sslmode=require"
+    "POSTGRES_DATABASE": "arcgentic",
+    "MIGRATE_DATABASE_URL": "postgres://DB_USER:DB_PASSWORD@RDS_ENDPOINT:5432/arcgentic?sslmode=require"
   }'
 ```
 
@@ -154,7 +154,7 @@ aws secretsmanager create-secret \
   --region "$AWS_REGION" \
   --name arcgentic/prod/agent-service \
   --secret-string '{
-    "DATABASE_URL": "postgresql://DB_USER:DB_PASSWORD@RDS_ENDPOINT:5432/aiproject",
+    "DATABASE_URL": "postgresql://DB_USER:DB_PASSWORD@RDS_ENDPOINT:5432/arcgentic",
     "OPENAI_API_KEY": "",
     "ANTHROPIC_API_KEY": "",
     "GOOGLE_API_KEY": "",
@@ -440,7 +440,7 @@ Open **RDS > Databases > Create database**.
    - VPC: same VPC as EKS.
    - Public access: **No**.
    - VPC security group: create `arcgentic-rds`.
-   - Initial database name: `aiproject`.
+   - Initial database name: `arcgentic`.
 9. Authentication: password authentication is enough for this guide.
 10. Backups: enable automated backups for production.
 11. Encryption: enable storage encryption.
@@ -486,8 +486,8 @@ Create `arcgentic/prod/user-service`:
 ```json
 {
   "POSTGRES_URI": "postgresql://DB_USER:DB_PASSWORD@RDS_ENDPOINT:5432",
-  "POSTGRES_DATABASE": "aiproject",
-  "MIGRATE_DATABASE_URL": "postgres://DB_USER:DB_PASSWORD@RDS_ENDPOINT:5432/aiproject?sslmode=require"
+  "POSTGRES_DATABASE": "arcgentic",
+  "MIGRATE_DATABASE_URL": "postgres://DB_USER:DB_PASSWORD@RDS_ENDPOINT:5432/arcgentic?sslmode=require"
 }
 ```
 
@@ -502,7 +502,7 @@ Create `arcgentic/prod/agent-service`:
 
 ```json
 {
-  "DATABASE_URL": "postgresql://DB_USER:DB_PASSWORD@RDS_ENDPOINT:5432/aiproject",
+  "DATABASE_URL": "postgresql://DB_USER:DB_PASSWORD@RDS_ENDPOINT:5432/arcgentic",
   "OPENAI_API_KEY": "",
   "ANTHROPIC_API_KEY": "",
   "GOOGLE_API_KEY": "",

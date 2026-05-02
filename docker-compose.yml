@@ -2,15 +2,15 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: aiproject
-      POSTGRES_PASSWORD: aiproject
-      POSTGRES_DB: aiproject
+      POSTGRES_USER: arcgentic
+      POSTGRES_PASSWORD: arcgentic
+      POSTGRES_DB: arcgentic
     ports:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U aiproject" ]
+      test: [ "CMD-SHELL", "pg_isready -U arcgentic" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -22,8 +22,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - POSTGRES_URI=postgresql://aiproject:aiproject@postgres:5432
-      - POSTGRES_DATABASE=aiproject
+      - POSTGRES_URI=postgresql://arcgentic:arcgentic@postgres:5432
+      - POSTGRES_DATABASE=arcgentic
       - POSTGRES_IS_SSL_DISABLED=true
       - NODE_ENV=production
     depends_on:
@@ -37,7 +37,7 @@ services:
     ports:
       - "5001:5001"
     environment:
-      - DATABASE_URL=postgresql://aiproject:aiproject@postgres:5432/aiproject
+      - DATABASE_URL=postgresql://arcgentic:arcgentic@postgres:5432/arcgentic
     env_file:
       - ./apps/agent_service/.env
     depends_on:

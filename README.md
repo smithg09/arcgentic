@@ -64,22 +64,50 @@ Make sure you have installed on your machine:
    cd arcgentic
    ```
 
-2. **Automated Setup**
-   Run the initial setup to install dependencies, boot the database, run migrations, and scaffold `.env` files.
+2. **Start the platform**
+   One command installs dependencies, launches all services via Docker Compose, and runs migrations:
    ```bash
-   make setup
-   ```
-
-3. **Start the Platform**
-   Bring up the complete application stack using Docker Compose:
-   ```bash
-   docker compose up -d
+   make start
    ```
 
 The application is now running locally!
 - **Web UI**: [http://localhost:5173](http://localhost:5173) (Open this in your browser)
 - Agent API: http://localhost:5001
 - User/GraphQL API: http://localhost:8080
+
+> **Local development with hot reload?** Use `make setup-local` instead, then `make dev` to run services with live reloading.
+
+---
+
+## 🛠 Tech Stack
+
+A polyglot, multi-service architecture built for modularity and performance. Each layer is independently deployable and uses best-in-class tooling for its domain.
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | TypeScript, React 19, Vite, TanStack Router & Query, Tailwind CSS v4, shadcn/ui |
+| **User Service** | Go, Echo, GraphQL (gqlgen), sqlc |
+| **Agent Service** | Python, Flask — Agent Harness using LangGraph orchestration (skills, tools, memory) |
+| **Web Server** | Nginx (reverse proxy & static serving) |
+| **Database** | PostgreSQL |
+| **Containerization** | Docker, Docker Compose |
+| **Monorepo** | Turborepo, pnpm workspaces |
+
+## ☁️ Deployment Stack
+
+Production-grade infrastructure on AWS with fully automated CI/CD. Zero static credentials — GitHub Actions authenticates via OIDC federation.
+
+| Component | Technology |
+|---|---|
+| **Containerization** | Docker, Amazon ECR |
+| **Orchestration** | Amazon EKS (Kubernetes) |
+| **Ingress / TLS** | AWS ALB + ACM Certificate |
+| **Web Server** | Nginx (reverse proxy, static assets, API routing) |
+| **Secrets** | AWS Secrets Manager → External Secrets Operator |
+| **Database** | Amazon RDS (PostgreSQL) |
+| **CI/CD** | GitHub Actions (OIDC federation, zero static keys) |
+| **Landing Page** | GitHub Pages |
+| **Documentation** | Docsify (GitHub Pages) |
 
 ---
 
@@ -89,4 +117,5 @@ For developers, contributors, and those looking to run services outside of Docke
 
 - **[Getting Started / Local Dev](docs/getting-started.md)** — Detailed setup instructions, hot-reloading configurations, and troubleshooting tips.
 - **[Architecture Overview](docs/architecture.md)** — Deep dive into the monorepo structure, multi-agent LangGraph flows, and tech stack details.
+- **[AWS Deployment](docs/aws-deployment.md)** — Deploy to Amazon EKS with CI/CD via GitHub Actions, ECR, Secrets Manager, and ALB ingress.
 - **[Contributing](docs/contributing.md)** — Pull request guidelines, code of conduct, and development standards.

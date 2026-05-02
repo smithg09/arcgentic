@@ -29,7 +29,7 @@ load_dotenv(env_path)
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://aiproject:aiproject@127.0.0.1:5433/aiproject",
+    "postgresql://arcgentic:arcgentic@127.0.0.1:5433/arcgentic",
 )
 
 # ── Graph singleton ─────────────────────────────────────────────────────────

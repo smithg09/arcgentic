@@ -66,8 +66,8 @@ cp .env.example .env
 |----------|---------|-------------|
 | `ENVIRONMENT` | `development` | Runtime environment |
 | `LOG_LEVEL` | `debug` | Log verbosity |
-| `POSTGRES_URI` | `postgresql://aiproject:aiproject@localhost:5433` | Database host |
-| `POSTGRES_DATABASE` | `aiproject` | Database name |
+| `POSTGRES_URI` | `postgresql://arcgentic:arcgentic@localhost:5433` | Database host |
+| `POSTGRES_DATABASE` | `arcgentic` | Database name |
 | `POSTGRES_IS_SSL_DISABLED` | `true` | Disable SSL for local dev |
 
 ## Development

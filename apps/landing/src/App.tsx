@@ -94,15 +94,9 @@ const setupSteps = [
   },
   {
     step: '02',
-    title: 'Run the automated setup',
-    detail: 'Install dependencies, prepare services, and scaffold local environment files.',
-    command: 'make setup',
-  },
-  {
-    step: '03',
     title: 'Start the platform',
-    detail: 'Launch the full stack with Docker Compose and open the web app in your browser.',
-    command: 'docker compose up -d',
+    detail: 'One command installs dependencies, launches all services via Docker Compose, and runs migrations.',
+    command: 'make start',
   },
 ];
 
@@ -673,7 +667,7 @@ function App() {
           <div className="grid gap-10 grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div className="space-y-4">
               <p className="eyebrow">Get started locally</p>
-              <h2 className="section-title">Launch the full platform in three moves.</h2>
+              <h2 className="section-title">Launch the full platform in two moves.</h2>
               <p className="section-copy">
                 The repo already includes the local workflow. Setup installs dependencies, prepares
                 the services, and gets the app ready to run on your machine.
