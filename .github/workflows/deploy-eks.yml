@@ -1,0 +1,430 @@
+name: Deploy to Amazon EKS
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_all:
+        description: "Force rebuild and deploy all services"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
+  APP_HOST: ${{ vars.APP_HOST }}
+  ACM_CERTIFICATE_ARN: ${{ vars.ACM_CERTIFICATE_ARN }}
+
+jobs:
+  # ── Job 1: Detect which apps changed using Turbo ──────────────────────
+  detect-changes:
+    name: Detect changed apps
+    runs-on: ubuntu-latest
+    outputs:
+      web: ${{ steps.changes.outputs.web }}
+      user-service: ${{ steps.changes.outputs.user_service }}
+      agent-service: ${{ steps.changes.outputs.agent_service }}
+      infra: ${{ steps.changes.outputs.infra }}
+      any-app: ${{ steps.changes.outputs.any_app }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Detect changes with Turbo
+        id: changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          FORCE="${{ github.event.inputs.force_all || 'false' }}"
+
+          if [[ "$FORCE" == "true" || "${{ github.event_name }}" == "workflow_dispatch" && "$FORCE" != "false" ]]; then
+            echo "Force mode: all apps marked as changed"
+            echo "web=true" >> "$GITHUB_OUTPUT"
+            echo "user_service=true" >> "$GITHUB_OUTPUT"
+            echo "agent_service=true" >> "$GITHUB_OUTPUT"
+            echo "infra=true" >> "$GITHUB_OUTPUT"
+            echo "any_app=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Use turbo dry run to detect which packages have changes since last commit
+          TURBO_OUTPUT=$(pnpm turbo build --dry=json --filter='...[HEAD~1]' 2>/dev/null || echo '{"packages":[]}')
+          CHANGED_PACKAGES=$(echo "$TURBO_OUTPUT" | jq -r '.packages[]' 2>/dev/null || echo "")
+
+          echo "Changed packages: $CHANGED_PACKAGES"
+
+          WEB=false
+          USER_SERVICE=false
+          AGENT_SERVICE=false
+
+          for pkg in $CHANGED_PACKAGES; do
+            case "$pkg" in
+              web) WEB=true ;;
+              user_service) USER_SERVICE=true ;;
+              agent_service) AGENT_SERVICE=true ;;
+            esac
+          done
+
+          # Check if k8s manifests or workflow changed
+          INFRA=false
+          if git diff --name-only HEAD~1 HEAD -- deploy/k8s/ .github/workflows/deploy-eks.yml | grep -q .; then
+            INFRA=true
+          fi
+
+          ANY_APP=false
+          if [[ "$WEB" == "true" || "$USER_SERVICE" == "true" || "$AGENT_SERVICE" == "true" ]]; then
+            ANY_APP=true
+          fi
+
+          echo "web=$WEB" >> "$GITHUB_OUTPUT"
+          echo "user_service=$USER_SERVICE" >> "$GITHUB_OUTPUT"
+          echo "agent_service=$AGENT_SERVICE" >> "$GITHUB_OUTPUT"
+          echo "infra=$INFRA" >> "$GITHUB_OUTPUT"
+          echo "any_app=$ANY_APP" >> "$GITHUB_OUTPUT"
+
+          echo "### 📦 Change Detection Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "| App | Changed |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-----|---------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| web | $WEB |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| user-service | $USER_SERVICE |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| agent-service | $AGENT_SERVICE |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| infra/k8s | $INFRA |" >> "$GITHUB_STEP_SUMMARY"
+
+  # ── Job 2: Build & push only changed images ───────────────────────────
+  build-images:
+    name: Build images
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.any-app == 'true'
+    environment: production
+    outputs:
+      web-image: ${{ steps.images.outputs.web_image }}
+      user-service-image: ${{ steps.images.outputs.user_service_image }}
+      user-service-migrate-image: ${{ steps.images.outputs.user_service_migrate_image }}
+      agent-service-image: ${{ steps.images.outputs.agent_service_image }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Ensure ECR repositories exist
+        run: |
+          set -euo pipefail
+          for repo in arcgentic-web arcgentic-user-service arcgentic-agent-service arcgentic-user-service-migrate; do
+            aws ecr describe-repositories --repository-names "$repo" >/dev/null 2>&1 \
+              || aws ecr create-repository \
+                --repository-name "$repo" \
+                --image-scanning-configuration scanOnPush=true \
+                --encryption-configuration encryptionType=AES256 >/dev/null
+          done
+
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── Web ──
+      - name: Build and push web
+        if: needs.detect-changes.outputs.web == 'true'
+        id: build-web
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.ecr-login.outputs.registry }}/arcgentic-web:${{ github.sha }}
+            ${{ steps.ecr-login.outputs.registry }}/arcgentic-web:latest
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+
+      # ── User Service ──
+      - name: Build and push user-service
+        if: needs.detect-changes.outputs.user-service == 'true'
+        id: build-user-service
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/user_service
+          file: apps/user_service/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.ecr-login.outputs.registry }}/arcgentic-user-service:${{ github.sha }}
+            ${{ steps.ecr-login.outputs.registry }}/arcgentic-user-service:latest
+          cache-from: type=gha,scope=user-service
+          cache-to: type=gha,mode=max,scope=user-service
+
+      - name: Build and push user-service-migrate
+        if: needs.detect-changes.outputs.user-service == 'true'
+        id: build-user-service-migrate
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/user_service
+          file: apps/user_service/Dockerfile.migrate
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.ecr-login.outputs.registry }}/arcgentic-user-service-migrate:${{ github.sha }}
+            ${{ steps.ecr-login.outputs.registry }}/arcgentic-user-service-migrate:latest
+          cache-from: type=gha,scope=user-service-migrate
+          cache-to: type=gha,mode=max,scope=user-service-migrate
+
+      # ── Agent Service ──
+      - name: Build and push agent-service
+        if: needs.detect-changes.outputs.agent-service == 'true'
+        id: build-agent-service
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/agent_service
+          file: apps/agent_service/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.ecr-login.outputs.registry }}/arcgentic-agent-service:${{ github.sha }}
+            ${{ steps.ecr-login.outputs.registry }}/arcgentic-agent-service:latest
+          cache-from: type=gha,scope=agent-service
+          cache-to: type=gha,mode=max,scope=agent-service
+
+      # ── Resolve all image references ──
+      - name: Resolve image references
+        id: images
+        shell: bash
+        run: |
+          set -euo pipefail
+          ECR="${{ steps.ecr-login.outputs.registry }}"
+
+          # Web
+          if [[ -n "${{ steps.build-web.outputs.digest }}" ]]; then
+            echo "web_image=${ECR}/arcgentic-web@${{ steps.build-web.outputs.digest }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "web_image=${ECR}/arcgentic-web:latest" >> "$GITHUB_OUTPUT"
+          fi
+
+          # User Service
+          if [[ -n "${{ steps.build-user-service.outputs.digest }}" ]]; then
+            echo "user_service_image=${ECR}/arcgentic-user-service@${{ steps.build-user-service.outputs.digest }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "user_service_image=${ECR}/arcgentic-user-service:latest" >> "$GITHUB_OUTPUT"
+          fi
+
+          # User Service Migrate
+          if [[ -n "${{ steps.build-user-service-migrate.outputs.digest }}" ]]; then
+            echo "user_service_migrate_image=${ECR}/arcgentic-user-service-migrate@${{ steps.build-user-service-migrate.outputs.digest }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "user_service_migrate_image=${ECR}/arcgentic-user-service-migrate:latest" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Agent Service
+          if [[ -n "${{ steps.build-agent-service.outputs.digest }}" ]]; then
+            echo "agent_service_image=${ECR}/arcgentic-agent-service@${{ steps.build-agent-service.outputs.digest }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "agent_service_image=${ECR}/arcgentic-agent-service:latest" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ── Job 3: Apply cluster infrastructure ────────────────────────────────
+  setup-cluster:
+    name: Setup cluster resources
+    runs-on: ubuntu-latest
+    needs: [detect-changes, build-images]
+    if: |
+      always() && !failure() && !cancelled() &&
+      (needs.detect-changes.outputs.any-app == 'true' || needs.detect-changes.outputs.infra == 'true')
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --name "$EKS_CLUSTER_NAME" \
+            --region "$AWS_REGION"
+
+      - name: Render infrastructure manifests
+        run: |
+          set -euo pipefail
+          cp -R deploy/k8s /tmp/arcgentic-k8s
+          perl -pi -e 's#__AWS_REGION__#$ENV{AWS_REGION}#g;
+                       s#__APP_HOST__#$ENV{APP_HOST}#g;' /tmp/arcgentic-k8s/*.yaml
+
+      - name: Apply namespace
+        run: kubectl apply -f /tmp/arcgentic-k8s/namespace.yaml
+
+      - name: Apply ConfigMap
+        run: kubectl apply -f /tmp/arcgentic-k8s/configmap.yaml
+
+      - name: Apply service accounts
+        run: kubectl apply -f /tmp/arcgentic-k8s/serviceaccounts.yaml
+
+      - name: Apply secret store
+        run: kubectl apply -f /tmp/arcgentic-k8s/secret-store.yaml
+
+      - name: Apply external secrets
+        run: kubectl apply -f /tmp/arcgentic-k8s/external-secrets.yaml
+
+      - name: Apply services
+        run: kubectl apply -f /tmp/arcgentic-k8s/services.yaml
+
+      - name: Wait for secrets to sync
+        run: |
+          kubectl -n arcgentic wait externalsecret/user-service-env \
+            --for=condition=Ready --timeout=180s
+          kubectl -n arcgentic wait externalsecret/agent-service-env \
+            --for=condition=Ready --timeout=180s
+
+  # ── Job 4: Run database migrations ─────────────────────────────────────
+  migrate:
+    name: Run migrations
+    runs-on: ubuntu-latest
+    needs: [detect-changes, build-images, setup-cluster]
+    if: |
+      always() && !failure() && !cancelled() &&
+      needs.detect-changes.outputs.user-service == 'true'
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --name "$EKS_CLUSTER_NAME" \
+            --region "$AWS_REGION"
+
+      - name: Run database migrations
+        env:
+          USER_SERVICE_MIGRATE_IMAGE: ${{ needs.build-images.outputs.user-service-migrate-image }}
+        run: |
+          set -euo pipefail
+          cp deploy/k8s/user-service-migration-job.yaml /tmp/migration-job.yaml
+          perl -pi -e 's#__USER_SERVICE_MIGRATE_IMAGE__#$ENV{USER_SERVICE_MIGRATE_IMAGE}#g;' \
+            /tmp/migration-job.yaml
+          kubectl -n arcgentic delete job user-service-migrate --ignore-not-found
+          kubectl apply -f /tmp/migration-job.yaml
+          kubectl -n arcgentic wait job/user-service-migrate \
+            --for=condition=Complete --timeout=300s
+
+  # ── Job 5: Deploy applications ─────────────────────────────────────────
+  deploy:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+    needs: [detect-changes, build-images, setup-cluster, migrate]
+    if: |
+      always() && !failure() && !cancelled() &&
+      needs.detect-changes.outputs.any-app == 'true' &&
+      needs.setup-cluster.result == 'success'
+    environment: production
+    env:
+      WEB_IMAGE: ${{ needs.build-images.outputs.web-image }}
+      USER_SERVICE_IMAGE: ${{ needs.build-images.outputs.user-service-image }}
+      AGENT_SERVICE_IMAGE: ${{ needs.build-images.outputs.agent-service-image }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --name "$EKS_CLUSTER_NAME" \
+            --region "$AWS_REGION"
+
+      - name: Deploy user-service
+        if: needs.detect-changes.outputs.user-service == 'true'
+        run: |
+          set -euo pipefail
+          cp deploy/k8s/user-service-deployment.yaml /tmp/user-service-deployment.yaml
+          perl -pi -e 's#__USER_SERVICE_IMAGE__#$ENV{USER_SERVICE_IMAGE}#g;' \
+            /tmp/user-service-deployment.yaml
+          kubectl apply -f /tmp/user-service-deployment.yaml
+          kubectl -n arcgentic rollout status deployment/user-service --timeout=300s
+
+      - name: Deploy agent-service
+        if: needs.detect-changes.outputs.agent-service == 'true'
+        run: |
+          set -euo pipefail
+          cp deploy/k8s/agent-service-deployment.yaml /tmp/agent-service-deployment.yaml
+          perl -pi -e 's#__AGENT_SERVICE_IMAGE__#$ENV{AGENT_SERVICE_IMAGE}#g;' \
+            /tmp/agent-service-deployment.yaml
+          kubectl apply -f /tmp/agent-service-deployment.yaml
+          kubectl -n arcgentic rollout status deployment/agent-service --timeout=300s
+
+      - name: Deploy web
+        if: needs.detect-changes.outputs.web == 'true'
+        run: |
+          set -euo pipefail
+          cp deploy/k8s/web-deployment.yaml /tmp/web-deployment.yaml
+          perl -pi -e 's#__WEB_IMAGE__#$ENV{WEB_IMAGE}#g;' \
+            /tmp/web-deployment.yaml
+          kubectl apply -f /tmp/web-deployment.yaml
+          kubectl -n arcgentic rollout status deployment/web --timeout=300s
+
+      - name: Apply ingress
+        run: |
+          set -euo pipefail
+          cp deploy/k8s/ingress.yaml /tmp/ingress.yaml
+          perl -pi -e 's#__ACM_CERTIFICATE_ARN__#$ENV{ACM_CERTIFICATE_ARN}#g;
+                       s#__APP_HOST__#$ENV{APP_HOST}#g;' /tmp/ingress.yaml
+          kubectl apply -f /tmp/ingress.yaml
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "### 🚀 Deployment Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Service | Deployed | Image |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---------|----------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| web | ${{ needs.detect-changes.outputs.web }} | \`${WEB_IMAGE}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| user-service | ${{ needs.detect-changes.outputs.user-service }} | \`${USER_SERVICE_IMAGE}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| agent-service | ${{ needs.detect-changes.outputs.agent-service }} | \`${AGENT_SERVICE_IMAGE}\` |" >> "$GITHUB_STEP_SUMMARY"
