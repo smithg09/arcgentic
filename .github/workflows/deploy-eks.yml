@@ -9,7 +9,7 @@ on:
       force_all:
         description: "Force rebuild and deploy all services"
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: read
