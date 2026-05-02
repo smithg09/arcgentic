@@ -116,6 +116,7 @@ Production-grade infrastructure on AWS with fully automated CI/CD. Zero static c
 For developers, contributors, and those looking to run services outside of Docker, please refer to our dedicated documentation guides:
 
 - **[Getting Started / Local Dev](docs/getting-started.md)** — Detailed setup instructions, hot-reloading configurations, and troubleshooting tips.
+- **[Agentic Harness](docs/agent-harness.md)** — Deep dive into the Python multi-agent system, including the Supervisor/Worker architecture, UI tools, and state persistence.
 - **[Architecture Overview](docs/architecture.md)** — Deep dive into the monorepo structure, multi-agent LangGraph flows, and tech stack details.
 - **[AWS Deployment](docs/aws-deployment.md)** — Deploy to Amazon EKS with CI/CD via GitHub Actions, ECR, Secrets Manager, and ALB ingress.
 - **[Contributing](docs/contributing.md)** — Pull request guidelines, code of conduct, and development standards.
