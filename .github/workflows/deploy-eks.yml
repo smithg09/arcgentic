@@ -33,7 +33,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0 # Fetch all history so we can compare against previous commits
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -50,13 +50,35 @@ jobs:
       - name: Detect changes with Turbo
         id: changes
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
-          FORCE="${{ github.event.inputs.force_all || 'false' }}"
+          # Get inputs
+          FORCE_INPUT="${{ github.event.inputs.force_all || 'false' }}"
+          
+          # 1. Try to find the last successful deployment SHA on this branch
+          LAST_SUCCESSFUL_SHA=$(gh run list --workflow "${{ github.workflow }}" --status success --branch "${{ github.ref_name }}" --limit 1 --json headSha -q '.[0].headSha' 2>/dev/null || echo "")
 
-          if [[ "$FORCE" == "true" || "${{ github.event_name }}" == "workflow_dispatch" && "$FORCE" != "false" ]]; then
-            echo "Force mode: all apps marked as changed"
+          if [[ -n "$LAST_SUCCESSFUL_SHA" ]]; then
+            BASE_SHA="$LAST_SUCCESSFUL_SHA"
+            echo "✅ Found last successful deployment at SHA: $BASE_SHA"
+            FORCE_DEPLOY="false"
+          else
+            echo "⚠️ No successful deployment found on this branch. Defaulting to full deploy."
+            BASE_SHA="HEAD~1"
+            FORCE_DEPLOY="true"
+          fi
+
+          # 2. Override with manual force if requested
+          if [[ "$FORCE_INPUT" == "true" ]]; then
+            echo "🚀 Manual force requested: deploying everything."
+            FORCE_DEPLOY="true"
+          fi
+
+          # 3. If forcing, set all outputs and exit early
+          if [[ "$FORCE_DEPLOY" == "true" ]]; then
             echo "web=true" >> "$GITHUB_OUTPUT"
             echo "user_service=true" >> "$GITHUB_OUTPUT"
             echo "agent_service=true" >> "$GITHUB_OUTPUT"
@@ -65,11 +87,12 @@ jobs:
             exit 0
           fi
 
-          # Use turbo dry run to detect which packages have changes since last commit
-          TURBO_OUTPUT=$(pnpm turbo build --dry=json --filter='...[HEAD~1]' 2>/dev/null || echo '{"packages":[]}')
+          # 4. Use turbo dry run to detect which packages have changes since the base commit
+          echo "🔍 Comparing changes from $BASE_SHA to HEAD"
+          TURBO_OUTPUT=$(pnpm turbo build --dry=json --filter="...[$BASE_SHA]" 2>/dev/null || echo '{"packages":[]}')
           CHANGED_PACKAGES=$(echo "$TURBO_OUTPUT" | jq -r '.packages[]' 2>/dev/null || echo "")
 
-          echo "Changed packages: $CHANGED_PACKAGES"
+          echo "📦 Changed packages: $CHANGED_PACKAGES"
 
           WEB=false
           USER_SERVICE=false
@@ -83,9 +106,10 @@ jobs:
             esac
           done
 
-          # Check if k8s manifests or workflow changed
+          # Check if k8s manifests or workflow changed since the base commit
           INFRA=false
-          if git diff --name-only HEAD~1 HEAD -- deployment/k8s/ .github/workflows/deploy-eks.yml | grep -q .; then
+          if git diff --name-only "$BASE_SHA" HEAD -- deployment/k8s/ .github/workflows/deploy-eks.yml | grep -q .; then
+            echo "🏗️ Infrastructure changes detected."
             INFRA=true
           fi
 
