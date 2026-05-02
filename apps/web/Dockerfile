@@ -1,24 +1,31 @@
-FROM node:20-alpine AS builder
-
-# Ensure pnpm is available
+FROM node:20-alpine AS pruner
+RUN apk add --no-cache libc6-compat
 RUN corepack enable
+WORKDIR /app
+COPY . .
+RUN npx turbo prune web --docker
 
+# --
+FROM node:20-alpine AS installer
+RUN apk add --no-cache libc6-compat
+RUN corepack enable
 WORKDIR /app
 
-# Copy the monorepo essential configurations
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json ./
+COPY --from=pruner /app/out/json/ .
 
-# Copy all projects into the build context
-COPY packages ./packages
-COPY apps ./apps
-
-# Install monorepo dependencies
 RUN pnpm install --frozen-lockfile
 
-# Build the web app via turbo
+# --
+FROM node:20-alpine AS builder
+RUN corepack enable
+WORKDIR /app
+
+COPY --from=installer /app/ .
+
+COPY --from=pruner /app/out/full/ .
 RUN pnpm run build --filter=web
 
-# Serve with Nginx
+# ---
 FROM nginxinc/nginx-unprivileged:alpine AS runner
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
 COPY apps/web/nginx.conf /etc/nginx/templates/default.conf.template
