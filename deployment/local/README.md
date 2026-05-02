@@ -86,19 +86,19 @@ docker build -t arcgentic-agent-service:local -f apps/agent_service/Dockerfile a
 
 The production manifests use `__PLACEHOLDER__` tokens and ExternalSecrets tied to AWS. For local testing, we create a self-contained overlay.
 
-### 2.1 — Create the deploy/local directory structure
+### 2.1 — Create the deployment/local directory structure
 
 The manifests below should already exist alongside this README. If not, create them as shown.
 
 ### 2.2 — Namespace (reuse production)
 
 ```bash
-kubectl apply -f deploy/k8s/namespace.yaml
+kubectl apply -f deployment/k8s/namespace.yaml
 ```
 
 ### 2.3 — Deploy PostgreSQL inside Minikube
 
-Create `deploy/local/postgres.yaml`:
+Create `deployment/local/postgres.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -168,13 +168,13 @@ spec:
 Apply it:
 
 ```bash
-kubectl apply -f deploy/local/postgres.yaml
+kubectl apply -f deployment/local/postgres.yaml
 kubectl -n arcgentic wait --for=condition=available deployment/postgres --timeout=120s
 ```
 
 ### 2.4 — Create Kubernetes Secrets (replaces ExternalSecrets / AWS Secrets Manager)
 
-Create `deploy/local/secrets.yaml`:
+Create `deployment/local/secrets.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -214,31 +214,31 @@ stringData:
 > export ANTHROPIC_API_KEY=""
 > export GOOGLE_API_KEY=""
 > export OPENROUTER_API_KEY=""
-> envsubst < deploy/local/secrets.yaml | kubectl apply -f -
+> envsubst < deployment/local/secrets.yaml | kubectl apply -f -
 > ```
 
 If editing directly, just replace the `${...}` placeholders and apply:
 
 ```bash
-kubectl apply -f deploy/local/secrets.yaml
+kubectl apply -f deployment/local/secrets.yaml
 ```
 
 ### 2.5 — ConfigMap (reuse production)
 
 ```bash
-kubectl apply -f deploy/k8s/configmap.yaml
+kubectl apply -f deployment/k8s/configmap.yaml
 ```
 
 ### 2.6 — ServiceAccounts (reuse production)
 
 ```bash
-kubectl apply -f deploy/k8s/serviceaccounts.yaml
+kubectl apply -f deployment/k8s/serviceaccounts.yaml
 ```
 
 ### 2.7 — Services (reuse production)
 
 ```bash
-kubectl apply -f deploy/k8s/services.yaml
+kubectl apply -f deployment/k8s/services.yaml
 ```
 
 ---
@@ -293,7 +293,7 @@ kubectl -n arcgentic logs job/user-service-migrate
 
 ## Step 4 — Deploy Application Services
 
-Create `deploy/local/deployments.yaml` — these mirror the production manifests but use local image tags and `imagePullPolicy: Never`:
+Create `deployment/local/deployments.yaml` — these mirror the production manifests but use local image tags and `imagePullPolicy: Never`:
 
 ```yaml
 # --- User Service ---
@@ -452,7 +452,7 @@ spec:
 Apply deployments and wait for rollout:
 
 ```bash
-kubectl apply -f deploy/local/deployments.yaml
+kubectl apply -f deployment/local/deployments.yaml
 
 kubectl -n arcgentic rollout status deployment/user-service --timeout=120s
 kubectl -n arcgentic rollout status deployment/agent-service --timeout=120s
@@ -463,7 +463,7 @@ kubectl -n arcgentic rollout status deployment/web --timeout=120s
 
 ## Step 5 — Create Local Ingress
 
-Create `deploy/local/ingress.yaml` — uses nginx ingress instead of ALB:
+Create `deployment/local/ingress.yaml` — uses nginx ingress instead of ALB:
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -489,7 +489,7 @@ spec:
 ```
 
 ```bash
-kubectl apply -f deploy/local/ingress.yaml
+kubectl apply -f deployment/local/ingress.yaml
 ```
 
 ---
@@ -574,21 +574,21 @@ docker build -t arcgentic-user-service-migrate:local -f apps/user_service/Docker
 docker build -t arcgentic-agent-service:local -f apps/agent_service/Dockerfile apps/agent_service
 
 # 3. Apply base resources
-kubectl apply -f deploy/k8s/namespace.yaml
-kubectl apply -f deploy/local/postgres.yaml
+kubectl apply -f deployment/k8s/namespace.yaml
+kubectl apply -f deployment/local/postgres.yaml
 kubectl -n arcgentic wait --for=condition=available deployment/postgres --timeout=120s
-kubectl apply -f deploy/local/secrets.yaml
-kubectl apply -f deploy/k8s/configmap.yaml
-kubectl apply -f deploy/k8s/serviceaccounts.yaml
-kubectl apply -f deploy/k8s/services.yaml
+kubectl apply -f deployment/local/secrets.yaml
+kubectl apply -f deployment/k8s/configmap.yaml
+kubectl apply -f deployment/k8s/serviceaccounts.yaml
+kubectl apply -f deployment/k8s/services.yaml
 
 # 4. Run migrations
 kubectl -n arcgentic delete job user-service-migrate --ignore-not-found
-kubectl apply -f deploy/local/migration-job.yaml
+kubectl apply -f deployment/local/migration-job.yaml
 kubectl -n arcgentic wait job/user-service-migrate --for=condition=Complete --timeout=120s
 
 # 5. Deploy apps
-kubectl apply -f deploy/local/deployments.yaml
+kubectl apply -f deployment/local/deployments.yaml
 kubectl -n arcgentic rollout status deployment/user-service --timeout=120s
 kubectl -n arcgentic rollout status deployment/agent-service --timeout=120s
 kubectl -n arcgentic rollout status deployment/web --timeout=120s
@@ -640,7 +640,7 @@ minikube delete
 | `connection refused` on port-forward | The container's health check is failing — check readiness probe and logs |
 | Ingress returns 404 | Verify ingress addon is enabled: `minikube addons list \| grep ingress` |
 | Minikube is slow | Increase resources: `minikube stop && minikube start --cpus 6 --memory 12288` |
-| Agent service won't start | Ensure at least one API key is set in `deploy/local/secrets.yaml` |
+| Agent service won't start | Ensure at least one API key is set in `deployment/local/secrets.yaml` |
 
 ---
 

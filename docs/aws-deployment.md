@@ -72,7 +72,7 @@ Before deploying, you need the following AWS resources provisioned:
 | **External Secrets Operator** | Syncs Secrets Manager → Kubernetes Secrets |
 
 > [!TIP]
-> You can set up all of these through the AWS Console or CLI. See the detailed walkthrough in [`deploy/aws/README.md`](https://github.com/smithg09/arcgentic/blob/main/deploy/aws/README.md) for step-by-step instructions for both approaches.
+> You can set up all of these through the AWS Console or CLI. See the detailed walkthrough in [`deployment/aws/README.md`](https://github.com/smithg09/arcgentic/blob/main/deployment/aws/README.md) for step-by-step instructions for both approaches.
 
 ## Quick Start
 
@@ -242,10 +242,10 @@ graph LR
 
 ## Kubernetes Resources
 
-All manifests live in `deploy/k8s/`:
+All manifests live in `deployment/k8s/`:
 
 ```
-deploy/k8s/
+deployment/k8s/
 ├── namespace.yaml                    # arcgentic namespace
 ├── configmap.yaml                    # Non-secret config for user-service and web
 ├── serviceaccounts.yaml              # K8s service accounts with IRSA annotations
@@ -346,19 +346,3 @@ curl https://your-domain.com/api/health
 | **GitHub Action builds but can't deploy** | EKS Access Entry missing for the deploy role | Create an access entry with `AmazonEKSClusterAdminPolicy` |
 | **App loads but `/api` or `/query` returns 502** | Backend pods not ready, or `web-config` ConfigMap has wrong URLs | Check pod readiness and verify ConfigMap service URLs |
 | **Migration job fails** | `MIGRATE_DATABASE_URL` secret not set or RDS not reachable | Check the secret value and RDS security group |
-
-## Cost Considerations
-
-A minimal production deployment with the configuration in this guide costs approximately:
-
-| Resource | Estimated Monthly Cost |
-|---|---|
-| EKS control plane | ~$73 |
-| 2× t3.medium nodes | ~$60 |
-| RDS db.t4g.micro | ~$13 |
-| ALB | ~$22 + data transfer |
-| NAT Gateway | ~$32 + data transfer |
-| **Total** | **~$200/month** |
-
-> [!TIP]
-> For non-production environments, you can reduce costs by using a single node, a smaller RDS instance, and scheduling the cluster to shut down outside business hours.

@@ -85,7 +85,7 @@ jobs:
 
           # Check if k8s manifests or workflow changed
           INFRA=false
-          if git diff --name-only HEAD~1 HEAD -- deploy/k8s/ .github/workflows/deploy-eks.yml | grep -q .; then
+          if git diff --name-only HEAD~1 HEAD -- deployment/k8s/ .github/workflows/deploy-eks.yml | grep -q .; then
             INFRA=true
           fi
 
@@ -278,7 +278,7 @@ jobs:
       - name: Render infrastructure manifests
         run: |
           set -euo pipefail
-          cp -R deploy/k8s /tmp/arcgentic-k8s
+          cp -R deployment/k8s /tmp/arcgentic-k8s
           perl -pi -e 's#__AWS_REGION__#$ENV{AWS_REGION}#g;
                        s#__APP_HOST__#$ENV{APP_HOST}#g;' /tmp/arcgentic-k8s/*.yaml
 
@@ -340,7 +340,7 @@ jobs:
           USER_SERVICE_MIGRATE_IMAGE: ${{ needs.build-images.outputs.user-service-migrate-image }}
         run: |
           set -euo pipefail
-          cp deploy/k8s/user-service-migration-job.yaml /tmp/migration-job.yaml
+          cp deployment/k8s/user-service-migration-job.yaml /tmp/migration-job.yaml
           perl -pi -e 's#__USER_SERVICE_MIGRATE_IMAGE__#$ENV{USER_SERVICE_MIGRATE_IMAGE}#g;' \
             /tmp/migration-job.yaml
           kubectl -n arcgentic delete job user-service-migrate --ignore-not-found
@@ -385,7 +385,7 @@ jobs:
         if: needs.detect-changes.outputs.user-service == 'true'
         run: |
           set -euo pipefail
-          cp deploy/k8s/user-service-deployment.yaml /tmp/user-service-deployment.yaml
+          cp deployment/k8s/user-service-deployment.yaml /tmp/user-service-deployment.yaml
           perl -pi -e 's#__USER_SERVICE_IMAGE__#$ENV{USER_SERVICE_IMAGE}#g;' \
             /tmp/user-service-deployment.yaml
           kubectl apply -f /tmp/user-service-deployment.yaml
@@ -395,7 +395,7 @@ jobs:
         if: needs.detect-changes.outputs.agent-service == 'true'
         run: |
           set -euo pipefail
-          cp deploy/k8s/agent-service-deployment.yaml /tmp/agent-service-deployment.yaml
+          cp deployment/k8s/agent-service-deployment.yaml /tmp/agent-service-deployment.yaml
           perl -pi -e 's#__AGENT_SERVICE_IMAGE__#$ENV{AGENT_SERVICE_IMAGE}#g;' \
             /tmp/agent-service-deployment.yaml
           kubectl apply -f /tmp/agent-service-deployment.yaml
@@ -405,7 +405,7 @@ jobs:
         if: needs.detect-changes.outputs.web == 'true'
         run: |
           set -euo pipefail
-          cp deploy/k8s/web-deployment.yaml /tmp/web-deployment.yaml
+          cp deployment/k8s/web-deployment.yaml /tmp/web-deployment.yaml
           perl -pi -e 's#__WEB_IMAGE__#$ENV{WEB_IMAGE}#g;' \
             /tmp/web-deployment.yaml
           kubectl apply -f /tmp/web-deployment.yaml
@@ -414,7 +414,7 @@ jobs:
       - name: Apply ingress
         run: |
           set -euo pipefail
-          cp deploy/k8s/ingress.yaml /tmp/ingress.yaml
+          cp deployment/k8s/ingress.yaml /tmp/ingress.yaml
           perl -pi -e 's#__ACM_CERTIFICATE_ARN__#$ENV{ACM_CERTIFICATE_ARN}#g;
                        s#__APP_HOST__#$ENV{APP_HOST}#g;' /tmp/ingress.yaml
           kubectl apply -f /tmp/ingress.yaml
