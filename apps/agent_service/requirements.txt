@@ -1,5 +1,6 @@
 Flask[async]>=3.0.0
 flask-cors
+gunicorn
 python-dotenv
 pydantic>=2.0
 

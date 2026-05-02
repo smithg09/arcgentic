@@ -19,9 +19,13 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm run build --filter=web
 
 # Serve with Nginx
-FROM nginx:alpine AS runner
+FROM nginxinc/nginx-unprivileged:alpine AS runner
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
-COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+COPY apps/web/nginx.conf /etc/nginx/templates/default.conf.template
 
-EXPOSE 80
+ENV AGENT_SERVICE_URL=http://agent_service:5001
+ENV USER_SERVICE_URL=http://user_service:8080
+ENV NGINX_ENVSUBST_FILTER=AGENT_SERVICE_URL|USER_SERVICE_URL
+
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]

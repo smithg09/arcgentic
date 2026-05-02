@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"os"
 	"os/signal"
 
@@ -63,6 +64,11 @@ func main() {
 	so := es.GetOperations()
 	so.UseRecover()
 	so.UseCors()
+	so.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"status":"healthy","service":"user-service"}`))
+	})
 	so.Get("/", playground.Handler("Golang Blog Starter", "/query"))
 	so.Post("/query", queryHandler.ServeHTTP)
 

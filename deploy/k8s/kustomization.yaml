@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - serviceaccounts.yaml
+  - secret-store.yaml
+  - external-secrets.yaml
+  - services.yaml
+  - user-service-deployment.yaml
+  - agent-service-deployment.yaml
+  - web-deployment.yaml
+  - ingress.yaml

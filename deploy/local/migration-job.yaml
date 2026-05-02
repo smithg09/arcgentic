@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: user-service-migrate
+  namespace: arcgentic
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: user-service-migrate
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: arcgentic-user-service-migrate:local
+          imagePullPolicy: Never
+          env:
+            - name: MIGRATE_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-env
+                  key: MIGRATE_DATABASE_URL
+          command: ["/bin/sh", "-c"]
+          args:
+            - migrate -path /migrations -database "$MIGRATE_DATABASE_URL" up
