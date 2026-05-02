@@ -38,7 +38,7 @@ async def architect_agent_node(state: AgentState, config: RunnableConfig) -> dic
     Reads the current spec from state (including any tool-updated values from
     prior iterations) and decides the next question or handoff.
     """
-    model_cfg = state.get("model_config")
+    model_cfg = config.get("configurable", {}).get("model_config")
     llm = get_chat_model(
         ModelConfig(**model_cfg) if model_cfg else None,
         defaults={"temperature": 0.7, "top_p": 1.0, "streaming": True},

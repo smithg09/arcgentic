@@ -46,7 +46,7 @@ async def builder_agent_node(state: AgentState, config: RunnableConfig) -> dict[
     Uses `current_user_request` from state as the focused instruction
     extracted by the supervisor for this specific task.
     """
-    model_cfg = state.get("model_config")
+    model_cfg = config.get("configurable", {}).get("model_config")
     llm = get_chat_model(
         ModelConfig(**model_cfg) if model_cfg else None,
         defaults={"temperature": 1.0, "top_p": 1.0, "streaming": True},

@@ -49,7 +49,7 @@ async def chat(session_id: str):
     }
 
     if parsed.model_config_raw and isinstance(parsed.model_config_raw, dict):
-        input_state["model_config"] = parsed.model_config_raw
+        config["configurable"]["model_config"] = parsed.model_config_raw
 
     if sources:
         input_state["spec"] = LearningSpec(sources=sources)
