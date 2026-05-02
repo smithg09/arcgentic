@@ -1,15 +1,12 @@
 name: Deploy to Amazon EKS
 
 on:
-  push:
-    branches:
-      - aws-eks-deployment
   workflow_dispatch:
     inputs:
       force_all:
         description: "Force rebuild and deploy all services"
         type: boolean
-        default: true
+        default: false
 
 permissions:
   contents: read
