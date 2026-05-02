@@ -23,7 +23,7 @@ WORKDIR /root/
 
 RUN addgroup --system --gid 1001 user101
 RUN adduser --system --uid 1001 user102
-USER user102
+USER 1001
 
 COPY --from=builder --chown=user102:user101 /app/build/core .
 

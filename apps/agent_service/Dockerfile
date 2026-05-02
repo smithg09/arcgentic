@@ -18,8 +18,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy source code
 COPY . .
 
-RUN addgroup --system app && adduser --system --ingroup app app
-USER app
+RUN addgroup --system --gid 1001 app && adduser --system --uid 1001 --ingroup app app
+USER 1001
 
 EXPOSE 5001
 
