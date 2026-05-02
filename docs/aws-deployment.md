@@ -72,7 +72,7 @@ Before deploying, you need the following AWS resources provisioned:
 | **External Secrets Operator** | Syncs Secrets Manager → Kubernetes Secrets |
 
 > [!TIP]
-> You can set up all of these through the AWS Console or CLI. See the detailed walkthrough in [`deployment/aws/README.md`](https://github.com/smithg09/arcgentic/blob/main/deployment/aws/README.md) for step-by-step instructions for both approaches.
+> You can set up all of these through the AWS Console or CLI. See the detailed walkthrough in [`deployment/aws-guide/README.md`](https://github.com/smithg09/arcgentic/blob/main/deployment/aws-guide/README.md) for step-by-step instructions for both approaches.
 
 ## Quick Start
 
