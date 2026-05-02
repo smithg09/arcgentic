@@ -60,7 +60,7 @@ Make sure you have installed on your machine:
 
 1. **Clone the repository**
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/smithg09/arcgentic
    cd arcgentic
    ```
 
