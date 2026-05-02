@@ -19,13 +19,14 @@ FROM alpine:latest AS runner
 
 RUN apk --no-cache add ca-certificates
 
-WORKDIR /root/
-
 RUN addgroup --system --gid 1001 user101
 RUN adduser --system --uid 1001 user102
-USER 1001
 
-COPY --from=builder --chown=user102:user101 /app/build/core .
+WORKDIR /app
+
+COPY --from=builder --chown=1001:1001 /app/build/core .
+
+USER 1001
 
 EXPOSE 8080
 
