@@ -86,7 +86,7 @@ A polyglot, multi-service architecture built for modularity and performance. Eac
 | Layer | Technology |
 |---|---|
 | **Frontend** | TypeScript, React 19, Vite, Tailwind CSS v4, shadcn/ui |
-| **State & Routing** | TanStack Router, TanStack Query, Zustand |
+| **State & Routing** | TanStack Router, TanStack Query |
 | **User Service** | Go 1.21+, Echo, GraphQL (gqlgen), sqlc |
 | **Agent Service** | Python 3.11+, Flask, LangGraph, LangChain |
 | **Web Server** | Nginx |
